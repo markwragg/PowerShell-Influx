@@ -47,23 +47,27 @@
     )
 
     Write-Verbose 'Getting hosts..'
-    $Hosts = Get-VMHost $Hosts
+    $VMHosts = Get-VMHost $Hosts
 
-    Write-Verbose 'Getting host statistics..'
-    $Stats = $Hosts | Get-Stat -MaxSamples 1 -Common | Where {-not $_.Instance}
+    if ($VMHosts) {
+        Write-Verbose 'Getting host statistics..'
+        $Stats = $VMHosts | Get-Stat -MaxSamples 1 -Common | Where {-not $_.Instance}
 
-    foreach ($Host in $Hosts) {
+        foreach ($Host in $VMHosts) {
         
-        $TagData = @{}
-        ($Host | Select $Tags).PSObject.Properties | ForEach-Object { $TagData.Add($_.Name,$_.Value) }
+            $TagData = @{}
+            ($Host | Select $Tags).PSObject.Properties | ForEach-Object { $TagData.Add($_.Name,$_.Value) }
 
-        $Metrics = @{}
-        $Stats | Where-Object { $_.Entity.Name -eq $Host.Name } | ForEach-Object { $Metrics.Add($_.MetricId,$_.Value) }
+            $Metrics = @{}
+            $Stats | Where-Object { $_.Entity.Name -eq $Host.Name } | ForEach-Object { $Metrics.Add($_.MetricId,$_.Value) }
 
-        Write-Verbose "Sending data for $($Host.Name) to Influx.."
+            Write-Verbose "Sending data for $($Host.Name) to Influx.."
 
-        if ($PSCmdlet.ShouldProcess($Host.name)) {
-            Write-Influx -Measure $Measure -Tags $TagData -Metrics $Metrics -Database $Database -Server $Server
+            if ($PSCmdlet.ShouldProcess($Host.name)) {
+                Write-Influx -Measure $Measure -Tags $TagData -Metrics $Metrics -Database $Database -Server $Server
+            }
         }
+    }else{
+        Throw 'No host data returned'
     }
 }
