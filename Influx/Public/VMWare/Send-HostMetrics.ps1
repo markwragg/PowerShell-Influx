@@ -15,6 +15,12 @@
         .PARAMETER Hosts
             One or more hosts to be queried.
 
+        .PARAMETER Server
+            The URL and port for the Influx REST API. Default: 'http://localhost:8086'
+
+        .PARAMETER Database
+            The name of the Influx database to write to. Default: 'vmware'. This must exist in Influx!
+
         .EXAMPLE
             Send-HostMetrics -Measure 'TestESXHosts' -Tags Name,Parent -Hosts TestHost*
             
@@ -31,7 +37,14 @@
         $Tags = ('Name','Parent','State','PowerState','Version'),
 
         [String[]]
-        $Hosts = '*'
+        $Hosts = '*',
+
+        [Alias('DB')]
+        [string]
+        $Database ='vmware',
+        
+        [string]
+        $Server = 'http://localhost:8086'
     )
 
     Write-Verbose 'Getting hosts..'
@@ -53,7 +66,7 @@
         Write-Verbose $Metrics
 
         if ($PSCmdlet.ShouldProcess($Host.name)) {
-            Write-Influx -Measure $Measure -Tags $TagData -Metrics $Metrics
+            Write-Influx -Measure $Measure -Tags $TagData -Metrics $Metrics -Database $Database -Server $Server
         }
     }
 }

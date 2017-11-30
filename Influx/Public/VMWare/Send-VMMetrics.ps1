@@ -15,6 +15,12 @@
         .PARAMETER VMs
             One or more Virtual Machines to be queried.
 
+        .PARAMETER Server
+            The URL and port for the Influx REST API. Default: 'http://localhost:8086'
+
+        .PARAMETER Database
+            The name of the Influx database to write to. Default: 'vmware'. This must exist in Influx!
+
         .EXAMPLE
             Send-VMMetrics -Measure 'TestVirtualMachines' -Tags Name,ResourcePool -Hosts TestVM*
             
@@ -31,7 +37,14 @@
         $Tags = ('Name','Folder','ResourcePool','PowerState','Guest','VMHost'),
 
         [String[]]
-        $VMs = '*'
+        $VMs = '*',
+
+        [Alias('DB')]
+        [string]
+        $Database = 'vmware',
+        
+        [string]
+        $Server = 'http://localhost:8086'
     )
 
     Write-Verbose 'Getting VMs..'
@@ -53,7 +66,7 @@
         Write-Verbose $Metrics
 
         if ($PSCmdlet.ShouldProcess($VM.name)) {
-            Write-Influx -Measure $Measure -Tags $TagData -Metrics $Metrics
+            Write-Influx -Measure $Measure -Tags $TagData -Metrics $Metrics -Database $Database -Server $Server
         }
     }
 }
