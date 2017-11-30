@@ -24,10 +24,13 @@
     #>  
     [cmdletbinding(SupportsShouldProcess=$true, ConfirmImpact='Medium')]
     param(
+        [String]
         $Measure = 'ESXHost',
 
+        [String[]]
         $Tags = ('Name','Parent','State','PowerState','Version'),
 
+        [String[]]
         $Hosts = '*'
     )
 
@@ -40,7 +43,7 @@
     foreach ($Host in $Hosts) {
         
         $TagData = @{}
-        ($Host | Select Name,$Tags).PSObject.Properties | ForEach-Object { $TagData.Add($_.Name,$_.Value) }
+        ($Host | Select $Tags).PSObject.Properties | ForEach-Object { $TagData.Add($_.Name,$_.Value) }
 
         $Metrics = @{}
         $Stats | Where-Object { $_.Entity.Name -eq $Host.Name } | ForEach-Object { $Metrics.Add($_.MetricId,$_.Value) }
