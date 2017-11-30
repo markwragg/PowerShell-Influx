@@ -39,7 +39,6 @@
         [String[]]
         $Hosts = '*',
 
-        [Alias('DB')]
         [string]
         $Database ='vmware',
         

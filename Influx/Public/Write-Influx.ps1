@@ -42,7 +42,6 @@
         $Metrics,
         
         [Parameter(Mandatory=$true)]
-        [Alias('DB')]
         [string]
         $Database,
         

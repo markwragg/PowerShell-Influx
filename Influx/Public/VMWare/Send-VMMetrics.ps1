@@ -39,7 +39,6 @@
         [String[]]
         $VMs = '*',
 
-        [Alias('DB')]
         [string]
         $Database = 'vmware',
         
