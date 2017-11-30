@@ -54,7 +54,7 @@
         foreach ($DS in $Datastores) {
         
             $TagData = @{}
-            ($VM | Select $Tags).PSObject.Properties | ForEach-Object { $TagData.Add($_.Name,$_.Value) }
+            ($DS | Select $Tags).PSObject.Properties | ForEach-Object { $TagData.Add($_.Name,$_.Value) }
 
             $Metrics = @{
                 State = $DS.State
