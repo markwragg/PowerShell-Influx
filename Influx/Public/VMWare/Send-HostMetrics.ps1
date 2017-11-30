@@ -61,8 +61,6 @@
         $Stats | Where-Object { $_.Entity.Name -eq $Host.Name } | ForEach-Object { $Metrics.Add($_.MetricId,$_.Value) }
 
         Write-Verbose "Sending data for $($Host.Name) to Influx.."
-        Write-Verbose $TagData
-        Write-Verbose $Metrics
 
         if ($PSCmdlet.ShouldProcess($Host.name)) {
             Write-Influx -Measure $Measure -Tags $TagData -Metrics $Metrics -Database $Database -Server $Server
