@@ -50,16 +50,36 @@
     $VMServers = Get-VM $VMs
 
     if ($VMServers) {
-        Write-Verbose 'Getting VM statistics..'
-        $Stats = $VMServers | Get-Stat -MaxSamples 1 -Common | Where {-not $_.Instance}
+        
+        if ($Stats) {
+            Write-Verbose 'Getting VM statistics..'
+            $VMStats = $VMServers | Get-Stat -MaxSamples 1 -Common | Where {-not $_.Instance}
+        }
 
         foreach ($VM in $VMServers) {
         
             $TagData = @{}
-            ($VM | Select $Tags).PSObject.Properties | ForEach-Object { $TagData.Add($_.Name,$_.Value) }
+            ($VM | Select $Tags).PSObject.Properties | ForEach-Object {     
+                if ($_.Value) {
+                    $TagData.Add($_.Name,$_.Value) 
+                }
+            }
 
-            $Metrics = @{}
-            $Stats | Where-Object { $_.Entity.Name -eq $VM.Name } | ForEach-Object { $Metrics.Add($_.MetricId,$_.Value) }
+            $Metrics = @{
+                PowerState = '"' + $VM.PowerState + '"'
+            }
+
+            $QuickStats = $VM.ExtensionData.Summary.QuickStats | Select GuestHeartbeatStatus,OverallCpuUsage,GuestMemoryUsage,HostMemoryUsage,UptimeSeconds
+            
+            $QuickStats.PSObject.Properties | ForEach-Object {     
+                if ($_.Value) {
+                    $Metrics.Add($_.Name,$_.Value) 
+                }
+            }
+
+            if ($VMStats) {
+                $Stats | Where-Object { $_.Entity.Name -eq $VM.Name } | ForEach-Object { $Metrics.Add($_.MetricId,$_.Value) }
+            }
 
             Write-Verbose "Sending data for $($VM.Name) to Influx.."
 
