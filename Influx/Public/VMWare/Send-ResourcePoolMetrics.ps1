@@ -65,14 +65,14 @@
             $Metrics = @{ VMs_Count = $VMs.count }
 
             If ($VMs.count -gt 0) {
-                $Metrics.Add('MemoryMB_Total',($VMs | Measure MemoryMB -Sum).Sum)
+                $Metrics.Add('MemoryGB_Total',($VMs | Measure MemoryGB -Sum).Sum)
                 $Metrics.Add('NumCPU_Total',($VMs | Measure NumCPU -Sum).Sum)
             }
             
             $VMS | Group PowerState | ForEach-Object { 
                 $Metrics.Add("VMs_$($_.Name)_VMs_Count",$_.Count)
                 If ($_.count -gt 0) {
-                    $Metrics.Add("VMs_$($_.Name)_MemoryMB_Total",($_.Group | Measure MemoryMB -Sum).Sum) 
+                    $Metrics.Add("VMs_$($_.Name)_MemoryGB_Total",($_.Group | Measure MemoryGB -Sum).Sum) 
                     $Metrics.Add("VMs_$($_.Name)_NumCPU_Total",($_.Group | Measure NumCPU -Sum).Sum) 
                 }
             }
