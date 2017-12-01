@@ -65,7 +65,11 @@
         foreach ($VMHost in $VMHosts) {
         
             $TagData = @{}
-            ($VMHost | Select $Tags).PSObject.Properties | ForEach-Object { $TagData.Add($_.Name,$_.Value) }
+            ($VMHost | Select $Tags).PSObject.Properties | ForEach-Object { 
+                if ($_.Value) {
+                    $TagData.Add($_.Name,$_.Value) 
+                }
+            }
 
             $Metrics = @{
                 CpuTotalMhz = $VMHost.CpuTotalMhz
