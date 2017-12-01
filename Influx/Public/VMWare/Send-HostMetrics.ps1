@@ -56,7 +56,8 @@
     $VMHosts = Get-VMHost $Hosts
 
     if ($VMHosts) {
-        If ($Stats) {
+
+        if ($Stats) {
             Write-Verbose 'Getting host statistics..'
             $HostStats = $VMHosts | Get-Stat -MaxSamples 1 -Common | Where {-not $_.Instance}
         }
@@ -75,7 +76,7 @@
                 MemoryUsagePercent = (($VMHost.MemoryTotalGB / $VMHost.MemoryUsageGB) * 100)
             }
             
-            If ($HostStats) {
+            if ($HostStats) {
                 $HostStats | Where-Object { $_.Entity.Name -eq $VMHost.Name } | ForEach-Object { $Metrics.Add($_.MetricId,$_.Value) }
             }
 
@@ -85,7 +86,6 @@
                 Write-Influx -Measure $Measure -Tags $TagData -Metrics $Metrics -Database $Database -Server $Server
             }
         }
-        
 
     }else{
         Throw 'No host data returned'
