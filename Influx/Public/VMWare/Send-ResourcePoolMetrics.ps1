@@ -1,0 +1,86 @@
+﻿Function Send-ResourcePoolMetrics {
+    <#
+        .SYNOPSIS
+            Sends Resource Pool metrics to Influx.
+
+        .DESCRIPTION
+            By default this cmdlet sends metrics for all Resource Pool returned by Get-ResourcePool.
+
+        .PARAMETER Measure
+            The name of the measure to be updated or created.
+
+        .PARAMETER Tags
+            An array of Resource Pool tags to be included. Default: 'Name','Parent'
+
+        .PARAMETER ResourcePool
+            One or more Resource Pools to be queried.
+
+        .PARAMETER Server
+            The URL and port for the Influx REST API. Default: 'http://localhost:8086'
+
+        .PARAMETER Database
+            The name of the Influx database to write to. Default: 'vmware'. This must exist in Influx!
+
+        .EXAMPLE
+            Send-ResourcePoolMetrics -Measure 'TestResources' -Tags Name,NumCpuShares -ResourcePool Test*
+            
+            Description
+            -----------
+            This command will submit the specified tags and resource pool metrics to a measure called 'TestResources' for all resource pools starting with 'Test'
+    #>  
+    [cmdletbinding(SupportsShouldProcess=$true, ConfirmImpact='Medium')]
+    param(
+        [String]
+        $Measure = 'ResourcePool',
+
+        [String[]]
+        $Tags = ('Name','Parent'),
+
+        [String[]]
+        $ResourcePool = '*',
+
+        [string]
+        $Database = 'vmware',
+        
+        [string]
+        $Server = 'http://localhost:8086'
+    )
+
+    Write-Verbose 'Getting resource pools..'
+    $ResourcePools = Get-ResourcePool $ResourcePool
+
+    if ($ResourcePools) {
+        
+        foreach ($RP in $ResourcePools) {
+        
+            $TagData = @{}
+            ($RP | Select $Tags).PSObject.Properties | ForEach-Object { 
+                if ($_.Value) {
+                    $TagData.Add($_.Name,$_.Value) 
+                }
+            }
+
+            $VMs = Get-ResourcePool 'Sandbox' | Get-VM
+            $Metrics = @{
+                VMs_Count = $VMs.count
+                MemoryMB_Total = ($VMs | Measure MemoryMB -Sum).Sum
+                NumCPU_Total = ($VMs | Measure NumCPU -Sum).Sum
+            }
+            
+            $VMS | Group PowerState | ForEach-Object { 
+                $Metrics.Add("VMs_$($_.Name)_VMs_Count",$_.Count) 
+                $Metrics.Add("VMs_$($_.Name)_MemoryMB_Total",($_.Group | Measure MemoryMB -Sum).Sum) 
+                $Metrics.Add("VMs_$($_.Name)_NumCPU_Total",($_.Group | Measure NumCPU -Sum).Sum) 
+            }
+                        
+            Write-Verbose "Sending data for $($RP.Name) to Influx.."
+
+            if ($PSCmdlet.ShouldProcess($RP.name)) {
+                Write-Influx -Measure $Measure -Tags $TagData -Metrics $Metrics -Database $Database -Server $Server
+            }
+        }
+
+    }else{
+        Throw 'No resource pool data returned'
+    }
+}

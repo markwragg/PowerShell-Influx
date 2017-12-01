@@ -10,7 +10,7 @@
             The name of the measure to be updated or created.
 
         .PARAMETER Tags
-            An array of datastore tags to be included. Default: 'Name','Folder','ResourcePool','PowerState','Guest','VMHost'
+            An array of datastore tags to be included. Default: 'Name','ParentFolder','Type'
 
         .PARAMETER Datastore
             One or more datastores to be queried.
@@ -61,7 +61,6 @@
             }
 
             $Metrics = @{
-                State = '"' + $DS.State + '"'
                 CapacityGB = $DS.CapacityGB
                 FreeSpaceGB = $DS.FreeSpaceGB
                 UsedSpaceGB = ($DS.CapacityGB - $DS.FreeSpaceGB)
