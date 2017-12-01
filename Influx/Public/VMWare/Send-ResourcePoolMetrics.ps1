@@ -60,7 +60,7 @@
                 }
             }
 
-            $VMs = Get-ResourcePool $RP | Get-VM
+            $VMs = $RP | Get-VM
 
             $Metrics = @{ VMs_Count = $VMs.count }
 
