@@ -76,9 +76,7 @@
                     $Metrics.Add("VMs_$($_.Name)_NumCPU_Total",($_.Group | Measure NumCPU -Sum).Sum) 
                 }
             }
-
-            $Metrics.GetEnumerator() | ForEach-Object { If ($_.Value -eq $null) { 
-                        
+            
             Write-Verbose "Sending data for $($RP.Name) to Influx.."
 
             if ($PSCmdlet.ShouldProcess($RP.name)) {
