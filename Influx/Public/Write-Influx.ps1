@@ -65,6 +65,6 @@
     $URI = "$Server/write?&db=$Database"
 
     if ($PSCmdlet.ShouldProcess($URI,$Body)) {
-        Invoke-RestMethod -Uri $URI -Method Post -Body $Body
+        Invoke-RestMethod -Uri $URI -Method Post -Body $Body | Out-Null
     }
 }
