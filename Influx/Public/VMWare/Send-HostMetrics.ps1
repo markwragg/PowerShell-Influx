@@ -15,6 +15,9 @@
         .PARAMETER Hosts
             One or more hosts to be queried.
 
+        .PARAMETER Stats
+            Use this switch if you want to collect common host stats using Get-Stat.
+        
         .PARAMETER Server
             The URL and port for the Influx REST API. Default: 'http://localhost:8086'
 
@@ -39,6 +42,9 @@
         [String[]]
         $Hosts = '*',
 
+        [Switch]
+        $Stats,
+
         [string]
         $Database ='vmware',
         
@@ -50,23 +56,37 @@
     $VMHosts = Get-VMHost $Hosts
 
     if ($VMHosts) {
-        Write-Verbose 'Getting host statistics..'
-        $Stats = $VMHosts | Get-Stat -MaxSamples 1 -Common | Where {-not $_.Instance}
+        If ($Stats) {
+            Write-Verbose 'Getting host statistics..'
+            $HostStats = $VMHosts | Get-Stat -MaxSamples 1 -Common | Where {-not $_.Instance}
+        }
 
-        foreach ($Host in $VMHosts) {
+        foreach ($VMHost in $VMHosts) {
         
             $TagData = @{}
-            ($Host | Select $Tags).PSObject.Properties | ForEach-Object { $TagData.Add($_.Name,$_.Value) }
+            ($VMHost | Select $Tags).PSObject.Properties | ForEach-Object { $TagData.Add($_.Name,$_.Value) }
 
-            $Metrics = @{}
-            $Stats | Where-Object { $_.Entity.Name -eq $Host.Name } | ForEach-Object { $Metrics.Add($_.MetricId,$_.Value) }
+            $Metrics = @{
+                CpuTotalMhz = $VMHost.CpuTotalMhz
+                CpuUsageMhz = $VMHost.CpuUsageMhz
+                CpuUsagePercent = (($VMHost.CpuTotalMhz / $VMHost.CpuUsageMhz) * 100)
+                MemoryTotalGB = $VMHost.MemoryTotalGB
+                MemoryUsageGB = $VMHost.MemoryUsageGB
+                MemoryUsagePercent = (($VMHost.MemoryTotalGB / $VMHost.MemoryUsageGB) * 100)
+            }
+            
+            If ($HostStats) {
+                $HostStats | Where-Object { $_.Entity.Name -eq $VMHost.Name } | ForEach-Object { $Metrics.Add($_.MetricId,$_.Value) }
+            }
 
-            Write-Verbose "Sending data for $($Host.Name) to Influx.."
+            Write-Verbose "Sending data for $($VMHost.Name) to Influx.."
 
-            if ($PSCmdlet.ShouldProcess($Host.name)) {
+            if ($PSCmdlet.ShouldProcess($VMHost.name)) {
                 Write-Influx -Measure $Measure -Tags $TagData -Metrics $Metrics -Database $Database -Server $Server
             }
         }
+        
+
     }else{
         Throw 'No host data returned'
     }
