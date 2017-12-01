@@ -62,17 +62,22 @@
 
             $VMs = Get-ResourcePool $RP | Get-VM
 
-            $Metrics = @{
-                VMs_Count = $VMs.count
-                MemoryMB_Total = ($VMs | Measure MemoryMB -Sum).Sum
-                NumCPU_Total = ($VMs | Measure NumCPU -Sum).Sum
+            $Metrics = @{ VMs_Count = $VMs.count }
+
+            If ($VMs.count -gt 0) {
+                $Metrics.Add('MemoryMB_Total',($VMs | Measure MemoryMB -Sum).Sum)
+                $Metrics.Add('NumCPU_Total',($VMs | Measure NumCPU -Sum).Sum)
             }
             
             $VMS | Group PowerState | ForEach-Object { 
-                $Metrics.Add("VMs_$($_.Name)_VMs_Count",$_.Count) 
-                $Metrics.Add("VMs_$($_.Name)_MemoryMB_Total",($_.Group | Measure MemoryMB -Sum).Sum) 
-                $Metrics.Add("VMs_$($_.Name)_NumCPU_Total",($_.Group | Measure NumCPU -Sum).Sum) 
+                $Metrics.Add("VMs_$($_.Name)_VMs_Count",$_.Count)
+                If ($_.count -gt 0) {
+                    $Metrics.Add("VMs_$($_.Name)_MemoryMB_Total",($_.Group | Measure MemoryMB -Sum).Sum) 
+                    $Metrics.Add("VMs_$($_.Name)_NumCPU_Total",($_.Group | Measure NumCPU -Sum).Sum) 
+                }
             }
+
+            $Metrics.GetEnumerator() | ForEach-Object { If ($_.Value -eq $null) { 
                         
             Write-Verbose "Sending data for $($RP.Name) to Influx.."
 
