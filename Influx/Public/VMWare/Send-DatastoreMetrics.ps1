@@ -61,6 +61,7 @@
             }
 
             $Metrics = @{
+                State = "'$($DS.State)'"
                 CapacityGB = $DS.CapacityGB
                 FreeSpaceGB = $DS.FreeSpaceGB
                 UsedSpaceGB = ($DS.CapacityGB - $DS.FreeSpaceGB)
