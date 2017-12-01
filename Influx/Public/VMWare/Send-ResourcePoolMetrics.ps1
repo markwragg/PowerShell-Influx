@@ -60,7 +60,8 @@
                 }
             }
 
-            $VMs = Get-ResourcePool 'Sandbox' | Get-VM
+            $VMs = Get-ResourcePool $RP | Get-VM
+
             $Metrics = @{
                 VMs_Count = $VMs.count
                 MemoryMB_Total = ($VMs | Measure MemoryMB -Sum).Sum
