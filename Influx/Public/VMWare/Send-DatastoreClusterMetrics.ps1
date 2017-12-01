@@ -64,6 +64,7 @@
                 CapacityGB = $DSCluster.CapacityGB
                 FreeSpaceGB = $DSCluster.FreeSpaceGB
                 UsedSpaceGB = ($DSCluster.CapacityGB - $DSCluster.FreeSpaceGB)
+                UsedSpacePercent = (($DSCluster.CapacityGB - $DSCluster.FreeSpaceGB) / $DSCluster.CapacityGB * 100)
             }
             
             Write-Verbose "Sending data for $($DSCluster.Name) to Influx.."

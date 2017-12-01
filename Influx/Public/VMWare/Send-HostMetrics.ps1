@@ -70,10 +70,10 @@
             $Metrics = @{
                 CpuTotalMhz = $VMHost.CpuTotalMhz
                 CpuUsageMhz = $VMHost.CpuUsageMhz
-                CpuUsagePercent = (($VMHost.CpuTotalMhz / $VMHost.CpuUsageMhz) * 100)
+                CpuUsagePercent = (($VMHost.CpuUsageMhz / $VMHost.CpuTotalMhz) * 100)
                 MemoryTotalGB = $VMHost.MemoryTotalGB
                 MemoryUsageGB = $VMHost.MemoryUsageGB
-                MemoryUsagePercent = (($VMHost.MemoryTotalGB / $VMHost.MemoryUsageGB) * 100)
+                MemoryUsagePercent = (($VMHost.MemoryUsageGB / $VMHost.MemoryTotalGB) * 100)
             }
             
             if ($HostStats) {
