@@ -82,7 +82,7 @@
         
                 $Metrics = @{}
 
-                $VV.PSObject.Properties | Where {$_.Name -notin 'Time','Date','r/w'} | ForEach-Object {
+                $VV.PSObject.Properties | Where {$_.Name -notin 'VVname','Time','Date','r/w'} | ForEach-Object {
                     if ($_.Value) {
                         $Metrics.Add($_.Name,$_.Value)
                     }
