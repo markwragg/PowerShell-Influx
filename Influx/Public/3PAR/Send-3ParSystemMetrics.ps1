@@ -75,7 +75,12 @@
     
     if ($3Par) {
     
-        $TagData = $3Par.GetEnumerator() | Where {$_.Name -in $Tags}
+        $TagData = @{}
+        $TagData = $3Par.GetEnumerator() | Where {$_.Name -in $Tags} | ForEach-Object {
+            if ($_.Value) {
+                $TagData.Add($_.Name,$_.Value)
+            }
+        }
         
         $3ParSpace = Get-3parSpace
                 
