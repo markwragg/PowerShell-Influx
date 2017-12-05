@@ -64,6 +64,9 @@
     $Body = $Body -Join "`n"
     $URI = "$Server/write?&db=$Database"
 
+    Write-Verbose ($TagData | Out-String)
+    Write-Verbose ($Metrics | Out-String)
+
     if ($PSCmdlet.ShouldProcess($URI,$Body)) {
         Invoke-RestMethod -Uri $URI -Method Post -Body $Body | Out-Null
     }
