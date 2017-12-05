@@ -65,7 +65,7 @@
     Try {
         Import-Module HPE3PARPSToolkit -ErrorAction Stop
 
-        Set-3parPoshSshConnectionUsingPasswordFile -SANIPAddress $SANIPAddress -SANUserName $SANUserName -epwdFile $SANPasswordFile -ErrorAction Stop
+        Set-3parPoshSshConnectionUsingPasswordFile -SANIPAddress $SANIPAddress -SANUserName $SANUserName -epwdFile $SANPasswordFile -ErrorAction Stop | Out-Null
     } Catch {
         Write-Error $_
         Break
