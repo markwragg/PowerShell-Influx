@@ -101,7 +101,7 @@
 
                 'StartTime','FinishTime' | ForEach-Object {
                     If ($Build.$_ -is [datetime]) {
-                        $Metrics.Add($_,(New-TimeSpan -Start (Get-Date -Date '01/01/1970') -End (Get-Date $Build.$_) ).Seconds) 
+                        $Metrics.Add($_,(New-TimeSpan -Start (Get-Date -Date '01/01/1970') -End $Build.$_).TotalSeconds) 
                     }
                 }
 
