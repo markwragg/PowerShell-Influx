@@ -96,9 +96,13 @@
 
                 $Metrics = @{
                     Result = '"' + $Build.Result + '"'
-                    StartTime = (New-TimeSpan -Start (Get-Date -Date "01/01/1970") -End $Build.StartTime).Seconds
-                    FinishTime = (New-TimeSpan -Start (Get-Date -Date "01/01/1970") -End $Build.FinishTime).Seconds
                     Duration = $Build.Duration
+                }
+
+                'StartTime','FinishTime' | ForEach-Object {
+                    If ($Build.$_ -is [datetime]) {
+                        $Metrics.Add($_,(New-TimeSpan -Start (Get-Date -Date '01/01/1970') -End (Get-Date $Build.$_) ).Seconds) 
+                    }
                 }
 
                 Write-Verbose "Sending data for $($Definition.Name) to Influx.."
