@@ -88,7 +88,7 @@
                     Result = $Build.Result
                 }
 
-                $Definition.GetEnumerator() | Where {$_.Name -in $Tags} | ForEach-Object {
+                ($Definition | Select $Tags).PsObject.Properties | ForEach-Object {
                     if ($_.Value) {
                         $TagData.Add($_.Name,$_.Value)
                     }
