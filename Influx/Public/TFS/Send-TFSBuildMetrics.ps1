@@ -96,8 +96,8 @@
 
                 $Metrics = @{
                     Result = '"' + $Build.Result + '"'
-                    StartTime = $Build.StartTime
-                    FinishTime = $Build.FinishTime
+                    StartTime = (New-TimeSpan -Start (Get-Date -Date "01/01/1970") -End $Build.StartTime).Seconds
+                    FinishTime = (New-TimeSpan -Start (Get-Date -Date "01/01/1970") -End $Build.FinishTime).Seconds
                     Duration = $Build.Duration
                 }
 
