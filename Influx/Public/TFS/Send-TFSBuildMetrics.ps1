@@ -79,12 +79,19 @@
     
     if ($Definitions) {
         
-        ForEach($Definition in $Definitions) { 
-            $Build = (Get-TFSBuilds -Definitions $Definition.Name -Top 1 -MaxBuildsPerDefinition 1 -ErrorAction SilentlyContinue) | Select -First 1
+        $Builds = @()
 
+        ForEach($Definition in $Definitions) { 
+            
+            $Build = (Get-TFSBuilds -Definitions $Definition.Name -Top 1 -MaxBuildsPerDefinition 1 -ErrorAction SilentlyContinue) | Select -First 1
+            
             if ($Build) {
                 
+                $Builds += $Build
+    
                 $TagData = @{
+                    Collection = $TFSCollection
+                    Project  = $TFSProject
                     Result = $Build.Result
                 }
 
@@ -114,6 +121,23 @@
             }else{
                 Write-Warning "No build returned for $($Definition.Name), skipping.."
             }
+        }
+
+        $TagData = @{
+            Collection = $TFSCollection
+            Project  = $TFSProject
+        }
+
+        $Metrics = @{
+            TotalBuilds = $Builds.Count
+        }
+
+        $Builds | Group-Object Result | ForEach-Object {
+            $Metrics.Add("Total$($_.Name)",$_.Count)
+        }
+        
+        if ($PSCmdlet.ShouldProcess($Definition.Name)) {
+            Write-Influx -Measure $Measure -Tags $TagData -Metrics $Metrics -Database $Database -Server $Server
         }
         
     }else{
