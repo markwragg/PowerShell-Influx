@@ -10,7 +10,7 @@
             The name of the measure to be updated or created.
 
         .PARAMETER Tags
-            An array of Build definition tags to be included, from those returned by Get-TfsBuildDefinitions.
+            An array of Build definition properties to be included, from those returned by Get-TfsBuildDefinitions.
         
         .PARAMETER TFSRootURL
             The root URL for TFS, e.g https://yourserver.yoursite.com/TFS
@@ -55,7 +55,7 @@
         $TFSProject,
         
         [string]
-        $Database = 'TFS',
+        $Database = 'tfs',
         
         [string]
         $Server = 'http://localhost:8086'
@@ -95,7 +95,7 @@
                 }
 
                 $Metrics = @{
-                    Result = $Build.Result
+                    Result = '"' + $Build.Result + '"'
                     StartTime = $Build.StartTime
                     FinishTime = $Build.FinishTime
                     Duration = $Build.Duration
