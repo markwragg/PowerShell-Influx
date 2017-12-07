@@ -85,8 +85,8 @@
         $3ParSpace = Get-3parSpace
                 
         $Metrics = @{ 
-            System_RawFreeMB = $3ParSpace."RawFree(MB)"
-            System_UsableFreeMB = $3ParSpace."UsableFree(MB)"
+            System_RawFreeMB = [float]$3ParSpace."RawFree(MB)"
+            System_UsableFreeMB = [float]$3ParSpace."UsableFree(MB)"
         }
             
         Write-Verbose "Sending data for $($3Par.System_Name) to Influx.."
