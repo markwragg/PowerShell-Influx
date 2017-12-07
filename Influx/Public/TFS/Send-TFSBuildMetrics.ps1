@@ -93,7 +93,6 @@
                     Collection = $TFSCollection
                     Project  = $TFSProject
                     Result = $Build.Result
-                    URL = '"' + $Build.Raw.Url + '"'
                 }
 
                 ($Definition | Select $Tags).PsObject.Properties | ForEach-Object {
