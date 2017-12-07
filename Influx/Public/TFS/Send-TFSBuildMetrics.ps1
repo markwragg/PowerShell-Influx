@@ -93,6 +93,7 @@
                     Collection = $TFSCollection
                     Project  = $TFSProject
                     Result = $Build.Result
+                    RequestedBy = $Build.raw.requestedBy.displayname
                 }
 
                 ($Definition | Select $Tags).PsObject.Properties | ForEach-Object {
@@ -107,7 +108,6 @@
                     Duration = $Build.Duration
                     sourceBranch = '"' + $Build.raw.sourceBranch + '"'
                     sourceVersion = '"' + $Build.raw.sourceVersion + '"'
-                    RequestedBy = '"' + $Build.raw.requestedBy.displayname + '"'
                     Id = $Build.Id
                     
                 }
