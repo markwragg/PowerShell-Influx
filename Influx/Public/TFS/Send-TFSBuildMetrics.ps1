@@ -116,6 +116,7 @@
                     sourceBranch  = $Build.raw.sourceBranch
                     sourceVersion = $Build.raw.sourceVersion
                     Id            = $Build.Id
+                    RequestedBy   = $Build.raw.requestedBy.displayname
                 }
 
                 'StartTime','FinishTime' | ForEach-Object {
