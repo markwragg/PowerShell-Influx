@@ -68,7 +68,7 @@
 
     $Body = foreach($Metric in $Metrics.Keys) {
         
-        $MetricValue = if ($Metrics[$Metric] -is [string]) { 
+        $MetricValue = if ($Metrics[$Metric] -is [string] -or $Metrics[$Metric] -eq $null) { 
             '"' + $Metrics[$Metric] + '"'
         } else {
             $Metrics[$Metric] | Out-InfluxEscapeString
