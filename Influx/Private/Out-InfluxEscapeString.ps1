@@ -15,13 +15,17 @@
             Result
             -----------
             Some\ \,string\=
-    #>  
+    #>
+    [cmdletbinding(SupportsShouldProcess)]
+    [OutputType([string])]
     param(
         [parameter(ValueFromPipeline)]
         [string]
         $String
     )
     process {
-        $String  -Replace '(\s|\=|,)','\$1' 
+        if ($PSCmdlet.ShouldProcess($String)) {
+            $String  -Replace '(\s|\=|,)','\$1'
+        }
     }
 }

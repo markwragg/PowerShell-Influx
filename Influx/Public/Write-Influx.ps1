@@ -54,7 +54,7 @@
     
     if ($TimeStamp) {
         $timeStampNanoSecs = [long]((New-TimeSpan -Start (Get-Date -Date '1970-01-01') -End (($Timestamp).ToUniversalTime())).TotalSeconds * 1E9)
-    } Else {
+    } else {
         $null = $timeStampNanoSecs
     }
 
@@ -67,7 +67,14 @@
     }
 
     $Body = foreach($Metric in $Metrics.Keys) {
-        "$($Measure | Out-InfluxEscapeString)$TagData $($Metric | Out-InfluxEscapeString)=$($Metrics[$Metric] | Out-InfluxEscapeString) $timeStampNanoSecs"
+        
+        $Metrics[$Metric] = if ($Metrics[$Metric] -is [string]) { 
+            '"' + $Metrics[$Metric] + '"'
+        } else {
+            $Metrics[$Metric] | Out-InfluxEscapeString
+        }
+        
+        "$($Measure | Out-InfluxEscapeString)$TagData $($Metric | Out-InfluxEscapeString)=$($Metrics[$Metric]) $timeStampNanoSecs"
     }
 
     $Body = $Body -Join "`n"

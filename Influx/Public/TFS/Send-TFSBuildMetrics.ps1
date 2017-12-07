@@ -90,9 +90,9 @@
                 $Builds += $Build
     
                 $TagData = @{
-                    Collection = $TFSCollection
-                    Project  = $TFSProject
-                    Result = $Build.Result
+                    Collection  = $TFSCollection
+                    Project     = $TFSProject
+                    Result      = $Build.Result
                     RequestedBy = $Build.raw.requestedBy.displayname
                 }
 
@@ -103,26 +103,26 @@
                 }
                 
                 $ResultNumeric = Switch ($Build.Result) {
-                    'canceled' { 0 }
-                    'succeeded' { 1 }
+                    'canceled'           { 0 }
+                    'succeeded'          { 1 }
                     'partiallySucceeded' { 2 }
-                    'failed' { 3 } 
+                    'failed'             { 3 }
+                    default              { $null }
                 }
-
+                
                 $Metrics = @{
-                    Name = '"' + $Build.Definition + '"'
-                    Result = '"' + $Build.Result + '"'
-                    ResultNumeric = $ResultNum
-                    Duration = $Build.Duration
-                    sourceBranch = '"' + $Build.raw.sourceBranch + '"'
-                    sourceVersion = '"' + $Build.raw.sourceVersion + '"'
-                    Id = $Build.Id
-                    
+                    Name          = $Build.Definition
+                    Result        = $Build.Result
+                    ResultNumeric = $ResultNumeric
+                    Duration      = $Build.Duration
+                    sourceBranch  = $Build.raw.sourceBranch
+                    sourceVersion = $Build.raw.sourceVersion
+                    Id            = $Build.Id
                 }
 
                 'StartTime','FinishTime' | ForEach-Object {
                     If ($Build.$_ -is [datetime]) {
-                        $Metrics.Add($_,(New-TimeSpan -Start (Get-Date -Date '01/01/1970') -End $Build.$_).TotalMilliseconds) 
+                        $Metrics.Add($_,($Build.$_ | ConvertTo-UnixTimeMilliseconds)) 
                     }
                 }
 

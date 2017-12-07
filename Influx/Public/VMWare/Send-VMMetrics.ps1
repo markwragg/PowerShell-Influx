@@ -66,7 +66,7 @@
             }
 
             $Metrics = @{
-                PowerState = '"' + $VM.PowerState + '"'
+                PowerState = $VM.PowerState
             }
 
             $QuickStats = $VM.ExtensionData.Summary.QuickStats | Select GuestHeartbeatStatus,OverallCpuUsage,GuestMemoryUsage,HostMemoryUsage,UptimeSeconds
