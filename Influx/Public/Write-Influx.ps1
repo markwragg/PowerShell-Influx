@@ -40,6 +40,9 @@
         [Parameter(Mandatory=$true)]
         [hashtable]
         $Metrics,
+
+        [string]
+        $TimeStamp,
         
         [Parameter(Mandatory=$true)]
         [string]
@@ -49,6 +52,12 @@
         $Server = 'http://localhost:8086'
     )
     
+    if ($TimeStamp) {
+        $timeStampNanoSecs = [long]((New-TimeSpan -Start (Get-Date -Date '1970-01-01') -End (($Timestamp).ToUniversalTime())).TotalSeconds * 1E9)
+    } Else {
+        $null = $timeStampNanoSecs
+    }
+
     if ($Tags) {
         $TagData = foreach($Tag in $Tags.Keys) {
             "$($Tag | Out-InfluxEscapeString)=$($Tags[$Tag] | Out-InfluxEscapeString)"
@@ -58,7 +67,7 @@
     }
 
     $Body = foreach($Metric in $Metrics.Keys) {
-        "$($Measure | Out-InfluxEscapeString)$TagData $($Metric | Out-InfluxEscapeString)=$($Metrics[$Metric] | Out-InfluxEscapeString)"
+        "$($Measure | Out-InfluxEscapeString)$TagData $($Metric | Out-InfluxEscapeString)=$($Metrics[$Metric] | Out-InfluxEscapeString) $timeStampNanoSecs"
     }
 
     $Body = $Body -Join "`n"
