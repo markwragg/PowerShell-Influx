@@ -68,13 +68,13 @@
 
     $Body = foreach($Metric in $Metrics.Keys) {
         
-        $Metrics[$Metric] = if ($Metrics[$Metric] -is [string]) { 
+        $MetricValue = if ($Metrics[$Metric] -is [string]) { 
             '"' + $Metrics[$Metric] + '"'
         } else {
             $Metrics[$Metric] | Out-InfluxEscapeString
         }
         
-        "$($Measure | Out-InfluxEscapeString)$TagData $($Metric | Out-InfluxEscapeString)=$($Metrics[$Metric]) $timeStampNanoSecs"
+        "$($Measure | Out-InfluxEscapeString)$TagData $($Metric | Out-InfluxEscapeString)=$MetricValue $timeStampNanoSecs"
     }
 
     $Body = $Body -Join "`n"
