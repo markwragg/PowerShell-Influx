@@ -93,6 +93,7 @@
                     Collection = $TFSCollection
                     Project  = $TFSProject
                     Result = $Build.Result
+                    URL = $Build.Raw.Url
                 }
 
                 ($Definition | Select $Tags).PsObject.Properties | ForEach-Object {
@@ -102,8 +103,12 @@
                 }
 
                 $Metrics = @{
+                    Name = $Build.Definition
                     Result = '"' + $Build.Result + '"'
                     Duration = $Build.Duration
+                    sourceBranch = '"' + $Build.raw.sourceBranch + '"'
+                    sourceVersion = '"' + $Build.raw.sourceVersion + '"'
+                    
                 }
 
                 'StartTime','FinishTime' | ForEach-Object {
