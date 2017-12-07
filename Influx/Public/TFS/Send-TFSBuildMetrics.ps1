@@ -107,6 +107,7 @@
                     Duration = $Build.Duration
                     sourceBranch = '"' + $Build.raw.sourceBranch + '"'
                     sourceVersion = '"' + $Build.raw.sourceVersion + '"'
+                    RequestedBy = '"' + $Builds.raw.requestedBy.displayname + '"'
                     Id = $Build.Id
                     
                 }
