@@ -101,10 +101,18 @@
                         $TagData.Add($_.Name,$_.Value)
                     }
                 }
+                
+                $ResultNumeric = Switch ($Build.Result) {
+                    'canceled' { 0 }
+                    'succeeded' { 1 }
+                    'partiallySucceeded' { 2 }
+                    'failed' { 3 } 
+                }
 
                 $Metrics = @{
                     Name = '"' + $Build.Definition + '"'
                     Result = '"' + $Build.Result + '"'
+                    ResultNumeric = $ResultNum
                     Duration = $Build.Duration
                     sourceBranch = '"' + $Build.raw.sourceBranch + '"'
                     sourceVersion = '"' + $Build.raw.sourceVersion + '"'
