@@ -115,7 +115,7 @@
                 Write-Verbose "Sending data for $($Definition.Name) to Influx.."
 
                 if ($PSCmdlet.ShouldProcess($Definition.Name)) {
-                    Write-Influx -Measure $Measure -Tags $TagData -Metrics $Metrics -Database $Database -Server $Server
+                    Write-Influx -Measure $Measure -Tags $TagData -Metrics $Metrics -TimeStamp $Build.StartTime -Database $Database -Server $Server
                 }     
 
             }else{
