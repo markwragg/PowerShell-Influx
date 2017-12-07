@@ -41,7 +41,7 @@
         [hashtable]
         $Metrics,
 
-        [string]
+        [datetime]
         $TimeStamp,
         
         [Parameter(Mandatory=$true)]
