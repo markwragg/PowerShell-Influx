@@ -103,11 +103,11 @@
                 }
                 
                 $ResultNumeric = Switch ($Build.Result) {
-                    'canceled'           { $null }
-                    'succeeded'          { $null }
+                    'canceled'           { -1 }
+                    'succeeded'          { -2 }
                     'partiallySucceeded' { 2 }
                     'failed'             { 1 }
-                    default              { $null }
+                    default              { 0 }
                 }
                 
                 $Metrics = @{
