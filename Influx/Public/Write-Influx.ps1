@@ -66,23 +66,28 @@
         $TagData = ",$TagData"
     }
 
+    
     $Body = foreach($Metric in $Metrics.Keys) {
         
-        $MetricValue = if ($Metrics[$Metric] -is [string] -or $Metrics[$Metric] -eq $null) { 
-            '"' + $Metrics[$Metric] + '"'
-        } else {
-            $Metrics[$Metric] | Out-InfluxEscapeString
-        }
+        if ($Metrics[$Metric]) {
+            $MetricValue = if ($Metrics[$Metric] -is [string]) { 
+                '"' + $Metrics[$Metric] + '"'
+            } else {
+                $Metrics[$Metric] | Out-InfluxEscapeString
+            }
         
-        "$($Measure | Out-InfluxEscapeString)$TagData $($Metric | Out-InfluxEscapeString)=$MetricValue $timeStampNanoSecs"
+            "$($Measure | Out-InfluxEscapeString)$TagData $($Metric | Out-InfluxEscapeString)=$MetricValue $timeStampNanoSecs"
+        }
     }
 
-    $Body = $Body -Join "`n"
-    $URI = "$Server/write?&db=$Database"
+    if ($Body) {
+        $Body = $Body -Join "`n"
+        $URI = "$Server/write?&db=$Database"
 
-    Write-Verbose $Body
+        Write-Verbose $Body
 
-    if ($PSCmdlet.ShouldProcess($URI,$Body)) {
-        Invoke-RestMethod -Uri $URI -Method Post -Body $Body | Out-Null
+        if ($PSCmdlet.ShouldProcess($URI,$Body)) {
+            Invoke-RestMethod -Uri $URI -Method Post -Body $Body | Out-Null
+        }
     }
 }
