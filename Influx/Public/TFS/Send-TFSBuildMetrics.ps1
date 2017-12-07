@@ -102,7 +102,7 @@
                 }
 
                 $Metrics = @{
-                    Name = $Build.Definition
+                    Name = '"' + $Build.Definition + '"'
                     Result = '"' + $Build.Result + '"'
                     Duration = $Build.Duration
                     sourceBranch = '"' + $Build.raw.sourceBranch + '"'
