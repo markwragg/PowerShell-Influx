@@ -84,7 +84,7 @@
     }
     
     Write-Verbose 'Getting builds..'
-    $Builds = Get-TFSBuilds -Top $Top
+    $Builds = Get-TFSBuilds -Top $Top | Where-Object { $_.$Build.StartTime }
 
     if ($Builds) {
     
