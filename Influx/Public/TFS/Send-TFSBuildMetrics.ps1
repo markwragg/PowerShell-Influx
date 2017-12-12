@@ -12,6 +12,9 @@
         .PARAMETER Tags
             An array of Build definition properties to be included, from those returned by Get-TfsBuildDefinitions.
         
+        .PARAMETER Top
+            An integer defining the number of most recent builds to return. Default: 100.
+        
         .PARAMETER TFSRootURL
             The root URL for TFS, e.g https://yourserver.yoursite.com/TFS
         
@@ -41,6 +44,9 @@
 
         [String[]]
         $Tags = ('Definition','Id','Result'),
+
+        [int]
+        $Top = 100,
 
         [Parameter(Mandatory=$true)]
         [string]
@@ -78,7 +84,7 @@
     }
     
     Write-Verbose 'Getting builds..'
-    $Builds = Get-TFSBuilds -Top 5000
+    $Builds = Get-TFSBuilds -Top $Top
 
     if ($Builds) {
     
