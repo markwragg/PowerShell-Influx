@@ -40,7 +40,7 @@
         $Measure = 'TFSBuild',
 
         [String[]]
-        $Tags = ('Name','Id','Author'),
+        $Tags = ('Definition','Id','Result'),
 
         [Parameter(Mandatory=$true)]
         [string]
@@ -63,10 +63,12 @@
     )
 
     Try {
-        $Global:TFS = @{
-            root_url = $TFSRootURL
-            collection = $TFSCollection
-            project  = $TFSProject
+        if (-not $Global:TFS) { 
+            $Global:TFS = @{
+                root_url = 'https://sts.ges.veritas.com:8088/tfs'
+                collection = 'LiveOffice'
+                project  = 'EVCloud'
+            }
         }
     
         Import-Module TFS -ErrorAction Stop
@@ -75,85 +77,58 @@
         Break
     }
     
-    $Definitions = (Get-TFSBuildDefinitions)
+    Write-Verbose 'Getting builds..'
+    $Builds = Get-TFSBuilds -Top 5000
+
+    if ($Builds) {
     
-    if ($Definitions) {
-        
-        $Builds = @()
-
-        ForEach($Definition in $Definitions) { 
-            
-            $Build = (Get-TFSBuilds -Definitions $Definition.Name -Top 1 -MaxBuildsPerDefinition 1 -ErrorAction SilentlyContinue) | Select -First 1
-            
-            if ($Build) {
-                
-                $Builds += $Build
-    
-                $TagData = @{
-                    Collection  = $TFSCollection
-                    Project     = $TFSProject
-                    Result      = $Build.Result
-                    RequestedBy = $Build.raw.requestedBy.displayname
-                }
-
-                ($Definition | Select $Tags).PsObject.Properties | ForEach-Object {
-                    if ($_.Value) {
-                        $TagData.Add($_.Name,$_.Value)
-                    }
-                }
-                
-                $ResultNumeric = Switch ($Build.Result) {
-                    'partiallySucceeded' { 1 }
-                    'failed'             { 2 }
-                    default              { $null }
-                }
-                
-                $Metrics = @{
-                    Name          = $Build.Definition
-                    Result        = $Build.Result
-                    ResultNumeric = $ResultNumeric
-                    Duration      = $Build.Duration
-                    sourceBranch  = $Build.raw.sourceBranch
-                    sourceVersion = $Build.raw.sourceVersion
-                    Id            = $Build.Id
-                    RequestedBy   = $Build.raw.requestedBy.displayname
-                }
-
-                'StartTime','FinishTime' | ForEach-Object {
-                    If ($Build.$_ -is [datetime]) {
-                        $Metrics.Add($_,($Build.$_ | ConvertTo-UnixTimeMilliseconds)) 
-                    }
-                }
-
-                Write-Verbose "Sending data for $($Definition.Name) to Influx.."
-
-                if ($PSCmdlet.ShouldProcess($Definition.Name)) {
-                    Write-Influx -Measure $Measure -Tags $TagData -Metrics $Metrics -TimeStamp $Build.StartTime -Database $Database -Server $Server
-                }     
-
-            }else{
-                Write-Warning "No build returned for $($Definition.Name), skipping.."
+        ForEach($Build in $Builds) { 
+         
+            $TagData = @{
+                Collection  = $TFSCollection
+                Project     = $TFSProject
+                Result      = $Build.Result
+                RequestedBy = $Build.raw.requestedBy.displayname
             }
-        }
 
-        $TagData = @{
-            Collection = $TFSCollection
-            Project  = $TFSProject
-        }
+            ($Build | Select $Tags).PsObject.Properties | ForEach-Object {
+                if ($_.Value) {
+                    $TagData.Add($_.Name,$_.Value)
+                }
+            }
+                
+            #Used to support row highlighting for non-successful builds
+            $ResultNumeric = Switch ($Build.Result) {
+                'partiallySucceeded' { 1 }
+                'failed'             { 2 }
+                default              { $null }
+            }
+                
+            $Metrics = @{
+                Name          = $Build.Definition
+                Result        = $Build.Result
+                ResultNumeric = $ResultNumeric
+                Duration      = $Build.Duration
+                sourceBranch  = $Build.raw.sourceBranch
+                sourceVersion = $Build.raw.sourceVersion
+                Id            = $Build.Id
+                RequestedBy   = $Build.raw.requestedBy.displayname
+            }
 
-        $Metrics = @{
-            TotalBuilds = $Builds.Count
-        }
+            'StartTime','FinishTime' | ForEach-Object {
+                If ($Build.$_ -is [datetime]) {
+                    $Metrics.Add($_,($Build.$_ | ConvertTo-UnixTimeMilliseconds)) 
+                }
+            }
 
-        $Builds | Group-Object Result | ForEach-Object {
-            $Metrics.Add("Total$($_.Name)",$_.Count)
-        }
-        
-        if ($PSCmdlet.ShouldProcess($Definition.Name)) {
-            Write-Influx -Measure $Measure -Tags $TagData -Metrics $Metrics -Database $Database -Server $Server
+            Write-Verbose "Sending data for $($Definition.Name) to Influx.."
+
+            if ($PSCmdlet.ShouldProcess($Definition.Name)) {
+                Write-Influx -Measure $Measure -Tags $TagData -Metrics $Metrics -TimeStamp $Build.StartTime -Database $Database -Server $Server
+            }     
         }
         
     }else{
-        Throw 'No build definition data returned'
+        Throw 'No build data returned'
     }
 }
