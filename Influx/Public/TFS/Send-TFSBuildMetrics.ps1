@@ -15,6 +15,9 @@
         .PARAMETER Top
             An integer defining the number of most recent builds to return. Default: 100.
         
+        .PARAMETER Latest
+            Switch parameter. When used returns only the most recent build for each distinct definition.
+
         .PARAMETER TFSRootURL
             The root URL for TFS, e.g https://yourserver.yoursite.com/TFS
         
@@ -48,6 +51,9 @@
         [int]
         $Top = 100,
 
+        [switch]
+        $Latest,
+
         [Parameter(Mandatory=$true)]
         [string]
         $TFSRootURL,
@@ -77,6 +83,10 @@
     
     Write-Verbose 'Getting builds..'
     $Builds = Get-TFSBuilds -Top $Top | Where-Object { $_.StartTime }
+
+    If ($Latest) {
+        $Builds = $Builds | Group Definition | ForEach-Object { $_.Group | Sort StartTime -Descending | Select -First 1 }
+    }
 
     if ($Builds) {
     
