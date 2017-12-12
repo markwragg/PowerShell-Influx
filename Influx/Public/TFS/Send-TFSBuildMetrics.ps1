@@ -87,7 +87,6 @@
             $TagData = @{
                 Collection  = $TFSCollection
                 Project     = $TFSProject
-                Result      = $Build.Result
                 RequestedBy = $Build.raw.requestedBy.displayname
             }
 
