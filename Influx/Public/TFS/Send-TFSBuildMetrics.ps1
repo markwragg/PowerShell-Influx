@@ -68,15 +68,7 @@
 
     )
 
-    Try {
-        if (-not $Global:TFS) { 
-            $Global:TFS = @{
-                root_url = 'https://sts.ges.veritas.com:8088/tfs'
-                collection = 'LiveOffice'
-                project  = 'EVCloud'
-            }
-        }
-    
+    Try {    
         Import-Module TFS -ErrorAction Stop
     } Catch {
         Write-Error $_
