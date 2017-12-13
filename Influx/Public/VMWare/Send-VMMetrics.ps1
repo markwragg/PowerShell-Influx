@@ -69,13 +69,15 @@
                 PowerState = $VM.PowerState
             }
 
-            $QuickStats = $VM.ExtensionData.Summary.QuickStats | Select-Object GuestHeartbeatStatus,OverallCpuUsage,GuestMemoryUsage,HostMemoryUsage,UptimeSeconds
+            $QuickStats = $VM.ExtensionData.Summary.QuickStats | Select-Object OverallCpuUsage,GuestMemoryUsage,HostMemoryUsage,UptimeSeconds
             
             $QuickStats.PSObject.Properties | ForEach-Object {     
                 if ($_.Value) {
                     $Metrics.Add($_.Name,$_.Value) 
                 }
             }
+
+            $Metrics.Add('GuestHeartbeatStatus',[int]$VM.ExtensionData.Summary.QuickStats.GuestHeartbeatStatus)
 
             if ($VMStats) {
                 $Stats | Where-Object { $_.Entity.Name -eq $VM.Name } | ForEach-Object { $Metrics.Add($_.MetricId,$_.Value) }
