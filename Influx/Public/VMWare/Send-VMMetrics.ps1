@@ -66,7 +66,8 @@
             }
 
             $Metrics = @{
-                PowerState = $VM.PowerState
+                PowerState = [int]$VM.PowerState
+                GuestHeartbeatStatus = [int]$VM.ExtensionData.Summary.QuickStats.GuestHeartbeatStatus
             }
 
             $QuickStats = $VM.ExtensionData.Summary.QuickStats | Select-Object OverallCpuUsage,GuestMemoryUsage,HostMemoryUsage,UptimeSeconds
@@ -76,8 +77,6 @@
                     $Metrics.Add($_.Name,$_.Value) 
                 }
             }
-
-            $Metrics.Add('GuestHeartbeatStatus',[int]$VM.ExtensionData.Summary.QuickStats.GuestHeartbeatStatus)
 
             if ($VMStats) {
                 $Stats | Where-Object { $_.Entity.Name -eq $VM.Name } | ForEach-Object { $Metrics.Add($_.MetricId,$_.Value) }
