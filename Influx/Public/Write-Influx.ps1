@@ -70,7 +70,7 @@
     $Body = foreach($Metric in $Metrics.Keys) {
         
         if ($Metrics[$Metric]) {
-            $MetricValue = if ($Metrics[$Metric] -is [string]) { 
+            $MetricValue = if ($Metrics[$Metric] -isnot [ValueType]) { 
                 '"' + $Metrics[$Metric] + '"'
             } else {
                 $Metrics[$Metric] | Out-InfluxEscapeString

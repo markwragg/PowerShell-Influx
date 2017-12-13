@@ -69,7 +69,7 @@
                 PowerState = $VM.PowerState
             }
 
-            $QuickStats = $VM.ExtensionData.Summary.QuickStats | Select GuestHeartbeatStatus,OverallCpuUsage,GuestMemoryUsage,HostMemoryUsage,UptimeSeconds
+            $QuickStats = $VM.ExtensionData.Summary.QuickStats | Select-Object GuestHeartbeatStatus,OverallCpuUsage,GuestMemoryUsage,HostMemoryUsage,UptimeSeconds
             
             $QuickStats.PSObject.Properties | ForEach-Object {     
                 if ($_.Value) {
