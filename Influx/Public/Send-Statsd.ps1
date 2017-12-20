@@ -24,7 +24,7 @@
         .EXAMPLE
             'my_metric:1|c' | Send-Statsd
     #>
-    [cmdletbinding()]
+    [cmdletbinding(SupportsShouldProcess,ConfirmImpact='Medium')]
     param(
       [parameter(Mandatory, ValueFromPipeline)]
       [string[]]
@@ -43,7 +43,10 @@
     Process {
         ForEach ($Item in $Data) {
             $EncodedData = [System.Text.Encoding]::ASCII.GetBytes($Item)
-            $BytesSent = $UDPClient.Send($EncodedData, $EncodedData.length, $Endpoint)
+            
+            if ($PSCmdlet.ShouldProcess($Item)) {
+                $BytesSent = $UDPClient.Send($EncodedData, $EncodedData.length, $Endpoint)
+            }
         }
     } 
     End {
