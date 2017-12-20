@@ -22,7 +22,7 @@
             The name of the Influx database to write to.
 
         .EXAMPLE
-            Write-Influx -Measure WebServer -Tags @{Server=Host01} -Metrics @{CPU=100; Memory=50} -Database Web -Server http://myinflux.local:8086
+            Write-Influx -Measure WebServer -Tags @{Server='Host01'} -Metrics @{CPU=100; Memory=50} -Database Web -Server http://myinflux.local:8086
             
             Description
             -----------
