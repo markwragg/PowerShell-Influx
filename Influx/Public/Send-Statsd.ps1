@@ -53,6 +53,3 @@
         $UDPClient.Close()
     }
 }
-
-
-Send-Statsd "my_metric:1|c"
