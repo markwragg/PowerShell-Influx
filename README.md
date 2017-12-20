@@ -5,7 +5,7 @@ This is a PowerShell module for interacting with the time-series database platfo
 For example:
 
 ```
-Write-Influx -Measure WebServer -Tags @{Server=Host01; OS=Windows} -Metrics @{CPU=100; Memory=50} -Database Web -Server http://myinflux.local:8086
+Write-Influx -Measure WebServer -Tags @{Server='Host01'; OS='Windows'} -Metrics @{CPU=100; Memory=50} -Database Web -Server http://myinflux.local:8086
 ```
 
 This project was created so that PowerShell could be used to routinely query for various infrastructure metrics and then send those metrics in to Influx for storage, where they could then be presented via a Grafana dashboard.
