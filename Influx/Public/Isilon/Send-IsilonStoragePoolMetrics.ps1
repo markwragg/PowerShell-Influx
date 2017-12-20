@@ -97,4 +97,6 @@
     }else{
         Throw 'No Storage Pool data returned'
     }
+
+    Remove-isiSession -Cluster $ClusterName
 }
