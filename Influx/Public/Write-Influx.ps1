@@ -65,7 +65,6 @@
         $TagData = $TagData -Join ','
         $TagData = ",$TagData"
     }
-
     
     $Body = foreach($Metric in $Metrics.Keys) {
         
@@ -83,8 +82,6 @@
     if ($Body) {
         $Body = $Body -Join "`n"
         $URI = "$Server/write?&db=$Database"
-
-        Write-Verbose $Body
 
         if ($PSCmdlet.ShouldProcess($URI,$Body)) {
             Invoke-RestMethod -Uri $URI -Method Post -Body $Body | Out-Null

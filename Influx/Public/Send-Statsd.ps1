@@ -26,16 +26,17 @@
     #>
     [cmdletbinding(SupportsShouldProcess,ConfirmImpact='Medium')]
     param(
-      [parameter(Mandatory, ValueFromPipeline)]
-      [string[]]
-      $Data,
+        [parameter(Mandatory, ValueFromPipeline)]
+        [string[]]
+        $Data,
 
-      [ipaddress]
-      $IP = '127.0.0.1',
+        [ipaddress]
+        $IP = '127.0.0.1',
   
-      [int]
-      $Port = 8125
+        [int]
+        $Port = 8125
     )
+
     Begin {
         $Endpoint  = New-Object System.Net.IPEndPoint($IP, $Port)
         $UDPClient = New-Object System.Net.Sockets.UdpClient
