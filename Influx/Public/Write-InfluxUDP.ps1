@@ -1,4 +1,4 @@
-﻿Function Send-InfluxUDP {
+﻿Function Write-InfluxUDP {
     <#
         .SYNOPSIS
             Send metrics to the Influx UDP listener (UDP must be enabled in influxdb.conf).
@@ -22,7 +22,7 @@
             Port for InfluxDB UDP listener.
 
         .EXAMPLE
-            Send-InfluxUDP -Measure WebServer -Tags @{Server='Host01'} -Metrics @{CPU=100; Memory=50} -IP 1.2.3.4 -Port 8089
+            Write-InfluxUDP -Measure WebServer -Tags @{Server='Host01'} -Metrics @{CPU=100; Memory=50} -IP 1.2.3.4 -Port 8089
             
             Description
             -----------
