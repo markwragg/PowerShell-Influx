@@ -44,7 +44,7 @@
         ForEach ($Item in $Data) {
             $EncodedData = [System.Text.Encoding]::ASCII.GetBytes($Item)
             
-            if ($PSCmdlet.ShouldProcess($Item)) {
+            if ($PSCmdlet.ShouldProcess("$($IP):$Port","$($MyInvocation.MyCommand) -Data $Item")) {
                 $BytesSent = $UDPClient.Send($EncodedData, $EncodedData.length, $Endpoint)
             }
         }
