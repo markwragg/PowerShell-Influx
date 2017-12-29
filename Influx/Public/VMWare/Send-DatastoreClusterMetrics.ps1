@@ -54,7 +54,7 @@
         foreach ($DSCluster in $DatastoreClusters) {
         
             $TagData = @{}
-            ($DSCluster | Select $Tags).PSObject.Properties | ForEach-Object { 
+            ($DSCluster | Select-Object $Tags).PSObject.Properties | ForEach-Object { 
                 if ($_.Value) {
                     $TagData.Add($_.Name,$_.Value) 
                 }

@@ -54,7 +54,7 @@
         foreach ($DC in $Datacenters) {
         
             $TagData = @{}
-            ($DC | Select $Tags).PSObject.Properties | ForEach-Object { 
+            ($DC | Select-Object $Tags).PSObject.Properties | ForEach-Object { 
                 if ($_.Value) {
                     $TagData.Add($_.Name,$_.Value) 
                 }
@@ -65,15 +65,15 @@
             $Metrics = @{ VMs_Count = $VMs.count }
 
             If ($VMs.count -gt 0) {
-                $Metrics.Add('VMs_MemoryGB_Total',($VMs | Measure MemoryGB -Sum).Sum)
-                $Metrics.Add('VMs_NumCPU_Total',($VMs | Measure NumCPU -Sum).Sum)
+                $Metrics.Add('VMs_MemoryGB_Total',($VMs | Measure-Object MemoryGB -Sum).Sum)
+                $Metrics.Add('VMs_NumCPU_Total',($VMs | Measure-Object NumCPU -Sum).Sum)
             }
             
-            $VMS | Group PowerState | ForEach-Object { 
+            $VMS | Group-Object PowerState | ForEach-Object { 
                 $Metrics.Add("$($_.Name)_VMs_Count",$_.Count)
                 If ($_.count -gt 0) {
-                    $Metrics.Add("$($_.Name)_VMs_MemoryGB_Total",($_.Group | Measure MemoryGB -Sum).Sum) 
-                    $Metrics.Add("$($_.Name)_VMs_NumCPU_Total",($_.Group | Measure NumCPU -Sum).Sum) 
+                    $Metrics.Add("$($_.Name)_VMs_MemoryGB_Total",($_.Group | Measure-Object MemoryGB -Sum).Sum) 
+                    $Metrics.Add("$($_.Name)_VMs_NumCPU_Total",($_.Group | Measure-Object NumCPU -Sum).Sum) 
                 }
             }
             

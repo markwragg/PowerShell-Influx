@@ -69,7 +69,7 @@
     
     if ($3Par) {
     
-        $VVStats = (Get-3parStatVV -Iteration 1) | Where {$_.VVname -notin 'admin','.srdata'}
+        $VVStats = (Get-3parStatVV -Iteration 1) | Where-Object {$_.VVname -notin 'admin','.srdata'}
         
         if ($VVStats) {
 
@@ -82,7 +82,7 @@
         
                 $Metrics = @{}
 
-                $VV.PSObject.Properties | Where {$_.Name -notin 'VVname','Time','Date','r/w'} | ForEach-Object {
+                $VV.PSObject.Properties | Where-Object {$_.Name -notin 'VVname','Time','Date','r/w'} | ForEach-Object {
                     if ($_.Value) {
                         $Metrics.Add($_.Name,[float]$_.Value)
                     }

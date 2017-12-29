@@ -81,7 +81,7 @@
         
             $Metrics = @{}
 
-            $StoragePool.usage.PSObject.Properties | Where {$_.Name -notin 'balanced'} | ForEach-Object {
+            $StoragePool.usage.PSObject.Properties | Where-Object {$_.Name -notin 'balanced'} | ForEach-Object {
                 if ($_.Value) {
                     $Metrics.Add($_.Name,[long]$_.Value)
                 }

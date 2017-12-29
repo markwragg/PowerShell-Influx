@@ -85,7 +85,7 @@
     $Builds = Get-TFSBuilds -Top $Top | Where-Object { $_.StartTime }
 
     If ($Latest) {
-        $Builds = $Builds | Group Definition | ForEach-Object { $_.Group | Sort StartTime -Descending | Select -First 1 }
+        $Builds = $Builds | Group-Object Definition | ForEach-Object { $_.Group | Sort-Object StartTime -Descending | Select-Object -First 1 }
     }
 
     if ($Builds) {
@@ -98,7 +98,7 @@
                 RequestedBy = $Build.raw.requestedBy.displayname
             }
 
-            ($Build | Select $Tags).PsObject.Properties | ForEach-Object {
+            ($Build | Select-Object $Tags).PsObject.Properties | ForEach-Object {
                 if ($_.Value) {
                     $TagData.Add($_.Name,$_.Value)
                 }
@@ -124,7 +124,7 @@
 
             'StartTime','FinishTime' | ForEach-Object {
                 If ($Build.$_ -is [datetime]) {
-                    $Metrics.Add($_,($Build.$_ | ConvertTo-UnixTimeMilliseconds)) 
+                    $Metrics.Add($_,($Build.$_ | ConvertTo-UnixTimeMillisecond)) 
                 }
             }
 

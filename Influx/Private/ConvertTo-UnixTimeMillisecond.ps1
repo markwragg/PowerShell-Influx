@@ -1,4 +1,4 @@
-﻿Function ConvertTo-UnixTimeMilliseconds {
+﻿Function ConvertTo-UnixTimeMillisecond {
     <#
         .SYNOPSIS
             Converts a datetime string to a Unix time code in milliseconds.
@@ -10,7 +10,7 @@
             The date/time to be converted.
 
         .EXAMPLE
-            '20-10-2017 12:34:22.12' | ConvertTo-UnixTimeMilliseconds
+            '20-10-2017 12:34:22.12' | ConvertTo-UnixTimeMillisecond
             
             Result
             -----------

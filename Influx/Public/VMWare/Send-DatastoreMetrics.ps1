@@ -54,7 +54,7 @@
         foreach ($DS in $Datastores) {
         
             $TagData = @{}
-            ($DS | Select $Tags).PSObject.Properties | ForEach-Object { 
+            ($DS | Select-Object $Tags).PSObject.Properties | ForEach-Object { 
                 if ($_.Value) {
                     $TagData.Add($_.Name,$_.Value) 
                 }

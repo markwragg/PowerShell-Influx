@@ -47,6 +47,7 @@
             
             if ($PSCmdlet.ShouldProcess("$($IP):$Port","$($MyInvocation.MyCommand) -Data $Item")) {
                 $BytesSent = $UDPClient.Send($EncodedData, $EncodedData.length, $Endpoint)
+                Write-Verbose "Transmitted $BytesSent Bytes."
             }
         }
     } 

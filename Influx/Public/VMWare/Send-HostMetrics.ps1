@@ -59,13 +59,13 @@
 
         if ($Stats) {
             Write-Verbose 'Getting host statistics..'
-            $HostStats = $VMHosts | Get-Stat -MaxSamples 1 -Common | Where {-not $_.Instance}
+            $HostStats = $VMHosts | Get-Stat -MaxSamples 1 -Common | Where-Object {-not $_.Instance}
         }
 
         foreach ($VMHost in $VMHosts) {
         
             $TagData = @{}
-            ($VMHost | Select $Tags).PSObject.Properties | ForEach-Object { 
+            ($VMHost | Select-Object $Tags).PSObject.Properties | ForEach-Object { 
                 if ($_.Value) {
                     $TagData.Add($_.Name,$_.Value) 
                 }
