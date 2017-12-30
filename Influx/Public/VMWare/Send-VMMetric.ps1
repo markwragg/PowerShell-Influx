@@ -1,4 +1,4 @@
-﻿Function Send-VMMetrics {
+﻿Function Send-VMMetric {
     <#
         .SYNOPSIS
             Sends Virtual Machine metrics to Influx.
@@ -22,7 +22,7 @@
             The name of the Influx database to write to. Default: 'vmware'. This must exist in Influx!
 
         .EXAMPLE
-            Send-VMMetrics -Measure 'TestVirtualMachines' -Tags Name,ResourcePool -Hosts TestVM*
+            Send-VMMetric -Measure 'TestVirtualMachines' -Tags Name,ResourcePool -Hosts TestVM*
             
             Description
             -----------

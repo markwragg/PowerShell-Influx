@@ -1,4 +1,4 @@
-﻿Function Send-IsilonStoragePoolMetrics {
+﻿Function Send-IsilonStoragePoolMetric {
     <#
         .SYNOPSIS
             Sends Isilon Storage Pool usage metrics returned by the Get-isiStoragepools cmdlet from the IsilonPlatform module to Influx.
@@ -25,7 +25,7 @@
             The name of the Influx database to write to. Default: 'storage'. This must exist in Influx!
 
         .EXAMPLE
-            Send-IsilonStoragePoolMetrics -Measure 'TestIsilonSP' -IsilonName 1.2.3.4 -IsilonPasswordFile C:\scripts\Isilon.pwd -ClusterName TestLab
+            Send-IsilonStoragePoolMetric -Measure 'TestIsilonSP' -IsilonName 1.2.3.4 -IsilonPasswordFile C:\scripts\Isilon.pwd -ClusterName TestLab
             
             Description
             -----------

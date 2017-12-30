@@ -1,4 +1,4 @@
-﻿Function Send-TFSBuildMetrics {
+﻿Function Send-TFSBuildMetric {
     <#
         .SYNOPSIS
             Sends TFS Build metrics to Influx.
@@ -34,7 +34,7 @@
             The name of the Influx database to write to. Default: 'TFS'. This must exist in Influx!
 
         .EXAMPLE
-            Send-TFSBuildMetrics -Measure 'TestTFS' -Tags Name,Author -TFSRootURL https://localhost:8088/tfs -TFSCollection MyCollection -TFSProject MyProject
+            Send-TFSBuildMetric -Measure 'TestTFS' -Tags Name,Author -TFSRootURL https://localhost:8088/tfs -TFSCollection MyCollection -TFSProject MyProject
             
             Description
             -----------

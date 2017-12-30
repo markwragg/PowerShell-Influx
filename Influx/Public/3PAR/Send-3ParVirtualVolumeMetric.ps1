@@ -1,16 +1,13 @@
-﻿Function Send-3ParSystemMetrics {
+﻿Function Send-3ParVirtualVolumeMetric {
     <#
         .SYNOPSIS
-            Sends 3Par System metrics to Influx.
+            Sends the 3Par Virtual Volume metrics returned by Get-3parStatVV to Influx.
 
         .DESCRIPTION
             This function requires the HPE3PARPSToolkit module from HP.
 
         .PARAMETER Measure
             The name of the measure to be updated or created.
-
-        .PARAMETER Tags
-            An array of 3PAR system tags to be included, from those returned by Get-3ParSystem.
 
         .PARAMETER SANIPAddress
             The IP address of the 3PAR SAN to be queried.
@@ -28,19 +25,16 @@
             The name of the Influx database to write to. Default: 'storage'. This must exist in Influx!
 
         .EXAMPLE
-            Send-3ParSystemMetrics -Measure 'Test3PAR' -Tags System_Name,System_Model,System_ID -SANIPAddress 1.2.3.4 -SANUsername admin -SANPasswordFile C:\scripts\3par.pwd
+            Send-3ParVirtualVolumeMetric -Measure 'Test3PARVV' -SANIPAddress 1.2.3.4 -SANUsername admin -SANPasswordFile C:\scripts\3par.pwd
             
             Description
             -----------
-            This command will submit the specified tags and 3PAR metrics to a measure called 'Test3PAR'.
+            This command will submit the 3PAR Virtual Volume metrics to a measure called 'Test3PARVV'.
     #>  
     [cmdletbinding(SupportsShouldProcess=$true, ConfirmImpact='Medium')]
     param(
         [String]
-        $Measure = '3PARSystem',
-
-        [String[]]
-        $Tags = ('System_Name','System_Model'),
+        $Measure = '3PARVirtualVolume',
 
         [Parameter(Mandatory=$true)]
         [String]
@@ -75,26 +69,36 @@
     
     if ($3Par) {
     
-        $TagData = @{}
-        $3Par.GetEnumerator() | Where-Object {$_.Name -in $Tags} | ForEach-Object {
-            if ($_.Value) {
-                $TagData.Add($_.Name,$_.Value)
-            }
-        }
+        $VVStats = (Get-3parStatVV -Iteration 1) | Where-Object {$_.VVname -notin 'admin','.srdata'}
         
-        $3ParSpace = Get-3parSpace
-                
-        $Metrics = @{ 
-            System_RawFreeMB = [float]$3ParSpace."RawFree(MB)"
-            System_UsableFreeMB = [float]$3ParSpace."UsableFree(MB)"
-        }
-            
-        Write-Verbose "Sending data for $($3Par.System_Name) to Influx.."
+        if ($VVStats) {
 
-        if ($PSCmdlet.ShouldProcess($3Par.System_Name)) {
-            Write-Influx -Measure $Measure -Tags $TagData -Metrics $Metrics -Database $Database -Server $Server
-        }
+            ForEach($VV in $VVStats) {
+
+                $TagData = @{
+                    System_Name = $3Par.System_Name
+                    VVname = $VV.VVname
+                }
         
+                $Metrics = @{}
+
+                $VV.PSObject.Properties | Where-Object {$_.Name -notin 'VVname','Time','Date','r/w'} | ForEach-Object {
+                    if ($_.Value) {
+                        $Metrics.Add($_.Name,[float]$_.Value)
+                    }
+                }   
+            
+                Write-Verbose "Sending data for $($VV.VVname) to Influx.."
+
+                if ($PSCmdlet.ShouldProcess($VV.VVname)) {
+                    Write-Influx -Measure $Measure -Tags $TagData -Metrics $Metrics -Database $Database -Server $Server
+                }
+            }
+
+        }else{
+            Throw 'No Virtual Volume data returned'
+        }
+
     }else{
         Throw 'No 3par system data returned'
     }

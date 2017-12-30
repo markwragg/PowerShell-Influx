@@ -1,4 +1,4 @@
-﻿Function Send-DatastoreClusterMetrics {
+﻿Function Send-DatastoreClusterMetric {
     <#
         .SYNOPSIS
             Sends Datastore Cluster metrics to Influx.
@@ -22,7 +22,7 @@
             The name of the Influx database to write to. Default: 'vmware'. This must exist in Influx!
 
         .EXAMPLE
-            Send-VMMetrics -Measure 'TestDatastoreClusters' -Tags Name,Type -DatastoreCluster Test*
+            Send-DatastoreClusterMetric -Measure 'TestDatastoreClusters' -Tags Name,Type -DatastoreCluster Test*
             
             Description
             -----------

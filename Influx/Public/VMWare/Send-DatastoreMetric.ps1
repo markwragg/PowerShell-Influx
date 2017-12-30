@@ -1,4 +1,4 @@
-﻿Function Send-DatastoreMetrics {
+﻿Function Send-DatastoreMetric {
     <#
         .SYNOPSIS
             Sends Datastore metrics to Influx.
@@ -22,7 +22,7 @@
             The name of the Influx database to write to. Default: 'vmware'. This must exist in Influx!
 
         .EXAMPLE
-            Send-VMMetrics -Measure 'TestDatastores' -Tags Name,Type -Datastore Test*
+            Send-DatastoreMetric -Measure 'TestDatastores' -Tags Name,Type -Datastore Test*
             
             Description
             -----------

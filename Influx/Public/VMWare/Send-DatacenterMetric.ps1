@@ -1,19 +1,19 @@
-﻿Function Send-ResourcePoolMetrics {
+﻿Function Send-DatacenterMetric {
     <#
         .SYNOPSIS
-            Sends Resource Pool metrics to Influx.
+            Sends Datacenter metrics to Influx.
 
         .DESCRIPTION
-            By default this cmdlet sends metrics for all Resource Pool returned by Get-ResourcePool.
+            By default this cmdlet sends metrics for all Datacenter returned by Get-Datacenter.
 
         .PARAMETER Measure
             The name of the measure to be updated or created.
 
         .PARAMETER Tags
-            An array of Resource Pool tags to be included. Default: 'Name','Parent'
+            An array of Datacenter tags to be included. Default: 'Name','ParentFolder'
 
-        .PARAMETER ResourcePool
-            One or more Resource Pools to be queried.
+        .PARAMETER Datacenter
+            One or more Datacenters to be queried.
 
         .PARAMETER Server
             The URL and port for the Influx REST API. Default: 'http://localhost:8086'
@@ -22,22 +22,22 @@
             The name of the Influx database to write to. Default: 'vmware'. This must exist in Influx!
 
         .EXAMPLE
-            Send-ResourcePoolMetrics -Measure 'TestResources' -Tags Name,NumCpuShares -ResourcePool Test*
+            Send-DatacenterMetric -Measure 'TestDatacenter' -Tags Name,NumCpuShares -Datacenter Test*
             
             Description
             -----------
-            This command will submit the specified tags and resource pool metrics to a measure called 'TestResources' for all resource pools starting with 'Test'
+            This command will submit the specified tags and Datacenter metrics to a measure called 'TestDatacenter' for all Datacenters starting with 'Test'
     #>  
     [cmdletbinding(SupportsShouldProcess=$true, ConfirmImpact='Medium')]
     param(
         [String]
-        $Measure = 'ResourcePool',
+        $Measure = 'Datacenter',
 
         [String[]]
-        $Tags = ('Name','Parent'),
+        $Tags = ('Name','ParentFolder'),
 
         [String[]]
-        $ResourcePool = '*',
+        $Datacenter = '*',
 
         [string]
         $Database = 'vmware',
@@ -46,21 +46,21 @@
         $Server = 'http://localhost:8086'
     )
 
-    Write-Verbose 'Getting resource pools..'
-    $ResourcePools = Get-ResourcePool $ResourcePool
+    Write-Verbose 'Getting Datacenters..'
+    $Datacenters = Get-Datacenter $Datacenter
 
-    if ($ResourcePools) {
+    if ($Datacenters) {
         
-        foreach ($RP in $ResourcePools) {
+        foreach ($DC in $Datacenters) {
         
             $TagData = @{}
-            ($RP | Select-Object $Tags).PSObject.Properties | ForEach-Object { 
+            ($DC | Select-Object $Tags).PSObject.Properties | ForEach-Object { 
                 if ($_.Value) {
                     $TagData.Add($_.Name,$_.Value) 
                 }
             }
 
-            $VMs = $RP | Get-VM
+            $VMs = $DC | Get-VM
 
             $Metrics = @{ VMs_Count = $VMs.count }
 
@@ -77,14 +77,14 @@
                 }
             }
             
-            Write-Verbose "Sending data for $($RP.Name) to Influx.."
+            Write-Verbose "Sending data for $($DC.Name) to Influx.."
 
-            if ($PSCmdlet.ShouldProcess($RP.name)) {
+            if ($PSCmdlet.ShouldProcess($DC.name)) {
                 Write-Influx -Measure $Measure -Tags $TagData -Metrics $Metrics -Database $Database -Server $Server
             }
         }
 
     }else{
-        Throw 'No resource pool data returned'
+        Throw 'No Datacenter data returned'
     }
 }

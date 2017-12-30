@@ -1,4 +1,4 @@
-﻿Function Send-HostMetrics {
+﻿Function Send-HostMetric {
     <#
         .SYNOPSIS
             Sends common ESX Host metrics to Influx.
@@ -25,7 +25,7 @@
             The name of the Influx database to write to. Default: 'vmware'. This must exist in Influx!
 
         .EXAMPLE
-            Send-HostMetrics -Measure 'TestESXHosts' -Tags Name,Parent -Hosts TestHost*
+            Send-HostMetric -Measure 'TestESXHosts' -Tags Name,Parent -Hosts TestHost*
             
             Description
             -----------
