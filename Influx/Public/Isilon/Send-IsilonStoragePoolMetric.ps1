@@ -12,7 +12,7 @@
         .PARAMETER IsilonName
             The name or IP address of the Isilon to be queried.
         
-        .PARAMETER IsilonPasswordFile
+        .PARAMETER IsilonPwdFile
             The encrypted credentials file for connecting to the Isilon. This should be created with Get-Credential | Export-Clixml.
         
         .PARAMETER ClusterName
@@ -25,7 +25,7 @@
             The name of the Influx database to write to. Default: 'storage'. This must exist in Influx!
 
         .EXAMPLE
-            Send-IsilonStoragePoolMetric -Measure 'TestIsilonSP' -IsilonName 1.2.3.4 -IsilonPasswordFile C:\scripts\Isilon.pwd -ClusterName TestLab
+            Send-IsilonStoragePoolMetric -Measure 'TestIsilonSP' -IsilonName 1.2.3.4 -IsilonPwdFile C:\scripts\Isilon.pwd -ClusterName TestLab
             
             Description
             -----------
@@ -42,7 +42,7 @@
 
         [Parameter(Mandatory=$true)]
         [String]
-        $IsilonPasswordFile,
+        $IsilonPwdFile,
 
         [Parameter(Mandatory=$true)]
         [String]
@@ -59,7 +59,7 @@
     Try {
         Import-Module IsilonPlatform -ErrorAction Stop
 
-        New-isiSession -ComputerName $IsilonName -Credential ($IsilonPasswordFile | Import-Clixml) -Cluster $ClusterName
+        New-isiSession -ComputerName $IsilonName -Credential ($IsilonPwdFile | Import-Clixml) -Cluster $ClusterName
     } Catch {
         Write-Error $_
 
