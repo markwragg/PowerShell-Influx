@@ -18,7 +18,7 @@
         .PARAMETER SANUserName
             The username for connecting to the 3PAR.
 
-        .PARAMETER SANPasswordFile
+        .PARAMETER SANPwdFile
             The encrypted password file for connecting to the 3PAR. This should be created with Set-3parPoshSshConnectionPasswordFile.
 
         .PARAMETER Server
@@ -28,7 +28,7 @@
             The name of the Influx database to write to. Default: 'storage'. This must exist in Influx!
 
         .EXAMPLE
-            Send-3ParSystemMetric -Measure 'Test3PAR' -Tags System_Name,System_Model,System_ID -SANIPAddress 1.2.3.4 -SANUsername admin -SANPasswordFile C:\scripts\3par.pwd
+            Send-3ParSystemMetric -Measure 'Test3PAR' -Tags System_Name,System_Model,System_ID -SANIPAddress 1.2.3.4 -SANUsername admin -SANPwdFile C:\scripts\3par.pwd
             
             Description
             -----------
@@ -52,7 +52,7 @@
 
         [Parameter(Mandatory=$true)]
         [String]
-        $SANPasswordFile,
+        $SANPwdFile,
 
         [string]
         $Database = 'storage',
@@ -65,7 +65,7 @@
     Try {
         Import-Module HPE3PARPSToolkit -ErrorAction Stop
 
-        Set-3parPoshSshConnectionUsingPasswordFile -SANIPAddress $SANIPAddress -SANUserName $SANUserName -epwdFile $SANPasswordFile -ErrorAction Stop | Out-Null
+        Set-3parPoshSshConnectionUsingPasswordFile -SANIPAddress $SANIPAddress -SANUserName $SANUserName -epwdFile $SANPwdFile -ErrorAction Stop | Out-Null
     } Catch {
         Write-Error $_
         Break
