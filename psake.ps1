@@ -63,6 +63,30 @@ Task Build -Depends Test {
 
 Task Deploy -Depends Build {
     '----------------------------------------------------------------------'
-    #Not in use for this project yet
+    # Update Manifest version number
+    $ManifestPath = $Env:BHPSModuleManifest
+    
+    If (-Not $env:APPVEYOR_BUILD_VERSION) {
+        $Manifest = Test-ModuleManifest -Path $manifestPath
+        [System.Version]$Version = $Manifest.Version
+        [String]$NewVersion = New-Object -TypeName System.Version -ArgumentList ($Version.Major, $Version.Minor, $Version.Build, ($Version.Revision+1))
+    } Else {
+        $NewVersion = $env:APPVEYOR_BUILD_VERSION
+    }
+    "New Version: $NewVersion"
 
+    $FunctionList = @((Get-ChildItem -Path .\$Env:BHProjectName\Public).BaseName)
+
+    Update-ModuleManifest -Path $ManifestPath -ModuleVersion $NewVersion -FunctionsToExport $functionList
+    (Get-Content -Path $ManifestPath) -replace "PSGet_$Env:BHProjectName", "$Env:BHProjectName" | Set-Content -Path $ManifestPath
+    (Get-Content -Path $ManifestPath) -replace 'NewManifest', "$Env:BHProjectName" | Set-Content -Path $ManifestPath
+    (Get-Content -Path $ManifestPath) -replace 'FunctionsToExport = ', 'FunctionsToExport = @(' | Set-Content -Path $ManifestPath -Force
+    (Get-Content -Path $ManifestPath) -replace "$($FunctionList[-1])'", "$($FunctionList[-1])')" | Set-Content -Path $ManifestPath -Force
+
+    $Params = @{
+        Path = $ProjectRoot
+        Force = $true
+        Recurse = $false # We keep psdeploy artifacts, avoid deploying those : )
+    }
+    Invoke-PSDeploy @Verbose @Params
 }
