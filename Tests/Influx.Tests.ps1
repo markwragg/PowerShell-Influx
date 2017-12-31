@@ -2,10 +2,8 @@
 $sut = Get-ChildItem "$here\..\Influx\*.ps1" -Recurse -File
 $sut | ForEach-Object { . $_.FullName }
 
-Describe 'ConvertTo-UnixTimeMillisecond' {
-    $UnixTime = Get-Date "01/01/2017" | ConvertTo-UnixTimeMillisecond
-
-    It "Should convert 01/01/2017 to 1483228800000" {
-        $UnixTime | Should Be 1483228800000
+Describe 'Isilon Module Tests' {
+    It "Should import without errors" {
+        {Import-Module $here\..\Influx\Influx.psd1 -ErrorAction Stop} | Should Not Throw
     }
 }
