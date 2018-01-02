@@ -38,8 +38,8 @@
     )
 
     Process {
-        ForEach ($Item in $Data) {
-            
+        foreach ($Item in $Data) {
+
             if ($PSCmdlet.ShouldProcess("$($IP):$Port","$($MyInvocation.MyCommand) -Data $Item")) {
                 $Item | Invoke-UDPSendMethod -IP $IP -Port $Port
             }
