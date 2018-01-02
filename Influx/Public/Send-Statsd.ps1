@@ -37,21 +37,12 @@
         $Port = 8125
     )
 
-    Begin {
-        $Endpoint  = New-Object System.Net.IPEndPoint($IP, $Port)
-        $UDPClient = New-Object System.Net.Sockets.UdpClient
-    } 
     Process {
-        ForEach ($Item in $Data) {
-            $EncodedData = [System.Text.Encoding]::ASCII.GetBytes($Item)
-            
+        foreach ($Item in $Data) {
+
             if ($PSCmdlet.ShouldProcess("$($IP):$Port","$($MyInvocation.MyCommand) -Data $Item")) {
-                $BytesSent = $UDPClient.Send($EncodedData, $EncodedData.length, $Endpoint)
-                Write-Verbose "Transmitted $BytesSent Bytes."
+                $Item | Invoke-UDPSendMethod -IP $IP -Port $Port
             }
         }
     } 
-    End {
-        $UDPClient.Close()
-    }
 }

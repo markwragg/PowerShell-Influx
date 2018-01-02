@@ -50,50 +50,39 @@
         [int]
         $Port = 8089
     )
-
-    Begin {
-        $Endpoint  = New-Object System.Net.IPEndPoint($IP, $Port)
-        $UDPClient = New-Object System.Net.Sockets.UdpClient
-    }
-    Process {
-        if ($TimeStamp) {
-            $timeStampNanoSecs = [long]((New-TimeSpan -Start (Get-Date -Date '1970-01-01') -End (($Timestamp).ToUniversalTime())).TotalSeconds * 1E9)
-        } else {
-            $null = $timeStampNanoSecs
-        }
-
-        if ($Tags) {
-            $TagData = foreach($Tag in $Tags.Keys) {
-                "$($Tag | Out-InfluxEscapeString)=$($Tags[$Tag] | Out-InfluxEscapeString)"
-            }
-            $TagData = $TagData -Join ','
-            $TagData = ",$TagData"
-        }
     
-        $Body = foreach($Metric in $Metrics.Keys) {
-        
-            if ($Metrics[$Metric]) {
-                $MetricValue = if ($Metrics[$Metric] -isnot [ValueType]) { 
-                    '"' + $Metrics[$Metric] + '"'
-                } else {
-                    $Metrics[$Metric] | Out-InfluxEscapeString
-                }
-        
-                "$($Measure | Out-InfluxEscapeString)$TagData $($Metric | Out-InfluxEscapeString)=$MetricValue $timeStampNanoSecs"
-            }
+    if ($TimeStamp) {
+        $timeStampNanoSecs = $Timestamp | ConvertTo-UnixTimeNanosecond
+    } else {
+        $null = $timeStampNanoSecs
+    }
+    
+    if ($Tags) {
+        $TagData = foreach($Tag in $Tags.Keys) {
+            "$($Tag | Out-InfluxEscapeString)=$($Tags[$Tag] | Out-InfluxEscapeString)"
         }
+        $TagData = $TagData -Join ','
+        $TagData = ",$TagData"
+    }
 
-        if ($Body) {
-            $Body = $Body -Join "`n"
-            $EncodedData = [System.Text.Encoding]::ASCII.GetBytes($Body)
-            
-            if ($PSCmdlet.ShouldProcess("$($IP):$Port","$Body")) {
-                $BytesSent = $UDPClient.Send($EncodedData, $EncodedData.length, $Endpoint)
-                Write-Verbose "Transmitted $BytesSent Bytes."
+    $Body = foreach($Metric in $Metrics.Keys) {
+    
+        if ($Metrics[$Metric]) {
+            $MetricValue = if ($Metrics[$Metric] -isnot [ValueType]) { 
+                '"' + $Metrics[$Metric] + '"'
+            } else {
+                $Metrics[$Metric] | Out-InfluxEscapeString
             }
+    
+            "$($Measure | Out-InfluxEscapeString)$TagData $($Metric | Out-InfluxEscapeString)=$MetricValue $timeStampNanoSecs"
         }
     }
-    End {
-        $UDPClient.Close()
+
+    if ($Body) {
+        $Body = $Body -Join "`n"
+        
+        if ($PSCmdlet.ShouldProcess("$($IP):$Port","$Body")) {
+            $Body | Invoke-UDPSendMethod -IP $IP -Port $Port
+        }
     }
 }
