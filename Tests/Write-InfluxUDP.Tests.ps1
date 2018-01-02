@@ -6,7 +6,7 @@ $Module = 'Influx'
 
 If (-not (Get-Module $Module)) { Import-Module "$Root\$Module" -Force }
 
-Describe "Write-Influx PS$PSVersion" {
+Describe "Write-InfluxUDP PS$PSVersion" {
     
     InModuleScope Influx {
 
@@ -17,10 +17,10 @@ Describe "Write-Influx PS$PSVersion" {
        
         Context 'Simulating successful write' {
            
-            $WriteInflux = Write-InfluxUDP -Measure WebServer -Tags @{Server='Host01'} -Metrics @{CPU=100; Status='PoweredOn'} -IP 1.2.3.4 -Port 1234 -Timestamp (Get-Date)
+            $WriteInfluxUDP = Write-InfluxUDP -Measure WebServer -Tags @{Server='Host01'} -Metrics @{CPU=100; Status='PoweredOn'} -IP 1.2.3.4 -Port 1234 -Timestamp (Get-Date)
 
-            It 'Write-Influx should return null' {
-                $WriteInflux | Should -Be $null
+            It 'Write-InfluxUDP should return null' {
+                $WriteInfluxUDP | Should -Be $null
             }
             It 'Should execute all verifiable mocks' {
                 Assert-VerifiableMock
@@ -38,10 +38,10 @@ Describe "Write-Influx PS$PSVersion" {
 
         Context 'Simulating -WhatIf and no Timestamp specified' {
             
-            $WriteInflux = Write-InfluxUDP -Measure WebServer -Tags @{Server='Host01'} -Metrics @{CPU=100; Status='PoweredOn'} -IP 1.2.3.4 -Port 1234 -WhatIf
+            $WriteInfluxUDP = Write-InfluxUDP -Measure WebServer -Tags @{Server='Host01'} -Metrics @{CPU=100; Status='PoweredOn'} -IP 1.2.3.4 -Port 1234 -WhatIf
 
-            It 'Write-Influx should return null' {
-                $WriteInflux | Should -Be $null
+            It 'Write-InfluxUDP should return null' {
+                $WriteInfluxUDP | Should -Be $null
             }
             It 'Should execute all verifiable mocks' {
                 Assert-VerifiableMock
