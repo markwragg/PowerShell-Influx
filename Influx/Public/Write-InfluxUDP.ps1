@@ -57,11 +57,11 @@
     }
     Process {
         if ($TimeStamp) {
-            $timeStampNanoSecs = [long]((New-TimeSpan -Start (Get-Date -Date '1970-01-01') -End (($Timestamp).ToUniversalTime())).TotalSeconds * 1E9)
+            $timeStampNanoSecs = $Timestamp | ConvertTo-UnixTimeNanosecond
         } else {
             $null = $timeStampNanoSecs
         }
-
+        
         if ($Tags) {
             $TagData = foreach($Tag in $Tags.Keys) {
                 "$($Tag | Out-InfluxEscapeString)=$($Tags[$Tag] | Out-InfluxEscapeString)"
