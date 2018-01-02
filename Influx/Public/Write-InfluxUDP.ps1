@@ -51,10 +51,6 @@
         $Port = 8089
     )
 
-    Begin {
-        $Endpoint  = New-Object System.Net.IPEndPoint($IP, $Port)
-        $UDPClient = New-Object System.Net.Sockets.UdpClient
-    }
     Process {
         if ($TimeStamp) {
             $timeStampNanoSecs = $Timestamp | ConvertTo-UnixTimeNanosecond
@@ -85,15 +81,10 @@
 
         if ($Body) {
             $Body = $Body -Join "`n"
-            $EncodedData = [System.Text.Encoding]::ASCII.GetBytes($Body)
             
             if ($PSCmdlet.ShouldProcess("$($IP):$Port","$Body")) {
-                $BytesSent = $UDPClient.Send($EncodedData, $EncodedData.length, $Endpoint)
-                Write-Verbose "Transmitted $BytesSent Bytes."
+                $Body | Invoke-UDPSendMethod -IP $IP -Port $Port
             }
         }
-    }
-    End {
-        $UDPClient.Close()
     }
 }
