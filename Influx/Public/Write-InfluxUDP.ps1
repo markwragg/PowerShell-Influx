@@ -50,41 +50,39 @@
         [int]
         $Port = 8089
     )
-
-    Process {
-        if ($TimeStamp) {
-            $timeStampNanoSecs = $Timestamp | ConvertTo-UnixTimeNanosecond
-        } else {
-            $null = $timeStampNanoSecs
-        }
-        
-        if ($Tags) {
-            $TagData = foreach($Tag in $Tags.Keys) {
-                "$($Tag | Out-InfluxEscapeString)=$($Tags[$Tag] | Out-InfluxEscapeString)"
-            }
-            $TagData = $TagData -Join ','
-            $TagData = ",$TagData"
-        }
     
-        $Body = foreach($Metric in $Metrics.Keys) {
-        
-            if ($Metrics[$Metric]) {
-                $MetricValue = if ($Metrics[$Metric] -isnot [ValueType]) { 
-                    '"' + $Metrics[$Metric] + '"'
-                } else {
-                    $Metrics[$Metric] | Out-InfluxEscapeString
-                }
-        
-                "$($Measure | Out-InfluxEscapeString)$TagData $($Metric | Out-InfluxEscapeString)=$MetricValue $timeStampNanoSecs"
-            }
+    if ($TimeStamp) {
+        $timeStampNanoSecs = $Timestamp | ConvertTo-UnixTimeNanosecond
+    } else {
+        $null = $timeStampNanoSecs
+    }
+    
+    if ($Tags) {
+        $TagData = foreach($Tag in $Tags.Keys) {
+            "$($Tag | Out-InfluxEscapeString)=$($Tags[$Tag] | Out-InfluxEscapeString)"
         }
+        $TagData = $TagData -Join ','
+        $TagData = ",$TagData"
+    }
 
-        if ($Body) {
-            $Body = $Body -Join "`n"
-            
-            if ($PSCmdlet.ShouldProcess("$($IP):$Port","$Body")) {
-                $Body | Invoke-UDPSendMethod -IP $IP -Port $Port
+    $Body = foreach($Metric in $Metrics.Keys) {
+    
+        if ($Metrics[$Metric]) {
+            $MetricValue = if ($Metrics[$Metric] -isnot [ValueType]) { 
+                '"' + $Metrics[$Metric] + '"'
+            } else {
+                $Metrics[$Metric] | Out-InfluxEscapeString
             }
+    
+            "$($Measure | Out-InfluxEscapeString)$TagData $($Metric | Out-InfluxEscapeString)=$MetricValue $timeStampNanoSecs"
+        }
+    }
+
+    if ($Body) {
+        $Body = $Body -Join "`n"
+        
+        if ($PSCmdlet.ShouldProcess("$($IP):$Port","$Body")) {
+            $Body | Invoke-UDPSendMethod -IP $IP -Port $Port
         }
     }
 }

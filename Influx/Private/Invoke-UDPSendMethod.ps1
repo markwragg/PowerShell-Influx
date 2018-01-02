@@ -10,10 +10,10 @@ Function Invoke-UDPSendMethod {
             String data to be transmitted via UDP.
 
         .PARAMETER IP
-            IP address for UDP listener.
+            IP address for UDP listener. 127.0.0.1 by default.
     
         .PARAMETER Port
-            Port for UDP listener.
+            Port for UDP listener. 8089 by default.
 
         .EXAMPLE
             'Some Data' | Invoke-UDPSendMethod -IP 1.2.3.4 -Port 1234
@@ -24,15 +24,15 @@ Function Invoke-UDPSendMethod {
     #>
     [cmdletbinding(SupportsShouldProcess, ConfirmImpact='Medium')]
     param(
-        [parameter(ValueFromPipeline)]
+        [parameter(Mandatory,ValueFromPipeline)]
         [string[]]
         $Data,
     
         [ipaddress]
-        $IP,
+        $IP = '127.0.0.1',
 
         [int]
-        $Port
+        $Port = 8089
     )
     Begin {
         $Endpoint  = New-Object System.Net.IPEndPoint($IP, $Port)
