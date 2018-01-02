@@ -27,7 +27,6 @@ Task Init {
 
 Task Test -Depends Init  {
     '----------------------------------------------------------------------'
-    
     $Timestamp = Get-date -uformat "%Y%m%d-%H%M%S"
     $PSVersion = $PSVersionTable.PSVersion.Major
     $TestFile = "TestResults_PS$PSVersion`_$TimeStamp.xml"
@@ -75,7 +74,7 @@ Task Deploy -Depends Build {
     }
     "New Version: $NewVersion"
 
-    $FunctionList = @((Get-ChildItem -Path .\$Env:BHProjectName\Public).BaseName)
+    $FunctionList = @((Get-ChildItem -File -Recurse -Path .\$Env:BHProjectName\Public).BaseName)
 
     Update-ModuleManifest -Path $ManifestPath -ModuleVersion $NewVersion -FunctionsToExport $functionList
     (Get-Content -Path $ManifestPath) -replace "PSGet_$Env:BHProjectName", "$Env:BHProjectName" | Set-Content -Path $ManifestPath

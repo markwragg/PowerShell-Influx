@@ -20,7 +20,7 @@ If ($Modules.count -gt 0) {
 }
 
 If ($Scripts.count -gt 0) {
-  Describe ‘Testing all Script against default PSScriptAnalyzer rule-set’ -Tag Default {
+  Describe ‘Testing all Scripts against default PSScriptAnalyzer rule-set’ -Tag Default {
     foreach ($Script in $scripts) {
       Context “Testing Script '$($script.FullName)'” {
         foreach ($rule in $rules) {
