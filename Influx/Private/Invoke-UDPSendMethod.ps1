@@ -1,7 +1,7 @@
 Function Invoke-UDPSendMethod {
     <#
         .SYNOPSIS
-            Send data a UDP listener.
+            Send data to a UDP listener.
 
         .DESCRIPTION
             Uses the System.Net.IPEndPoint and System.Net.Sockets.UdpClient .NET methods to transmit data via UDP.

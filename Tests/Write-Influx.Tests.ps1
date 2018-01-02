@@ -2,8 +2,9 @@ if(-not $PSScriptRoot) { $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path
 
 $PSVersion = $PSVersionTable.PSVersion.Major
 $Root = "$PSScriptRoot\..\"
+$Module = 'Influx'
 
-Import-Module "$Root\Influx" -Force
+If (-not (Get-Module $Module)) { Import-Module "$Root\$Module" -Force }
 
 Describe "Write-Influx PS$PSVersion" {
     
