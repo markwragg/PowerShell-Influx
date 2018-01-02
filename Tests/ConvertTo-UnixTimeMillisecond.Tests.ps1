@@ -1,18 +1,18 @@
 ﻿if(-not $PSScriptRoot) { $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent }
 
 $PSVersion = $PSVersionTable.PSVersion.Major
+$Root = "$PSScriptRoot\.."
 $Sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace '\.Tests\.', '.'
-$Root = "$PSScriptRoot\..\"
 
-Get-ChildItem $Root -Recurse | Where-Object { $_.Name -eq $Sut } | ForEach-Object { . $_.FullName }
+Get-ChildItem $Root -Filter $Sut -Recurse | ForEach-Object { . $_.FullName }
 
 Describe "ConvertTo-UnixTimeMillisecond PS$PSVersion" {
 
     Context 'Date object input' {
 
-        $UnixTime = Get-Date "01/01/2017" | ConvertTo-UnixTimeMillisecond
+        $UnixTime = Get-Date '01/01/2017' | ConvertTo-UnixTimeMillisecond
 
-        It "Should convert 01/01/2017 to 1483228800000" {
+        It 'Should convert 01/01/2017 to 1483228800000' {
             $UnixTime | Should Be 1483228800000
         }
         It "Should return a [double] type value" {

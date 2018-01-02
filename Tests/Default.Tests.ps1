@@ -11,7 +11,7 @@ If ($Modules.count -gt 0) {
       Context “Testing Module '$($module.FullName)'” {
         foreach ($rule in $rules) {
           It “passes the PSScriptAnalyzer Rule $rule“ {
-            (Invoke-ScriptAnalyzer -Path $module.FullName -IncludeRule $rule.RuleName ).Count | Should Be 0
+            (Invoke-ScriptAnalyzer -Path $module.FullName -IncludeRule $rule.RuleName ).Count | Should -Be 0
           }
         }
       }
@@ -26,7 +26,7 @@ If ($Scripts.count -gt 0) {
         foreach ($rule in $rules) {
           It “passes the PSScriptAnalyzer Rule $rule“ {
             If (-not ($module.BaseName -match 'AppVeyor') -and -not ($rule.Rulename -eq 'PSAvoidUsingWriteHost') ) {
-              (Invoke-ScriptAnalyzer -Path $script.FullName -IncludeRule $rule.RuleName ).Count | Should Be 0
+              (Invoke-ScriptAnalyzer -Path $script.FullName -IncludeRule $rule.RuleName ).Count | Should -Be 0
             }
           }
         }
