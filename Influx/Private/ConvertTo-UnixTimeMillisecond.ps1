@@ -10,11 +10,11 @@
             The date/time to be converted.
 
         .EXAMPLE
-            '20-10-2017 12:34:22.12' | ConvertTo-UnixTimeMillisecond
+            '01-01-2017 12:34:22.12' | ConvertTo-UnixTimeMillisecond
             
             Result
             -----------
-            1508502862120
+            1483274062120
     #>      
     [cmdletbinding(SupportsShouldProcess)]
     [OutputType([double])]

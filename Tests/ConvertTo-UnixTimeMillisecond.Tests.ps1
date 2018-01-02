@@ -22,10 +22,10 @@ Describe "ConvertTo-UnixTimeMillisecond PS$PSVersion" {
 
     Context 'String object input' {
 
-        $UnixTime = '20-10-2017 12:34:22.12' | ConvertTo-UnixTimeMillisecond
+        $UnixTime = '01-01-2017 12:34:22.12' | ConvertTo-UnixTimeMillisecond
 
-        It "Should convert '20-10-2017 12:34:22.12' to 1508502862120" {
-            $UnixTime | Should Be 1508502862120
+        It "Should convert '01-01-2017 12:34:22.12' to 1508502862120" {
+            $UnixTime | Should Be 1483274062120
         }
         It "Should return a [double] type value" {
             $UnixTime | Should BeOfType [double]
