@@ -34,7 +34,7 @@
         $Measure = 'DatastoreCluster',
 
         [String[]]
-        $Tags = ('Name'),
+        $Tags = 'Name',
 
         [String[]]
         $DatastoreCluster = '*',
