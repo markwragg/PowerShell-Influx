@@ -15,6 +15,9 @@
         .PARAMETER VMs
             One or more Virtual Machines to be queried.
 
+        .PARAMETER Stats
+            Use to enable the collection of VM statistics via Get-Stat for each VM.
+
         .PARAMETER Server
             The URL and port for the Influx REST API. Default: 'http://localhost:8086'
 
@@ -30,14 +33,17 @@
     #>  
     [cmdletbinding(SupportsShouldProcess=$true, ConfirmImpact='Medium')]
     param(
-        [String]
+        [string]
         $Measure = 'VirtualMachine',
 
-        [String[]]
+        [string[]]
         $Tags = ('Name','Folder','ResourcePool','PowerState','Guest','VMHost'),
 
-        [String[]]
+        [string[]]
         $VMs = '*',
+
+        [switch]
+        $Stats,
 
         [string]
         $Database = 'vmware',
@@ -79,7 +85,7 @@
             }
 
             if ($VMStats) {
-                $Stats | Where-Object { $_.Entity.Name -eq $VM.Name } | ForEach-Object { $Metrics.Add($_.MetricId,$_.Value) }
+                $VMStats | Where-Object { $_.Entity.Name -eq $VM.Name } | ForEach-Object { $Metrics.Add($_.MetricId,$_.Value) }
             }
 
             Write-Verbose "Sending data for $($VM.Name) to Influx.."
