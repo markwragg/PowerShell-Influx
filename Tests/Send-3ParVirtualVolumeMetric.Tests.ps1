@@ -1,9 +1,7 @@
 if(-not $PSScriptRoot) { $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent }
 
-$PSScriptRoot
-
 $PSVersion = $PSVersionTable.PSVersion.Major
-$Root = "$Here\.."
+$Root = "$PSScriptRoot\.."
 $Module = 'Influx'
 
 If (-not (Get-Module $Module)) { Import-Module "$Root\$Module" -Force }

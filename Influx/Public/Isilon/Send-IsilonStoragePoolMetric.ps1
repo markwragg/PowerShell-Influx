@@ -61,9 +61,7 @@
 
         New-isiSession -ComputerName $IsilonName -Credential ($IsilonPwdFile | Import-Clixml) -Cluster $ClusterName
     } Catch {
-        Write-Error $_
-
-        Break
+        Throw $_
     }
     
     $StoragePools = Get-isiStoragepools
