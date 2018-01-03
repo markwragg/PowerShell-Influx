@@ -49,7 +49,7 @@ Describe "Send-TFSBuildMetric PS$PSVersion" {
             It 'Should call Get-TFSBuilds exactly 1 time' {
                 Assert-MockCalled Get-TFSBuilds -Exactly 1
             }
-            It 'Should call Write-Influx exactly 1 time' {
+            It 'Should call Write-Influx exactly 2 times' {
                 Assert-MockCalled Write-Influx -Exactly 2
             }  
         }
@@ -105,7 +105,7 @@ Describe "Send-TFSBuildMetric PS$PSVersion" {
             It 'Should call Get-TFSBuilds exactly 1 time' {
                 Assert-MockCalled Get-TFSBuilds -Exactly 1
             }
-            It 'Should call Write-Influx exactly 1 time' {
+            It 'Should call Write-Influx exactly 0 times' {
                 Assert-MockCalled Write-Influx -Exactly 0
             }
         }
