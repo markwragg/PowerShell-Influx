@@ -6,7 +6,7 @@ $Module = 'Influx'
 
 If (-not (Get-Module $Module)) { Import-Module "$Root\$Module" -Force }
 
-Describe "Send-3ParSystemMetric.ps1 PS$PSVersion" {
+Describe "Send-3ParSystemMetric PS$PSVersion" {
 
     InModuleScope Influx {
 
@@ -16,15 +16,15 @@ Describe "Send-3ParSystemMetric.ps1 PS$PSVersion" {
         
         Mock Set-3parPoshSshConnectionUsingPasswordFile { } -Verbose
         
-        Mock Get-3parSpace { Import-Clixml .\Tests\Mock-Send3ParSystemMetric-Get3parSpace.xml } -Verifiable
+        Mock Get-3parSpace { Import-Clixml .\Tests\Mock-Get3parSpace.xml } -Verifiable
 
-        Mock Write-Influx { } -Verifiable
+        Mock Write-Influx { }
 
         Context 'Simulating successful send' {
         
             Mock Import-Module { } -ParameterFilter {$Name -eq 'HPE3PARPSToolkit'} -Verifiable
             
-            Mock Get-3parSystem { Import-Clixml .\Tests\Mock-Send3ParSystemMetric-Get3parSystem.xml } -Verifiable
+            Mock Get-3parSystem { Import-Clixml .\Tests\Mock-Get3parSystem.xml } -Verifiable
             
             $Send3ParSys = Send-3ParSystemMetric -SANIPAddress 1.2.3.4 -SANUsername admin -SANPwdFile C:\scripts\3par.pwd
             
