@@ -77,8 +77,7 @@
     Try {    
         Import-Module TFS -ErrorAction Stop
     } Catch {
-        Write-Error $_
-        Break
+        Throw $_
     }
     
     Write-Verbose 'Getting builds..'

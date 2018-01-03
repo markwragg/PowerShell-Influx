@@ -49,7 +49,11 @@ Describe "Send-IsilonStoragePoolMetric PS$PSVersion" {
             }
             It 'Should call Write-Influx exactly 1 time' {
                 Assert-MockCalled Write-Influx -Exactly 1
-            }  
+            }
+            It 'Should call Remove-isiSession exactly 1 time' {
+                Assert-MockCalled Remove-isiSession -Exactly 1
+            }
+
         }
 
         Context 'Simulating no storage pool data returned' {
@@ -75,6 +79,9 @@ Describe "Send-IsilonStoragePoolMetric PS$PSVersion" {
             }
             It 'Should call Write-Influx exactly 1 time' {
                 Assert-MockCalled Write-Influx -Exactly 0
+            }
+            It 'Should call Remove-isiSession exactly 1 time' {
+                Assert-MockCalled Remove-isiSession -Exactly 0
             }
         }
 
