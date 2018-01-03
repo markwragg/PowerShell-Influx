@@ -61,8 +61,7 @@
 
         Set-3parPoshSshConnectionUsingPasswordFile -SANIPAddress $SANIPAddress -SANUserName $SANUserName -epwdFile $SANPwdFile -ErrorAction Stop | Out-Null
     } Catch {
-        Write-Error $_
-        Break
+        Throw $_
     }
     
     $3Par = Get-3parSystem
