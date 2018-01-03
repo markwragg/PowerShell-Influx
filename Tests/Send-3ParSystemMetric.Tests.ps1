@@ -16,7 +16,7 @@ Describe "Send-3ParSystemMetric.ps1 PS$PSVersion" {
         
         Mock Set-3parPoshSshConnectionUsingPasswordFile { } -Verbose
         
-        Mock Get-3parSpace { } -Verifiable
+        Mock Get-3parSpace { Import-Clixml .\Tests\Mock-Send3ParSystemMetric-Get3parSpace.xml } -Verifiable
 
         Mock Write-Influx { } -Verifiable
 
