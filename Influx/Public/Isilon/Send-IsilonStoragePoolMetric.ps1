@@ -31,20 +31,20 @@
             -----------
             This command will submit the specified Isilon's Storage Pool metrics to a measure called 'TestIsilonSP'.
     #>  
-    [cmdletbinding(SupportsShouldProcess=$true, ConfirmImpact='Medium')]
+    [cmdletbinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     param(
         [String]
         $Measure = 'IsilonStoragePool',
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [String]
         $IsilonName,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [String]
         $IsilonPwdFile,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [String]
         $ClusterName,
 
@@ -56,45 +56,15 @@
 
     )
 
-    Try {
-        Import-Module IsilonPlatform -ErrorAction Stop
-
-        New-isiSession -ComputerName $IsilonName -Credential ($IsilonPwdFile | Import-Clixml) -Cluster $ClusterName
-    } Catch {
-        Throw $_
-    }
+    $Metric = Get-IsilonStoragePoolMetric @PSBoundParameters
     
-    $StoragePools = Get-isiStoragepools
-    
-    if ($StoragePools) {
-    
-        ForEach ($StoragePool in $StoragePools) {
+    if ($Metric.Measure) {
 
-            $TagData = @{
-                Name = $IsilonName
-                Cluster = $ClusterName
-                StoragePool = $StoragePool.name
-                Id = $StoragePool.id
-            }
-        
-            $Metrics = @{}
-
-            $StoragePool.usage.PSObject.Properties | Where-Object {$_.Name -notin 'balanced'} | ForEach-Object {
-                if ($_.Value) {
-                    $Metrics.Add($_.Name,[long]$_.Value)
-                }
-            }
-            
-            Write-Verbose "Sending data for $($StoragePool.name) to Influx.."
-
-            if ($PSCmdlet.ShouldProcess($StoragePool.name)) {
-                Write-Influx -Measure $Measure -Tags $TagData -Metrics $Metrics -Database $Database -Server $Server
-            }
+        if ($PSCmdlet.ShouldProcess($Metric.Measure)) {
+            $Metric | Write-Influx -Database $Database -Server $Server
         }
-
-    }else{
-        Throw 'No Storage Pool data returned'
     }
-
-    Remove-isiSession -Cluster $ClusterName
+    else {
+        throw 'No Isilon Storage Pool metric data returned'
+    }
 }
