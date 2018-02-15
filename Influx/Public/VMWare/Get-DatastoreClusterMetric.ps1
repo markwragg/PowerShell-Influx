@@ -22,7 +22,7 @@
             -----------
             This command will return the specified tags and DatastoreCluster metrics for a measure called 'TestDatastoreClusters' for all DatastoreClusters starting with 'Test'.
     #>  
-    [cmdletbinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+    [cmdletbinding()]
     param(
         [String]
         $Measure = 'DatastoreCluster',

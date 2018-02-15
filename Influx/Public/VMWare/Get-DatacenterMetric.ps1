@@ -22,7 +22,7 @@
             -----------
             This command will return the specified tags and Datacenter metrics for a measure named 'TestDatacenter' for all Datacenters starting with 'Test'
     #>  
-    [cmdletbinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+    [cmdletbinding()]
     param(
         [String]
         $Measure = 'Datacenter',

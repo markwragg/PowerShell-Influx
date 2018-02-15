@@ -31,13 +31,13 @@
             -----------
             This command will submit the specified tag and common ESX host data to a measure called 'TestESXHosts' for all hosts starting with 'TestHost'
     #>  
-    [cmdletbinding(SupportsShouldProcess=$true, ConfirmImpact='Medium')]
+    [cmdletbinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     param(
         [String]
         $Measure = 'ESXHost',
 
         [String[]]
-        $Tags = ('Name','Parent','State','PowerState','Version'),
+        $Tags = ('Name', 'Parent', 'State', 'PowerState', 'Version'),
 
         [String[]]
         $Hosts = '*',
@@ -46,49 +46,25 @@
         $Stats,
 
         [string]
-        $Database ='vmware',
+        $Database = 'vmware',
         
         [string]
         $Server = 'http://localhost:8086'
     )
 
-    Write-Verbose 'Getting hosts..'
-    $VMHosts = Get-VMHost $Hosts
+    $MetricParams = @{
+        Measure = $Measure
+        Tags    = $Tags
+        Hosts   = $Hosts
+        Stats   = $Stats
+    }
 
-    if ($VMHosts) {
+    $Metric = Get-HostMetric @MetricParams
+    
+    if ($Metric.Measure) {
 
-        if ($Stats) {
-            Write-Verbose 'Getting host statistics..'
-            $HostStats = $VMHosts | Get-Stat -MaxSamples 1 -Common | Where-Object {-not $_.Instance}
-        }
-
-        foreach ($VMHost in $VMHosts) {
-        
-            $TagData = @{}
-            ($VMHost | Select-Object $Tags).PSObject.Properties | ForEach-Object { 
-                if ($_.Value) {
-                    $TagData.Add($_.Name,$_.Value) 
-                }
-            }
-
-            $Metrics = @{
-                CpuTotalMhz = $VMHost.CpuTotalMhz
-                CpuUsageMhz = $VMHost.CpuUsageMhz
-                CpuUsagePercent = (($VMHost.CpuUsageMhz / $VMHost.CpuTotalMhz) * 100)
-                MemoryTotalGB = $VMHost.MemoryTotalGB
-                MemoryUsageGB = $VMHost.MemoryUsageGB
-                MemoryUsagePercent = (($VMHost.MemoryUsageGB / $VMHost.MemoryTotalGB) * 100)
-            }
-            
-            if ($HostStats) {
-                $HostStats | Where-Object { $_.Entity.Name -eq $VMHost.Name } | ForEach-Object { $Metrics.Add($_.MetricId,$_.Value) }
-            }
-
-            Write-Verbose "Sending data for $($VMHost.Name) to Influx.."
-
-            if ($PSCmdlet.ShouldProcess($VMHost.name)) {
-                Write-Influx -Measure $Measure -Tags $TagData -Metrics $Metrics -Database $Database -Server $Server
-            }
+        if ($PSCmdlet.ShouldProcess($Metric.Measure)) {
+            $Metric | Write-Influx -Database $Database -Server $Server
         }
     }
 }
