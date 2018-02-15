@@ -61,7 +61,7 @@
         $Measure = $InputObject.Measure
         $Tags = $InputObject.Tags
         $Metrics = $InputObject.Metrics
-        $TimeStamp = $InputObject.TimeStamp
+        if ($InputObject.TimeStamp) { $TimeStamp = $InputObject.TimeStamp }
     }
 
     if ($TimeStamp) {
@@ -82,11 +82,11 @@
     $Body = foreach ($Metric in $Metrics.Keys) {
         
         if ($Metrics[$Metric]) {
-            $MetricValue = if ($Metrics[$Metric] -isnot [ValueType]) { 
-                '"' + $Metrics[$Metric] + '"'
+            if ($Metrics[$Metric] -isnot [ValueType]) { 
+                $MetricValue = '"' + $Metrics[$Metric] + '"'
             }
             else {
-                $Metrics[$Metric] | Out-InfluxEscapeString
+                $MetricValue = $Metrics[$Metric] | Out-InfluxEscapeString
             }
         
             "$($Measure | Out-InfluxEscapeString)$TagData $($Metric | Out-InfluxEscapeString)=$MetricValue $timeStampNanoSecs"
