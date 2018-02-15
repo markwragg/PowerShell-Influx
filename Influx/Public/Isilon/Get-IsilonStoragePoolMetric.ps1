@@ -83,7 +83,7 @@
         }
     }
     else {
-        Throw 'No Storage Pool data returned'
+        Write-Verbose 'No Storage Pool data returned'
     }
 
     Remove-isiSession -Cluster $ClusterName

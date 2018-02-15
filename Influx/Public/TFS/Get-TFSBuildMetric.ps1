@@ -125,6 +125,6 @@
         } 
     }
     else {
-        throw 'No build data returned'
+        Write-Verbose 'No build data returned'
     }
 }

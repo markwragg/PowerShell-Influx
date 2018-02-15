@@ -28,7 +28,7 @@
             -----------
             This command will submit the specified tags and DatastoreCluster metrics to a measure called 'TestDatastoreClusters' for all DatastoreClusters starting with 'Test'
     #>  
-    [cmdletbinding(SupportsShouldProcess=$true, ConfirmImpact='Medium')]
+    [cmdletbinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     param(
         [String]
         $Measure = 'DatastoreCluster',
@@ -46,35 +46,21 @@
         $Server = 'http://localhost:8086'
     )
 
-    Write-Verbose 'Getting DatastoreClusters..'
-    $DatastoreClusters = Get-DatastoreCluster $DatastoreCluster
+    $MetricParams = @{
+        Measure          = $Measure
+        Tags             = $Tags
+        DatastoreCluster = $Datacenter
+    }
 
-    if ($DatastoreClusters) {
-        
-        foreach ($DSCluster in $DatastoreClusters) {
-        
-            $TagData = @{}
-            ($DSCluster | Select-Object $Tags).PSObject.Properties | ForEach-Object { 
-                if ($_.Value) {
-                    $TagData.Add($_.Name,$_.Value) 
-                }
-            }
+    $Metric = Get-DatacenterMetric @MetricParams
+    
+    if ($Metric.Measure) {
 
-            $Metrics = @{
-                CapacityGB = $DSCluster.CapacityGB
-                FreeSpaceGB = $DSCluster.FreeSpaceGB
-                UsedSpaceGB = ($DSCluster.CapacityGB - $DSCluster.FreeSpaceGB)
-                UsedSpacePercent = (($DSCluster.CapacityGB - $DSCluster.FreeSpaceGB) / $DSCluster.CapacityGB * 100)
-            }
-            
-            Write-Verbose "Sending data for $($DSCluster.Name) to Influx.."
-
-            if ($PSCmdlet.ShouldProcess($DSCluster.name)) {
-                Write-Influx -Measure $Measure -Tags $TagData -Metrics $Metrics -Database $Database -Server $Server
-            }
+        if ($PSCmdlet.ShouldProcess($Metric.Measure)) {
+            $Metric | Write-Influx -Database $Database -Server $Server
         }
-
-    }else{
-        Throw 'No DatastoreCluster data returned'
+    }
+    else {
+        throw 'No DatastoreCluster data returned'
     }
 }

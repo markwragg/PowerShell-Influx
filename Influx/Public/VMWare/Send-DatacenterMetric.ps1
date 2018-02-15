@@ -28,13 +28,13 @@
             -----------
             This command will submit the specified tags and Datacenter metrics to a measure called 'TestDatacenter' for all Datacenters starting with 'Test'
     #>  
-    [cmdletbinding(SupportsShouldProcess=$true, ConfirmImpact='Medium')]
+    [cmdletbinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     param(
         [String]
         $Measure = 'Datacenter',
 
         [String[]]
-        $Tags = ('Name','ParentFolder'),
+        $Tags = ('Name', 'ParentFolder'),
 
         [String[]]
         $Datacenter = '*',
@@ -46,45 +46,21 @@
         $Server = 'http://localhost:8086'
     )
 
-    Write-Verbose 'Getting Datacenters..'
-    $Datacenters = Get-Datacenter $Datacenter
+    $MetricParams = @{
+        Measure    = $Measure
+        Tags       = $Tags
+        Datacenter = $Datacenter
+    }
 
-    if ($Datacenters) {
-        
-        foreach ($DC in $Datacenters) {
-        
-            $TagData = @{}
-            ($DC | Select-Object $Tags).PSObject.Properties | ForEach-Object { 
-                if ($_.Value) {
-                    $TagData.Add($_.Name,$_.Value) 
-                }
-            }
+    $Metric = Get-DatacenterMetric @MetricParams
+    
+    if ($Metric.Measure) {
 
-            $VMs = $DC | Get-VM
-
-            $Metrics = @{ VMs_Count = $VMs.count }
-
-            If ($VMs.count -gt 0) {
-                $Metrics.Add('VMs_MemoryGB_Total',($VMs | Measure-Object MemoryGB -Sum).Sum)
-                $Metrics.Add('VMs_NumCPU_Total',($VMs | Measure-Object NumCPU -Sum).Sum)
-            }
-            
-            $VMS | Group-Object PowerState | ForEach-Object { 
-                $Metrics.Add("$($_.Name)_VMs_Count",$_.Count)
-                If ($_.count -gt 0) {
-                    $Metrics.Add("$($_.Name)_VMs_MemoryGB_Total",($_.Group | Measure-Object MemoryGB -Sum).Sum) 
-                    $Metrics.Add("$($_.Name)_VMs_NumCPU_Total",($_.Group | Measure-Object NumCPU -Sum).Sum) 
-                }
-            }
-            
-            Write-Verbose "Sending data for $($DC.Name) to Influx.."
-
-            if ($PSCmdlet.ShouldProcess($DC.name)) {
-                Write-Influx -Measure $Measure -Tags $TagData -Metrics $Metrics -Database $Database -Server $Server
-            }
+        if ($PSCmdlet.ShouldProcess($Metric.Measure)) {
+            $Metric | Write-Influx -Database $Database -Server $Server
         }
-
-    }else{
-        Throw 'No Datacenter data returned'
+    }
+    else {
+        throw 'No Datacenter data returned'
     }
 }

@@ -82,6 +82,6 @@
         }
     }
     else {
-        throw 'No 3par system data returned'
+        Write-Verbose 'No 3par system data returned'
     }
 }
