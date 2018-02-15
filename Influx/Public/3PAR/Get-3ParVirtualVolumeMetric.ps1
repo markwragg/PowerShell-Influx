@@ -25,7 +25,7 @@
             -----------
             This command will return a PowerShell object with the 3PAR Virtual Volume metrics for a measure called 'Test3PARVV'.
     #>  
-    [cmdletbinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+    [cmdletbinding()]
     param(
         [String]
         $Measure = '3PARVirtualVolume',
