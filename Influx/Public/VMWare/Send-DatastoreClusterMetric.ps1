@@ -49,10 +49,10 @@
     $MetricParams = @{
         Measure          = $Measure
         Tags             = $Tags
-        DatastoreCluster = $Datacenter
+        DatastoreCluster = $DatastoreCluster
     }
 
-    $Metric = Get-DatacenterMetric @MetricParams
+    $Metric = Get-DatastoreClusterMetric @MetricParams
     
     if ($Metric.Measure) {
 

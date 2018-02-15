@@ -49,7 +49,7 @@
     $MetricParams = @{
         Measure   = $Measure
         Tags      = $Tags
-        Datastore = $Datacenter
+        Datastore = $Datastore
     }
 
     $Metric = Get-DatastoreMetric @MetricParams
