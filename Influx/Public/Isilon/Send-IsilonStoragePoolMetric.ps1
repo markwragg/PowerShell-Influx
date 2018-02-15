@@ -56,7 +56,14 @@
 
     )
 
-    $Metric = Get-IsilonStoragePoolMetric @PSBoundParameters
+    $MetricParams = @{
+        Measure       = $Measure
+        IsilonName    = $IsilonName
+        IsilonPwdFile = $IsilonPwdFile
+        ClusterName   = $ClusterName
+    }
+
+    $Metric = Get-IsilonStoragePoolMetric @MetricParams
     
     if ($Metric.Measure) {
 

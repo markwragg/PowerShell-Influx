@@ -74,9 +74,17 @@
 
     )
 
-    'Database', 'Server' | ForEach-Object { [void]$PSBoundParameters.Remove($_) }
+    $MetricParams = @{
+        Measure       = $Measure
+        Tags          = $Tags
+        Top           = $Top
+        Latest        = $Latest
+        TFSRootURL    = $TFSRootURL
+        TFSCollection = $TFSCollection
+        TFSProject    = $TFSProject
+    }
 
-    $Metric = Get-TFSBuildMetric @MetricParameters
+    $Metric = Get-TFSBuildMetric @MetricParams
     
     if ($Metric.Measure) {
 

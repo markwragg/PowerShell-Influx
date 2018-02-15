@@ -56,7 +56,14 @@
 
     )
    
-    $Metric = Get-3ParVirtualVolumeMetric @PSBoundParameters
+    $MetricParams = @{
+        Measure      = $Measure
+        SANIPAddress = $SANIPAddress
+        SANUserName  = $SANUserName
+        SANPwdFile   = $SANPwdFile
+    }
+
+    $Metric = Get-3ParVirtualVolumeMetric @MetricParams
 
     if ($Metric.Measure) {
 

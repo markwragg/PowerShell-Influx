@@ -62,7 +62,15 @@
 
     )
 
-    $Metric = Get-3ParSystemMetric @PSBoundParameters
+    $MetricParams = @{
+        Measure      = $Measure
+        Tags         = $Tags
+        SANIPAddress = $SANIPAddress
+        SANUserName  = $SANUserName
+        SANPwdFile   = $SANPwdFile
+    }
+
+    $Metric = Get-3ParSystemMetric @MetricParams
     
     if ($Metric.Measure) {
 
