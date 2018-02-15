@@ -28,23 +28,28 @@
             -----------
             This command will submit the provided tag and metric data for a measure called 'WebServer' to a database called 'Web' via the API endpoint 'http://myinflux.local:8086'
     #>  
-    [cmdletbinding(SupportsShouldProcess=$true, ConfirmImpact='Medium')]
+    [cmdletbinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     param (
-        [Parameter(Mandatory=$true, Position=0)]
+        [Parameter(ParameterSetName = 'MetricObject', ValueFromPipeline = $True, Position = 0)]
+        [metric]$InputObject,
+
+        [Parameter(ParameterSetName = 'Measure', Mandatory = $true, Position = 0)]
         [string]
         $Measure,
 
+        [Parameter(ParameterSetName = 'Measure')]
         [hashtable]
         $Tags,
         
-        [Parameter(Mandatory=$true)]
+        [Parameter(ParameterSetName = 'Measure', Mandatory = $true)]
         [hashtable]
         $Metrics,
 
+        [Parameter(ParameterSetName = 'Measure')]
         [datetime]
         $TimeStamp,
         
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $Database,
         
@@ -52,26 +57,35 @@
         $Server = 'http://localhost:8086'
     )
     
+    if ($InputObject) {
+        $Measure = $InputObject.Measure
+        $Tags = $InputObject.Tags
+        $Metrics = $InputObject.Metrics
+        $TimeStamp = $InputObject.TimeStamp
+    }
+
     if ($TimeStamp) {
         $timeStampNanoSecs = $Timestamp | ConvertTo-UnixTimeNanosecond
-    } else {
+    }
+    else {
         $null = $timeStampNanoSecs
     }
 
     if ($Tags) {
-        $TagData = foreach($Tag in $Tags.Keys) {
+        $TagData = foreach ($Tag in $Tags.Keys) {
             "$($Tag | Out-InfluxEscapeString)=$($Tags[$Tag] | Out-InfluxEscapeString)"
         }
         $TagData = $TagData -Join ','
         $TagData = ",$TagData"
     }
     
-    $Body = foreach($Metric in $Metrics.Keys) {
+    $Body = foreach ($Metric in $Metrics.Keys) {
         
         if ($Metrics[$Metric]) {
             $MetricValue = if ($Metrics[$Metric] -isnot [ValueType]) { 
                 '"' + $Metrics[$Metric] + '"'
-            } else {
+            }
+            else {
                 $Metrics[$Metric] | Out-InfluxEscapeString
             }
         
@@ -83,7 +97,7 @@
         $Body = $Body -Join "`n"
         $URI = "$Server/write?&db=$Database"
 
-        if ($PSCmdlet.ShouldProcess($URI,$Body)) {
+        if ($PSCmdlet.ShouldProcess($URI, $Body)) {
             Invoke-RestMethod -Uri $URI -Method Post -Body $Body | Out-Null
         }
     }
