@@ -57,9 +57,6 @@ Describe "Send-3ParSystemMetric PS$PSVersion" {
        
             Mock Get-3parSystem { } -Verifiable
                 
-            it 'Should throw when no 3par system data is returned' {
-                { Send-3ParSystemMetric -SANIPAddress 1.2.3.4 -SANUsername admin -SANPwdFile C:\scripts\3par.pwd } | Should Throw 'No 3par system data returned'
-            }
             It 'Should execute all verifiable mocks' {
                 Assert-VerifiableMock
             }

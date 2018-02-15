@@ -15,18 +15,12 @@
         .PARAMETER DatastoreCluster
             One or more Datastore Clusters to be queried.
 
-        .PARAMETER Server
-            The URL and port for the Influx REST API. Default: 'http://localhost:8086'
-
-        .PARAMETER Database
-            The name of the Influx database to write to. Default: 'vmware'. This must exist in Influx!
-
         .EXAMPLE
-            Send-DatastoreClusterMetric -Measure 'TestDatastoreClusters' -Tags Name,Type -DatastoreCluster Test*
+            Get-DatastoreClusterMetric -Measure 'TestDatastoreClusters' -Tags Name,Type -DatastoreCluster Test*
             
             Description
             -----------
-            This command will submit the specified tags and DatastoreCluster metrics to a measure called 'TestDatastoreClusters' for all DatastoreClusters starting with 'Test'
+            This command will return the specified tags and DatastoreCluster metrics for a measure called 'TestDatastoreClusters' for all DatastoreClusters starting with 'Test'.
     #>  
     [cmdletbinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     param(
@@ -37,13 +31,7 @@
         $Tags = 'Name',
 
         [String[]]
-        $DatastoreCluster = '*',
-
-        [string]
-        $Database = 'vmware',
-        
-        [string]
-        $Server = 'http://localhost:8086'
+        $DatastoreCluster = '*'
     )
 
     Write-Verbose 'Getting DatastoreClusters..'
@@ -59,23 +47,21 @@
                     $TagData.Add($_.Name, $_.Value) 
                 }
             }
-
-            $Metrics = @{
-                CapacityGB       = $DSCluster.CapacityGB
-                FreeSpaceGB      = $DSCluster.FreeSpaceGB
-                UsedSpaceGB      = ($DSCluster.CapacityGB - $DSCluster.FreeSpaceGB)
-                UsedSpacePercent = (($DSCluster.CapacityGB - $DSCluster.FreeSpaceGB) / $DSCluster.CapacityGB * 100)
-            }
             
-            Write-Verbose "Sending data for $($DSCluster.Name) to Influx.."
-
-            if ($PSCmdlet.ShouldProcess($DSCluster.name)) {
-                Write-Influx -Measure $Measure -Tags $TagData -Metrics $Metrics -Database $Database -Server $Server
+            [pscustomobject]@{
+                PSTypeName = 'Metric'
+                Measure    = $Measure
+                Tags       = $TagData
+                Metrics    = @{
+                    CapacityGB       = $DSCluster.CapacityGB
+                    FreeSpaceGB      = $DSCluster.FreeSpaceGB
+                    UsedSpaceGB      = ($DSCluster.CapacityGB - $DSCluster.FreeSpaceGB)
+                    UsedSpacePercent = (($DSCluster.CapacityGB - $DSCluster.FreeSpaceGB) / $DSCluster.CapacityGB * 100)
+                }
             }
         }
-
     }
     else {
-        Throw 'No DatastoreCluster data returned'
+        Write-Verbose 'No DatastoreCluster data returned'
     }
 }

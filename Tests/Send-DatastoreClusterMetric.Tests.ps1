@@ -44,9 +44,6 @@ Describe "Send-DatastoreClusterMetric PS$PSVersion" {
         
             Mock Get-DatastoreCluster { } -Verifiable
 
-            it 'Should throw if no Datacenter data returned' {
-                { Send-DatastoreClusterMetric } | Should Throw 'No DatastoreCluster data returned'
-            }  
             It 'Should execute all verifiable mocks' {
                 Assert-VerifiableMock
             }

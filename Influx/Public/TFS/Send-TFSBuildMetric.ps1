@@ -92,7 +92,4 @@
             $Metric | Write-Influx -Database $Database -Server $Server
         }
     }
-    else {
-        throw 'No TFS build data returned'
-    }
 }

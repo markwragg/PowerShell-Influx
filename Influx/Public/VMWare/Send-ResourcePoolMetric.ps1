@@ -83,8 +83,5 @@
                 Write-Influx -Measure $Measure -Tags $TagData -Metrics $Metrics -Database $Database -Server $Server
             }
         }
-
-    }else{
-        Throw 'No resource pool data returned'
     }
 }

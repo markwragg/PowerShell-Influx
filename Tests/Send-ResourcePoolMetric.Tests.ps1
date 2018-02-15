@@ -66,9 +66,6 @@ Describe "Send-ResourcePoolMetric PS$PSVersion" {
             
             Mock Get-VM { }
 
-            it 'Should throw if no ResourcePool data returned' {
-                { Send-ResourcePoolMetric } | Should Throw 'No resource pool data returned'
-            }  
             It 'Should execute all verifiable mocks' {
                 Assert-VerifiableMock
             }

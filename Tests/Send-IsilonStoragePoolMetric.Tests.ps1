@@ -62,9 +62,6 @@ Describe "Send-IsilonStoragePoolMetric PS$PSVersion" {
             
             Mock Get-isiStoragepools { } -Verifiable
             
-            it 'Should throw if no storage pool data returned' {
-                { Send-IsilonStoragePoolMetric -IsilonName 1.2.3.4 -IsilonPwdFile C:\scripts\Isilon.pwd -ClusterName TestLab } | Should Throw 'No Storage Pool data returned'
-            }  
             It 'Should execute all verifiable mocks' {
                 Assert-VerifiableMock
             }

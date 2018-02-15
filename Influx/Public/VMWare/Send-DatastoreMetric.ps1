@@ -60,7 +60,4 @@
             $Metric | Write-Influx -Database $Database -Server $Server
         }
     }
-    else {
-        Throw 'No datastore data returned'
-    }
 }

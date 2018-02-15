@@ -71,7 +71,4 @@
             $Metric | Write-Influx -Database $Database -Server $Server
         }
     }
-    else {
-        throw 'No 3par virtual volume metric data returned'
-    }
 }

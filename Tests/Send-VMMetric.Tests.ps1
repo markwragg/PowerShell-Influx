@@ -112,9 +112,6 @@ Describe "Send-VMMetric PS$PSVersion" {
             
             Mock Get-Stat { }
 
-            it 'Should throw if no VM data returned' {
-                { Send-VMMetric } | Should Throw 'No VM data returned'
-            }  
             It 'Should execute all verifiable mocks' {
                 Assert-VerifiableMock
             }

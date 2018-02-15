@@ -96,10 +96,7 @@ Describe "Send-HostMetric PS$PSVersion" {
             Mock Get-VMHost { } -Verifiable
             
             Mock Get-Stat { }
-
-            it 'Should throw if no VMHost data returned' {
-                { Send-HostMetric } | Should Throw 'No host data returned'
-            }  
+ 
             It 'Should execute all verifiable mocks' {
                 Assert-VerifiableMock
             }

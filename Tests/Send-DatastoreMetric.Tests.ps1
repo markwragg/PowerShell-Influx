@@ -43,10 +43,7 @@ Describe "Send-DatastoreMetric PS$PSVersion" {
         Context 'Simulating no Datastore data returned' {
         
             Mock Get-Datastore { } -Verifiable
-
-            it 'Should throw if no Datacenter data returned' {
-                { Send-DatastoreMetric } | Should Throw 'No datastore data returned'
-            }  
+ 
             It 'Should execute all verifiable mocks' {
                 Assert-VerifiableMock
             }

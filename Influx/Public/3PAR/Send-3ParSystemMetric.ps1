@@ -78,7 +78,4 @@
             $Metric | Write-Influx -Database $Database -Server $Server
         }
     }
-    else {
-        throw 'No 3par metric data returned'
-    }
 }
