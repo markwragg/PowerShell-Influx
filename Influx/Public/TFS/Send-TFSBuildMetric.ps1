@@ -74,7 +74,7 @@
 
     )
 
-    $MetricParameters = $PSBoundParameters.GetEnumerator() | Where-Object {$_.Key -notin 'Database', 'Server'}
+    'Database', 'Server' | ForEach-Object { [void]$PSBoundParameters.Remove($_) }
 
     $Metric = Get-TFSBuildMetric @MetricParameters
     
