@@ -31,7 +31,7 @@
     [cmdletbinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     param (
         [Parameter(ParameterSetName = 'MetricObject', ValueFromPipeline = $True, Position = 0)]
-        [metric]$InputObject,
+        [PSTypeName('Metric')]$InputObject,
 
         [Parameter(ParameterSetName = 'Measure', Mandatory = $true, Position = 0)]
         [string]
