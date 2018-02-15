@@ -34,7 +34,7 @@
             -----------
             This command will return the specified tags and build metrics of a measure called 'TestTFS' as a PowerShell object.
     #>  
-    [cmdletbinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+    [cmdletbinding()]
     param(
         [String]
         $Measure = 'TFSBuild',

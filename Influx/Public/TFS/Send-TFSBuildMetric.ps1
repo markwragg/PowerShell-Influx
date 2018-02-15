@@ -74,7 +74,9 @@
 
     )
 
-    $Metric = Get-TFSBuildMetric @PSBoundParameters
+    $MetricParameters = $PSBoundParameters.Remove('Database', 'Server')
+
+    $Metric = Get-TFSBuildMetric @MetricParameters
     
     if ($Metric.Measure) {
 
