@@ -62,15 +62,15 @@
 
     )
 
-    $Metric = Get-3ParSystemMetric -Measure @PSBoundParameters
+    $Metric = Get-3ParSystemMetric @PSBoundParameters
     
     if ($Metric.Measure) {
-        
+
         if ($PSCmdlet.ShouldProcess($Metric.Measure)) {
             $Metric | Write-Influx -Database $Database -Server $Server
         }
     }
     else {
-        Throw 'No 3par system data returned'
+        throw 'No 3par metric data returned'
     }
 }
