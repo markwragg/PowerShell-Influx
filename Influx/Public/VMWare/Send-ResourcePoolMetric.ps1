@@ -28,13 +28,13 @@
             -----------
             This command will submit the specified tags and resource pool metrics to a measure called 'TestResources' for all resource pools starting with 'Test'
     #>  
-    [cmdletbinding(SupportsShouldProcess=$true, ConfirmImpact='Medium')]
+    [cmdletbinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     param(
         [String]
         $Measure = 'ResourcePool',
 
         [String[]]
-        $Tags = ('Name','Parent'),
+        $Tags = ('Name', 'Parent'),
 
         [String[]]
         $ResourcePool = '*',
@@ -46,42 +46,18 @@
         $Server = 'http://localhost:8086'
     )
 
-    Write-Verbose 'Getting resource pools..'
-    $ResourcePools = Get-ResourcePool $ResourcePool
+    $MetricParams = @{
+        Measure      = $Measure
+        Tags         = $Tags
+        ResourcePool = $ResourcePool
+    }
 
-    if ($ResourcePools) {
-        
-        foreach ($RP in $ResourcePools) {
-        
-            $TagData = @{}
-            ($RP | Select-Object $Tags).PSObject.Properties | ForEach-Object { 
-                if ($_.Value) {
-                    $TagData.Add($_.Name,$_.Value) 
-                }
-            }
+    $Metric = Get-ResourcePoolMetric @MetricParams
+    
+    if ($Metric.Measure) {
 
-            $VMs = $RP | Get-VM
-
-            $Metrics = @{ VMs_Count = $VMs.count }
-
-            If ($VMs.count -gt 0) {
-                $Metrics.Add('VMs_MemoryGB_Total',($VMs | Measure-Object MemoryGB -Sum).Sum)
-                $Metrics.Add('VMs_NumCPU_Total',($VMs | Measure-Object NumCPU -Sum).Sum)
-            }
-            
-            $VMS | Group-Object PowerState | ForEach-Object { 
-                $Metrics.Add("$($_.Name)_VMs_Count",$_.Count)
-                If ($_.count -gt 0) {
-                    $Metrics.Add("$($_.Name)_VMs_MemoryGB_Total",($_.Group | Measure-Object MemoryGB -Sum).Sum) 
-                    $Metrics.Add("$($_.Name)_VMs_NumCPU_Total",($_.Group | Measure-Object NumCPU -Sum).Sum) 
-                }
-            }
-            
-            Write-Verbose "Sending data for $($RP.Name) to Influx.."
-
-            if ($PSCmdlet.ShouldProcess($RP.name)) {
-                Write-Influx -Measure $Measure -Tags $TagData -Metrics $Metrics -Database $Database -Server $Server
-            }
+        if ($PSCmdlet.ShouldProcess($Metric.Measure)) {
+            $Metric | Write-Influx -Database $Database -Server $Server
         }
     }
 }
