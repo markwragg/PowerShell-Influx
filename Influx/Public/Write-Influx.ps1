@@ -56,49 +56,50 @@
         [string]
         $Server = 'http://localhost:8086'
     )
-    
-    if ($InputObject) {
-        $Measure = $InputObject.Measure
-        $Tags = $InputObject.Tags
-        $Metrics = $InputObject.Metrics
-        if ($InputObject.TimeStamp) { $TimeStamp = $InputObject.TimeStamp }
-    }
-
-    if ($TimeStamp) {
-        $timeStampNanoSecs = $Timestamp | ConvertTo-UnixTimeNanosecond
-    }
-    else {
-        $null = $timeStampNanoSecs
-    }
-
-    if ($Tags) {
-        $TagData = foreach ($Tag in $Tags.Keys) {
-            "$($Tag | Out-InfluxEscapeString)=$($Tags[$Tag] | Out-InfluxEscapeString)"
+    Process {
+        if ($InputObject) {
+            $Measure = $InputObject.Measure
+            $Metrics = $InputObject.Metrics
+            if ($InputObject.Tags) { $Tags = $InputObject.Tags }
+            if ($InputObject.TimeStamp) { $TimeStamp = $InputObject.TimeStamp }
         }
-        $TagData = $TagData -Join ','
-        $TagData = ",$TagData"
-    }
     
-    $Body = foreach ($Metric in $Metrics.Keys) {
-        
-        if ($Metrics[$Metric]) {
-            if ($Metrics[$Metric] -isnot [ValueType]) { 
-                $MetricValue = '"' + $Metrics[$Metric] + '"'
-            }
-            else {
-                $MetricValue = $Metrics[$Metric] | Out-InfluxEscapeString
-            }
-        
-            "$($Measure | Out-InfluxEscapeString)$TagData $($Metric | Out-InfluxEscapeString)=$MetricValue $timeStampNanoSecs"
+        if ($TimeStamp) {
+            $timeStampNanoSecs = $Timestamp | ConvertTo-UnixTimeNanosecond
         }
-    }
-
-    if ($Body) {
-        $Body = $Body -Join "`n"
-        $URI = "$Server/write?&db=$Database"
-
-        if ($PSCmdlet.ShouldProcess($URI, $Body)) {
-            Invoke-RestMethod -Uri $URI -Method Post -Body $Body | Out-Null
+        else {
+            $null = $timeStampNanoSecs
+        }
+    
+        if ($Tags) {
+            $TagData = foreach ($Tag in $Tags.Keys) {
+                "$($Tag | Out-InfluxEscapeString)=$($Tags[$Tag] | Out-InfluxEscapeString)"
+            }
+            $TagData = $TagData -Join ','
+            $TagData = ",$TagData"
+        }
+        
+        $Body = foreach ($Metric in $Metrics.Keys) {
+            
+            if ($Metrics[$Metric]) {
+                if ($Metrics[$Metric] -isnot [ValueType]) { 
+                    $MetricValue = '"' + $Metrics[$Metric] + '"'
+                }
+                else {
+                    $MetricValue = $Metrics[$Metric] | Out-InfluxEscapeString
+                }
+            
+                "$($Measure | Out-InfluxEscapeString)$TagData $($Metric | Out-InfluxEscapeString)=$MetricValue $timeStampNanoSecs"
+            }
+        }
+    
+        if ($Body) {
+            $Body = $Body -Join "`n"
+            $URI = "$Server/write?&db=$Database"
+    
+            if ($PSCmdlet.ShouldProcess($URI, $Body)) {
+                Invoke-RestMethod -Uri $URI -Method Post -Body $Body | Out-Null
+            }
         }
     }
 }

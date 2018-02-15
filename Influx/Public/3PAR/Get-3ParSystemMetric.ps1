@@ -49,13 +49,13 @@
         $SANPwdFile
     )
 
-    Try {
+    try {
         Import-Module HPE3PARPSToolkit -ErrorAction Stop
 
         Set-3parPoshSshConnectionUsingPasswordFile -SANIPAddress $SANIPAddress -SANUserName $SANUserName -epwdFile $SANPwdFile -ErrorAction Stop | Out-Null
     }
-    Catch {
-        Throw $_
+    catch {
+        throw $_
     }
     
     $3Par = Get-3parSystem
@@ -82,6 +82,6 @@
         }
     }
     else {
-        Throw 'No 3par system data returned'
+        throw 'No 3par system data returned'
     }
 }
