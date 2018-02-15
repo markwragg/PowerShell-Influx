@@ -1,13 +1,13 @@
 ﻿Function Get-3ParSystemMetric {
     <#
         .SYNOPSIS
-            Sends 3Par System metrics to Influx.
+            Returns 3Par System metrics as a metric object which can then be transmitted to Influx.
 
         .DESCRIPTION
             This function requires the HPE3PARPSToolkit module from HP.
 
         .PARAMETER Measure
-            The name of the measure to be updated or created.
+            The name of the measure to be (ultimately) updated or created when this metric object is transmitted to Influx.
 
         .PARAMETER Tags
             An array of 3PAR system tags to be included, from those returned by Get-3ParSystem.

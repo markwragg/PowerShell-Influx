@@ -16,7 +16,7 @@
             -----------
             Some\ \,string\=
     #>
-    [cmdletbinding(SupportsShouldProcess)]
+    [cmdletbinding()]
     [OutputType([string])]
     param(
         [parameter(ValueFromPipeline)]
@@ -24,8 +24,6 @@
         $String
     )
     process {
-        if ($PSCmdlet.ShouldProcess($String)) {
-            $String -Replace '(\s|\=|,)', '\$1'
-        }
+        $String -Replace '(\s|\=|,)', '\$1'
     }
 }
