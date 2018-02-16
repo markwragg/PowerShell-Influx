@@ -57,7 +57,7 @@ Describe "Write-Influx PS$PSVersion" {
             It 'Should call ConvertTo-UnixTimeNanosecond exactly 1 time' {
                 Assert-MockCalled ConvertTo-UnixTimeNanosecond -Exactly 1
             }
-            It 'Should call Out-InfluxEscapeString exactly 7 times' {
+            It 'Should call Out-InfluxEscapeString exactly 9 times' {
                 Assert-MockCalled Out-InfluxEscapeString -Exactly 9
             }
             It 'Should call Invoke-RestMethod exactly 1 time' {

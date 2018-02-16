@@ -1,4 +1,4 @@
-if(-not $PSScriptRoot) { $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent }
+if (-not $PSScriptRoot) { $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent }
 
 $PSVersion = $PSVersionTable.PSVersion.Major
 $Root = "$PSScriptRoot\..\"
@@ -17,7 +17,7 @@ Describe "Write-InfluxUDP PS$PSVersion" {
        
         Context 'Simulating successful write' {
            
-            $WriteInfluxUDP = Write-InfluxUDP -Measure WebServer -Tags @{Server='Host01'} -Metrics @{CPU=100; Status='PoweredOn'} -IP 1.2.3.4 -Port 1234 -Timestamp (Get-Date)
+            $WriteInfluxUDP = Write-InfluxUDP -Measure WebServer -Tags @{Server = 'Host01'} -Metrics @{CPU = 100; Status = 'PoweredOn'} -IP 1.2.3.4 -Port 1234 -Timestamp (Get-Date)
 
             It 'Write-InfluxUDP should return null' {
                 $WriteInfluxUDP | Should -Be $null
@@ -36,9 +36,38 @@ Describe "Write-InfluxUDP PS$PSVersion" {
             }
         }
 
+        Context 'Simulating successful write via piped object' {
+           
+            $MeasureObject = [pscustomobject]@{
+                PSTypeName = 'Metric'
+                Measure    = 'SomeMeasure'
+                Metrics    = @{One = 'One'; Two = 2}
+                Tags       = @{TagOne = 'One'; TagTwo = 2}
+                TimeStamp  = (Get-Date)
+            }
+
+            $WriteInfluxUDP = $MeasureObject | Write-InfluxUDP -IP 1.2.3.4 -Port 1234
+
+            It 'Write-InfluxUDP should return null' {
+                $WriteInfluxUDP | Should -Be $null
+            }
+            It 'Should execute all verifiable mocks' {
+                Assert-VerifiableMock
+            }
+            It 'Should call ConvertTo-UnixTimeNanosecond exactly 1 time' {
+                Assert-MockCalled ConvertTo-UnixTimeNanosecond -Exactly 1
+            }
+            It 'Should call Out-InfluxEscapeString exactly 9 times' {
+                Assert-MockCalled Out-InfluxEscapeString -Exactly 9
+            }
+            It 'Should call Invoke-UDPSendMethod exactly 1 time' {
+                Assert-MockCalled Invoke-UDPSendMethod -Exactly 1
+            }
+        }
+
         Context 'Simulating -WhatIf and no Timestamp specified' {
             
-            $WriteInfluxUDP = Write-InfluxUDP -Measure WebServer -Tags @{Server='Host01'} -Metrics @{CPU=100; Status='PoweredOn'} -IP 1.2.3.4 -Port 1234 -WhatIf
+            $WriteInfluxUDP = Write-InfluxUDP -Measure WebServer -Tags @{Server = 'Host01'} -Metrics @{CPU = 100; Status = 'PoweredOn'} -IP 1.2.3.4 -Port 1234 -WhatIf
 
             It 'Write-InfluxUDP should return null' {
                 $WriteInfluxUDP | Should -Be $null
