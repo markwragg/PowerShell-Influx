@@ -22,7 +22,7 @@
             MemoryUsageGB,Name=somehost1,PowerState=PoweredOn:17.0029296875|g
     #>      
     [cmdletbinding()]
-    [OutputType([long])]
+    [OutputType([String])]
     Param(
         [Parameter(ValueFromPipeline = $True, Position = 0)]
         [PSTypeName('Metric')]
