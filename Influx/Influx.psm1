@@ -10,6 +10,6 @@ $Private = @( Get-ChildItem -Path "$PSScriptRoot\Private\*.ps1" -Recurse )
     }
 }
 
-Export-ModuleMember -Function $Public.BaseName
-
 New-Alias -Name 'Send-Statsd' -Value 'Write-Statsd'
+
+Export-ModuleMember -Function $Public.BaseName -Alias 'Send-Statsd'
