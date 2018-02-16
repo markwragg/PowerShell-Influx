@@ -6,7 +6,7 @@ $Module = 'Influx'
 
 If (-not (Get-Module $Module)) { Import-Module "$Root\$Module" -Force }
 
-Describe "Send-Statsd PS$PSVersion" {
+Describe "Write-StatsD PS$PSVersion" {
     
     InModuleScope Influx {
  
@@ -14,10 +14,10 @@ Describe "Send-Statsd PS$PSVersion" {
        
             Mock Invoke-UDPSendMethod { $null } -Verifiable
                   
-            $SendStatsd = 'my_metric:1|c' | Send-Statsd -IP 1.2.3.4 -Port 1234
+            $WriteStatsD = 'my_metric:1|c' | Write-StatsD -IP 1.2.3.4 -Port 1234
 
-            It 'Send-Statsd should return null' {
-                $SendStatsd | Should -Be $null
+            It 'Write-StatsD should return null' {
+                $WriteStatsD | Should -Be $null
             }
             It 'Should execute all verifiable mocks' {
                 Assert-VerifiableMock
@@ -39,10 +39,10 @@ Describe "Send-Statsd PS$PSVersion" {
                 TimeStamp  = (Get-Date)
             }
 
-            $SendStatsd = $MeasureObject | Send-Statsd -IP 1.2.3.4 -Port 1234
+            $WriteStatsD = $MeasureObject | Write-StatsD -IP 1.2.3.4 -Port 1234
 
-            It 'Send-Statsd should not return an error' {
-                { $SendStatsd } | Should -Not -Throw
+            It 'Write-StatsD should not return an error' {
+                { $WriteStatsD } | Should -Not -Throw
             }
             It 'Should execute all verifiable mocks' {
                 Assert-VerifiableMock
@@ -56,10 +56,10 @@ Describe "Send-Statsd PS$PSVersion" {
        
             Mock Invoke-UDPSendMethod { $null } -ParameterFilter {$WhatIf -eq $true}
            
-            $SendStatsd = 'my_metric:1|c' | Send-Statsd -IP 1.2.3.4 -Port 1234 -WhatIf
+            $WriteStatsD = 'my_metric:1|c' | Write-StatsD -IP 1.2.3.4 -Port 1234 -WhatIf
 
-            It 'Send-Statsd should return null' {
-                $SendStatsd | Should -Be $null
+            It 'Write-StatsD should return null' {
+                $WriteStatsD | Should -Be $null
             }
             It 'Should execute all verifiable mocks' {
                 Assert-VerifiableMock
