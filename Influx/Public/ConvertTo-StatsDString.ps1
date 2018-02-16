@@ -1,7 +1,7 @@
 ﻿Function ConvertTo-StatsDString {
     <#
         .SYNOPSIS
-            Converts a metric object to a StatsD format string which could be used with Send-StatsD.
+            Converts a metric object to a StatsD format string which could be used with Write-StatsD.
 
         .DESCRIPTION
             This is the format a StatsD listener expects for writing metrics.
