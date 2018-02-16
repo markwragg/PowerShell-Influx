@@ -41,7 +41,7 @@
             $TagData = ',' + ($Tags -Join ',')
             
             ForEach ($Metric in $_.Metrics.GetEnumerator()) {
-                "$($Metric.Key)$TagData`:$($Metric.Value)|$Type"
+                "$($_.Measure).$($Metric.Key)$TagData`:$($Metric.Value)|$Type"
             }
         }
     }
