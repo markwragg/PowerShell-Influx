@@ -1,7 +1,7 @@
-﻿Function Send-Statsd {
+﻿Function Write-StatsD {
     <#
         .SYNOPSIS
-            Send metrics to a statsd server via UDP.
+            Send metrics to a statsd server via UDP for writing to Influx.
 
         .DESCRIPTION
             PowerShell cmdlet to send metric data to a statsd server. Unless server or port is passed, uses the default 127.0.0.1 and port of 8125.
@@ -20,13 +20,13 @@
             Port that statsd server is listening to
     
         .EXAMPLE
-            Send-Statsd 'my_metric:123|g'
+            Write-StatsD 'my_metric:123|g'
 
         .EXAMPLE
-            Send-Statsd 'my_metric:321|g' -ip 10.0.0.10 -port 8180
+            Write-StatsD 'my_metric:321|g' -ip 10.0.0.10 -port 8180
 
         .EXAMPLE
-            'my_metric:1|c' | Send-Statsd
+            'my_metric:1|c' | Write-StatsD
     #>
     [cmdletbinding(SupportsShouldProcess, ConfirmImpact = 'Medium')]
     param(
@@ -44,7 +44,6 @@
         [int]
         $Port = 8125
     )
-
     Process {
         if ($InputObject) {
             $Data = $InputObject | ConvertTo-StatsDString
