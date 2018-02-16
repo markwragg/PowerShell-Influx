@@ -1,4 +1,4 @@
-if(-not $PSScriptRoot) { $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent }
+if (-not $PSScriptRoot) { $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent }
 
 $PSVersion = $PSVersionTable.PSVersion.Major
 $Root = "$PSScriptRoot\.."
@@ -62,9 +62,11 @@ Describe "Send-IsilonStoragePoolMetric PS$PSVersion" {
             
             Mock Get-isiStoragepools { } -Verifiable
             
-            it 'Should throw if no storage pool data returned' {
-                { Send-IsilonStoragePoolMetric -IsilonName 1.2.3.4 -IsilonPwdFile C:\scripts\Isilon.pwd -ClusterName TestLab } | Should Throw 'No Storage Pool data returned'
-            }  
+            $SendIsilonSP = Send-IsilonStoragePoolMetric -IsilonName 1.2.3.4 -IsilonPwdFile C:\scripts\Isilon.pwd -ClusterName TestLab
+            
+            it 'Should return null' {
+                $SendIsilonSP | Should be $null
+            }
             It 'Should execute all verifiable mocks' {
                 Assert-VerifiableMock
             }
@@ -81,7 +83,7 @@ Describe "Send-IsilonStoragePoolMetric PS$PSVersion" {
                 Assert-MockCalled Write-Influx -Exactly 0
             }
             It 'Should call Remove-isiSession exactly 1 time' {
-                Assert-MockCalled Remove-isiSession -Exactly 0
+                Assert-MockCalled Remove-isiSession -Exactly 1
             }
         }
 

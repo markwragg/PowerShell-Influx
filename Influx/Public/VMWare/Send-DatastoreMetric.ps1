@@ -28,13 +28,13 @@
             -----------
             This command will submit the specified tags and datastore metrics to a measure called 'TestDatastores' for all datastores starting with 'Test'
     #>  
-    [cmdletbinding(SupportsShouldProcess=$true, ConfirmImpact='Medium')]
+    [cmdletbinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     param(
         [String]
         $Measure = 'Datastore',
 
         [String[]]
-        $Tags = ('Name','ParentFolder','Type'),
+        $Tags = ('Name', 'ParentFolder', 'Type'),
 
         [String[]]
         $Datastore = '*',
@@ -46,34 +46,18 @@
         $Server = 'http://localhost:8086'
     )
 
-    Write-Verbose 'Getting datastores..'
-    $Datastores = Get-Datastore $Datastore
+    $MetricParams = @{
+        Measure   = $Measure
+        Tags      = $Tags
+        Datastore = $Datastore
+    }
 
-    if ($Datastores) {
-        
-        foreach ($DS in $Datastores) {
-        
-            $TagData = @{}
-            ($DS | Select-Object $Tags).PSObject.Properties | ForEach-Object { 
-                if ($_.Value) {
-                    $TagData.Add($_.Name,$_.Value) 
-                }
-            }
+    $Metric = Get-DatastoreMetric @MetricParams
+    
+    if ($Metric.Measure) {
 
-            $Metrics = @{
-                CapacityGB = $DS.CapacityGB
-                FreeSpaceGB = $DS.FreeSpaceGB
-                UsedSpaceGB = ($DS.CapacityGB - $DS.FreeSpaceGB)
-            }
-            
-            Write-Verbose "Sending data for $($DS.Name) to Influx.."
-
-            if ($PSCmdlet.ShouldProcess($DS.name)) {
-                Write-Influx -Measure $Measure -Tags $TagData -Metrics $Metrics -Database $Database -Server $Server
-            }
+        if ($PSCmdlet.ShouldProcess($Metric.Measure)) {
+            $Metric | Write-Influx -Database $Database -Server $Server
         }
-
-    }else{
-        Throw 'No datastore data returned'
     }
 }

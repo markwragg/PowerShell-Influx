@@ -34,23 +34,23 @@
             -----------
             This command will submit the specified tags and 3PAR metrics to a measure called 'Test3PAR'.
     #>  
-    [cmdletbinding(SupportsShouldProcess=$true, ConfirmImpact='Medium')]
+    [cmdletbinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     param(
         [String]
         $Measure = '3PARSystem',
 
         [String[]]
-        $Tags = ('System_Name','System_Model'),
+        $Tags = ('System_Name', 'System_Model'),
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [String]
         $SANIPAddress,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [String]
         $SANUserName, 
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [String]
         $SANPwdFile,
 
@@ -62,39 +62,20 @@
 
     )
 
-    Try {
-        Import-Module HPE3PARPSToolkit -ErrorAction Stop
-
-        Set-3parPoshSshConnectionUsingPasswordFile -SANIPAddress $SANIPAddress -SANUserName $SANUserName -epwdFile $SANPwdFile -ErrorAction Stop | Out-Null
-    } Catch {
-        Throw $_
+    $MetricParams = @{
+        Measure      = $Measure
+        Tags         = $Tags
+        SANIPAddress = $SANIPAddress
+        SANUserName  = $SANUserName
+        SANPwdFile   = $SANPwdFile
     }
-    
-    $3Par = Get-3parSystem
-    
-    if ($3Par) {
-    
-        $TagData = @{}
-        $3Par.GetEnumerator() | Where-Object {$_.Name -in $Tags} | ForEach-Object {
-            if ($_.Value) {
-                $TagData.Add($_.Name,$_.Value)
-            }
-        }
-        
-        $3ParSpace = Get-3parSpace
-                
-        $Metrics = @{ 
-            System_RawFreeMB = [float]$3ParSpace."RawFree(MB)"
-            System_UsableFreeMB = [float]$3ParSpace."UsableFree(MB)"
-        }
-            
-        Write-Verbose "Sending data for $($3Par.System_Name) to Influx.."
 
-        if ($PSCmdlet.ShouldProcess($3Par.System_Name)) {
-            Write-Influx -Measure $Measure -Tags $TagData -Metrics $Metrics -Database $Database -Server $Server
+    $Metric = Get-3ParSystemMetric @MetricParams
+    
+    if ($Metric.Measure) {
+
+        if ($PSCmdlet.ShouldProcess($Metric.Measure)) {
+            $Metric | Write-Influx -Database $Database -Server $Server
         }
-        
-    }else{
-        Throw 'No 3par system data returned'
     }
 }

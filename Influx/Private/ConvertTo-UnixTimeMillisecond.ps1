@@ -16,15 +16,13 @@
             -----------
             1483274062120
     #>      
-    [cmdletbinding(SupportsShouldProcess)]
+    [cmdletbinding()]
     [OutputType([double])]
     Param(
         [parameter(ValueFromPipeline)]
         $Date
     )
     Process {
-        if ($PSCmdlet.ShouldProcess($Date)) {
-            (New-TimeSpan -Start (Get-Date -Date '01/01/1970') -End $Date).TotalMilliseconds
-        }
+        (New-TimeSpan -Start (Get-Date -Date '01/01/1970') -End $Date).TotalMilliseconds
     }
 }

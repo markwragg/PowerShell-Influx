@@ -1,4 +1,4 @@
-if(-not $PSScriptRoot) { $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent }
+if (-not $PSScriptRoot) { $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent }
 
 $PSVersion = $PSVersionTable.PSVersion.Major
 $Root = "$PSScriptRoot\.."
@@ -18,8 +18,8 @@ Describe "Send-DatastoreMetric PS$PSVersion" {
             
             Mock Get-Datastore { 
                 [PSCustomObject]@{ 
-                    Name = 'Test Datastore' 
-                    CapacityGB = 12345.987
+                    Name        = 'Test Datastore' 
+                    CapacityGB  = 12345.987
                     FreespaceGB = 654.123
                 }
             } -Verifiable
@@ -43,10 +43,10 @@ Describe "Send-DatastoreMetric PS$PSVersion" {
         Context 'Simulating no Datastore data returned' {
         
             Mock Get-Datastore { } -Verifiable
-
-            it 'Should throw if no Datacenter data returned' {
-                { Send-DatastoreMetric } | Should Throw 'No datastore data returned'
-            }  
+ 
+            it 'Should return null' {
+                Send-DatastoreMetric | Should be $null
+            }
             It 'Should execute all verifiable mocks' {
                 Assert-VerifiableMock
             }

@@ -1,4 +1,4 @@
-if(-not $PSScriptRoot) { $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent }
+if (-not $PSScriptRoot) { $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent }
 
 $PSVersion = $PSVersionTable.PSVersion.Major
 $Root = "$PSScriptRoot\.."
@@ -59,8 +59,8 @@ Describe "Send-3ParVirtualVolumeMetric PS$PSVersion" {
             
             Mock Get-3parStatVV { }
             
-            it 'Should throw when no 3par system data is returned' {
-                { Send-3ParVirtualVolumeMetric -SANIPAddress 1.2.3.4 -SANUsername admin -SANPwdFile C:\scripts\3par.pwd } | Should Throw 'No 3par system data returned'
+            It 'Should return null' {
+                Send-3ParVirtualVolumeMetric -SANIPAddress 1.2.3.4 -SANUsername admin -SANPwdFile C:\scripts\3par.pwd | Should -Be $null
             }
             It 'Should execute all verifiable mocks' {
                 Assert-VerifiableMock
@@ -90,8 +90,8 @@ Describe "Send-3ParVirtualVolumeMetric PS$PSVersion" {
             
             Mock Get-3parStatVV { } -Verifiable
             
-            it 'Should throw when no 3par volume data is returned' {
-                { Send-3ParVirtualVolumeMetric -SANIPAddress 1.2.3.4 -SANUsername admin -SANPwdFile C:\scripts\3par.pwd } | Should Throw 'No Virtual Volume data returned'
+            It 'Should return null' {
+                Send-3ParVirtualVolumeMetric -SANIPAddress 1.2.3.4 -SANUsername admin -SANPwdFile C:\scripts\3par.pwd | Should -Be $null
             }
             It 'Should execute all verifiable mocks' {
                 Assert-VerifiableMock

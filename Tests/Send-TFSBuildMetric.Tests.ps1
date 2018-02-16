@@ -1,4 +1,4 @@
-if(-not $PSScriptRoot) { $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent }
+if (-not $PSScriptRoot) { $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent }
 
 $PSVersion = $PSVersionTable.PSVersion.Major
 $Root = "$PSScriptRoot\.."
@@ -21,17 +21,17 @@ Describe "Send-TFSBuildMetric PS$PSVersion" {
             Mock Get-TFSBuilds { 
                 [PSCustomObject]@{
                     Definition = 'Some def'
-                    Result = 'failed'
-                    Duration = '123'
-                    Id = '456'
-                    StartTime = (Get-Date '01/01/2017 10:00:00')
+                    Result     = 'failed'
+                    Duration   = '123'
+                    Id         = '456'
+                    StartTime  = (Get-Date '01/01/2017 10:00:00')
                 }
                 [PSCustomObject]@{
                     Definition = 'Some def'
-                    Result = 'success'
-                    Duration = '123'
-                    Id = '456'
-                    StartTime = (Get-Date '01/01/2017 10:00:00')
+                    Result     = 'success'
+                    Duration   = '123'
+                    Id         = '456'
+                    StartTime  = (Get-Date '01/01/2017 10:00:00')
                 }
             } -Verifiable
 
@@ -61,10 +61,10 @@ Describe "Send-TFSBuildMetric PS$PSVersion" {
             Mock Get-TFSBuilds { 
                 [PSCustomObject]@{
                     Definition = 'Some def'
-                    Result = 'partiallySucceeded'
-                    Duration = '123'
-                    Id = '456'
-                    StartTime = (Get-Date '01/01/2017 10:00:00')
+                    Result     = 'partiallySucceeded'
+                    Duration   = '123'
+                    Id         = '456'
+                    StartTime  = (Get-Date '01/01/2017 10:00:00')
                 }
             } -Verifiable
 
@@ -92,9 +92,11 @@ Describe "Send-TFSBuildMetric PS$PSVersion" {
             Mock Import-Module { } -ParameterFilter {$Name -eq 'TFS'} -Verifiable
             
             Mock Get-TFSBuilds { } -Verifiable
-        
-            it 'Should throw if no TFS build data returned' {
-                { Send-TFSBuildMetric -TFSRootURL https://localhost:8088/tfs -TFSCollection MyCollection -TFSProject MyProject } | Should Throw 'No build data returned'
+            
+            $SendTFSBuild = Send-TFSBuildMetric -TFSRootURL https://localhost:8088/tfs -TFSCollection MyCollection -TFSProject MyProject -Latest -Tags Definition, Id
+            
+            It 'Should return null' {
+                $SendTFSBuild | Should be $null
             }  
             It 'Should execute all verifiable mocks' {
                 Assert-VerifiableMock

@@ -31,20 +31,20 @@
             -----------
             This command will submit the 3PAR Virtual Volume metrics to a measure called 'Test3PARVV'.
     #>  
-    [cmdletbinding(SupportsShouldProcess=$true, ConfirmImpact='Medium')]
+    [cmdletbinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     param(
         [String]
         $Measure = '3PARVirtualVolume',
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [String]
         $SANIPAddress,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [String]
         $SANUserName, 
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [String]
         $SANPwdFile,
 
@@ -55,50 +55,20 @@
         $Server = 'http://localhost:8086'
 
     )
-
-    Try {
-        Import-Module HPE3PARPSToolkit -ErrorAction Stop
-
-        Set-3parPoshSshConnectionUsingPasswordFile -SANIPAddress $SANIPAddress -SANUserName $SANUserName -epwdFile $SANPwdFile -ErrorAction Stop | Out-Null
-    } Catch {
-        Throw $_
+   
+    $MetricParams = @{
+        Measure      = $Measure
+        SANIPAddress = $SANIPAddress
+        SANUserName  = $SANUserName
+        SANPwdFile   = $SANPwdFile
     }
-    
-    $3Par = Get-3parSystem
-    
-    if ($3Par) {
-    
-        $VVStats = (Get-3parStatVV -Iteration 1) | Where-Object {$_.VVname -notin 'admin','.srdata'}
-        
-        if ($VVStats) {
 
-            ForEach($VV in $VVStats) {
+    $Metric = Get-3ParVirtualVolumeMetric @MetricParams
 
-                $TagData = @{
-                    System_Name = $3Par.System_Name
-                    VVname = $VV.VVname
-                }
-        
-                $Metrics = @{}
+    if ($Metric.Measure) {
 
-                $VV.PSObject.Properties | Where-Object {$_.Name -notin 'VVname','Time','Date','r/w'} | ForEach-Object {
-                    if ($_.Value) {
-                        $Metrics.Add($_.Name,[float]$_.Value)
-                    }
-                }   
-            
-                Write-Verbose "Sending data for $($VV.VVname) to Influx.."
-
-                if ($PSCmdlet.ShouldProcess($VV.VVname)) {
-                    Write-Influx -Measure $Measure -Tags $TagData -Metrics $Metrics -Database $Database -Server $Server
-                }
-            }
-
-        }else{
-            Throw 'No Virtual Volume data returned'
+        if ($PSCmdlet.ShouldProcess($Metric.Measure)) {
+            $Metric | Write-Influx -Database $Database -Server $Server
         }
-
-    }else{
-        Throw 'No 3par system data returned'
     }
 }

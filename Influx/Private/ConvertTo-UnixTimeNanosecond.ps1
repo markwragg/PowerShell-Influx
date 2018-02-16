@@ -16,7 +16,7 @@
             -------------------
             1483274062120000000
     #>      
-    [cmdletbinding(SupportsShouldProcess)]
+    [cmdletbinding()]
     [OutputType([long])]
     Param(
         [parameter(ValueFromPipeline)]
@@ -24,8 +24,6 @@
         $Date
     )
     Process {
-        if ($PSCmdlet.ShouldProcess($Date)) {
-            [long]((New-TimeSpan -Start (Get-Date -Date '1970-01-01') -End (($Date).ToUniversalTime())).TotalSeconds * 1E9)
-        }
+        [long]((New-TimeSpan -Start (Get-Date -Date '1970-01-01') -End (($Date).ToUniversalTime())).TotalSeconds * 1E9)
     }
 }

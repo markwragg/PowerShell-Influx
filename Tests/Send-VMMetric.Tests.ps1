@@ -1,4 +1,4 @@
-if(-not $PSScriptRoot) { $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent }
+if (-not $PSScriptRoot) { $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent }
 
 $PSVersion = $PSVersionTable.PSVersion.Major
 $Root = "$PSScriptRoot\.."
@@ -19,18 +19,18 @@ Describe "Send-VMMetric PS$PSVersion" {
             
             Mock Get-VM {
                 [PSCustomObject]@{ 
-                    Name = 'TestVM001' 
+                    Name         = 'TestVM001' 
                     ParentFolder = 'Some Folder'
-                    MemoryGB = 4
-                    NumCPU = 2
-                    PowerState = 1
+                    MemoryGB     = 4
+                    NumCPU       = 2
+                    PowerState   = 1
                 }
                 [PSCustomObject]@{ 
-                    Name = 'TestVM002' 
+                    Name         = 'TestVM002' 
                     ParentFolder = 'Some Other Folder'
-                    MemoryGB = 8
-                    NumCPU = 4
-                    PowerState = 0
+                    MemoryGB     = 8
+                    NumCPU       = 4
+                    PowerState   = 0
                 }
             } -Verifiable
 
@@ -59,18 +59,18 @@ Describe "Send-VMMetric PS$PSVersion" {
             
             Mock Get-VM {
                 [PSCustomObject]@{ 
-                    Name = 'TestVM001' 
-                    ParentFolder = 'Some Folder'
-                    MemoryGB = 4
-                    NumCPU = 2
-                    PowerState = 1
+                    Name          = 'TestVM001' 
+                    ParentFolder  = 'Some Folder'
+                    MemoryGB      = 4
+                    NumCPU        = 2
+                    PowerState    = 1
                     ExtensionData = @{
                         Summary = @{
                             QuickStats = [PSCustomObject]@{
-                                OverallCpuUsage = 10
+                                OverallCpuUsage  = 10
                                 GuestMemoryUsage = 50
-                                HostMemoryUsage = 150
-                                UptimeSeconds = 1234567890
+                                HostMemoryUsage  = 150
+                                UptimeSeconds    = 1234567890
                             }
                         }
                     }
@@ -79,17 +79,17 @@ Describe "Send-VMMetric PS$PSVersion" {
 
             Mock Get-Stat {
                 [PSCustomObject]@{ 
-                    Entity = @{Name = 'TestVM001'}
-                    MetricID = 'cpu.usage.average'
+                    Entity    = @{Name = 'TestVM001'}
+                    MetricID  = 'cpu.usage.average'
                     Timestamp = '12/31/2017 12:00:00 AM'
-                    Value = '0.11'
-                    Unit = '%'
+                    Value     = '0.11'
+                    Unit      = '%'
                 }
             } -Verifiable
 
             $SendVM = Send-VMMetric -Stats
             
-            it 'Should return null' {
+            It 'Should return null' {
                 $SendVM | Should be $null
             }
             It 'Should execute all verifiable mocks' {
@@ -112,9 +112,11 @@ Describe "Send-VMMetric PS$PSVersion" {
             
             Mock Get-Stat { }
 
-            it 'Should throw if no VM data returned' {
-                { Send-VMMetric } | Should Throw 'No VM data returned'
-            }  
+            $SendVM = Send-VMMetric
+            
+            It 'Should return null' {
+                $SendVM | Should be $null
+            }
             It 'Should execute all verifiable mocks' {
                 Assert-VerifiableMock
             }

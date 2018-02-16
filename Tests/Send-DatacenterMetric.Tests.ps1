@@ -1,4 +1,4 @@
-if(-not $PSScriptRoot) { $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent }
+if (-not $PSScriptRoot) { $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent }
 
 $PSVersion = $PSVersionTable.PSVersion.Major
 $Root = "$PSScriptRoot\.."
@@ -19,25 +19,25 @@ Describe "Send-DatacenterMetric PS$PSVersion" {
             
             Mock Get-Datacenter { 
                 [PSCustomObject]@{ 
-                    Name = 'Test Datacenter' 
+                    Name         = 'Test Datacenter' 
                     ParentFolder = 'Some Folder'
                 }
             } -Verifiable
 
             Mock Get-VM {
                 [PSCustomObject]@{ 
-                    Name = 'TestVM001' 
+                    Name         = 'TestVM001' 
                     ParentFolder = 'Some Folder'
-                    MemoryGB = 4
-                    NumCPU = 2
-                    PowerState = 'PoweredOn'
+                    MemoryGB     = 4
+                    NumCPU       = 2
+                    PowerState   = 'PoweredOn'
                 }
                 [PSCustomObject]@{ 
-                    Name = 'TestVM002' 
+                    Name         = 'TestVM002' 
                     ParentFolder = 'Some Other Folder'
-                    MemoryGB = 8
-                    NumCPU = 4
-                    PowerState = 'PoweredOff'
+                    MemoryGB     = 8
+                    NumCPU       = 4
+                    PowerState   = 'PoweredOff'
                 }
             } -Verifiable
 
@@ -66,9 +66,9 @@ Describe "Send-DatacenterMetric PS$PSVersion" {
 
             Mock Get-VM { }
         
-            it 'Should throw if no Datacenter data returned' {
-                { Send-DatacenterMetric } | Should Throw 'No Datacenter data returned'
-            }  
+            It 'Should return null' {
+                Send-DatacenterMetric | Should -Be $null
+            }
             It 'Should execute all verifiable mocks' {
                 Assert-VerifiableMock
             }
