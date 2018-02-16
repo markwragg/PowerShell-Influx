@@ -28,19 +28,20 @@
         [PSTypeName('Metric')]
         $InputObject,
 
+        [string]
         $Type = 'g'
     )
     Process {
         $InputObject | ForEach-Object {
             
             $Tags = @()
-            ForEach ($Tag in $_.Tags.GetEnumerator()) {
+            ForEach ($Tag in $_.Tags.GetEnumerator() | Sort-Object Key) {
                 $Tags += "$($Tag.Key)=$($Tag.Value)"
             }
             
             $TagData = ',' + ($Tags -Join ',')
             
-            ForEach ($Metric in $_.Metrics.GetEnumerator()) {
+            ForEach ($Metric in $_.Metrics.GetEnumerator() | Sort-Object Key) {
                 "$($_.Measure).$($Metric.Key)$TagData`:$($Metric.Value)|$Type"
             }
         }
