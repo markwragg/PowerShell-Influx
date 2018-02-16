@@ -1,4 +1,4 @@
-if(-not $PSScriptRoot) { $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent }
+if (-not $PSScriptRoot) { $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent }
 
 $PSVersion = $PSVersionTable.PSVersion.Major
 $Root = "$PSScriptRoot\.."
@@ -19,25 +19,25 @@ Describe "Send-ResourcePoolMetric PS$PSVersion" {
             
             Mock Get-ResourcePool { 
                 [PSCustomObject]@{ 
-                    Name = 'Test ResourcePool' 
+                    Name   = 'Test ResourcePool' 
                     Parent = 'Parent Folder'
                 }
             } -Verifiable
 
             Mock Get-VM {
                 [PSCustomObject]@{ 
-                    Name = 'TestVM001' 
+                    Name         = 'TestVM001' 
                     ParentFolder = 'Some Folder'
-                    MemoryGB = 4
-                    NumCPU = 2
-                    PowerState = 'PoweredOn'
+                    MemoryGB     = 4
+                    NumCPU       = 2
+                    PowerState   = 'PoweredOn'
                 }
                 [PSCustomObject]@{ 
-                    Name = 'TestVM002' 
+                    Name         = 'TestVM002' 
                     ParentFolder = 'Some Other Folder'
-                    MemoryGB = 8
-                    NumCPU = 4
-                    PowerState = 'PoweredOff'
+                    MemoryGB     = 8
+                    NumCPU       = 4
+                    PowerState   = 'PoweredOff'
                 }
             } -Verifiable
 
@@ -66,6 +66,11 @@ Describe "Send-ResourcePoolMetric PS$PSVersion" {
             
             Mock Get-VM { }
 
+            $SendResourcePool = Send-ResourcePoolMetric
+            
+            it 'Should return null' {
+                $SendResourcePool | Should be $null
+            }
             It 'Should execute all verifiable mocks' {
                 Assert-VerifiableMock
             }

@@ -1,4 +1,4 @@
-if(-not $PSScriptRoot) { $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent }
+if (-not $PSScriptRoot) { $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent }
 
 $PSVersion = $PSVersionTable.PSVersion.Major
 $Root = "$PSScriptRoot\.."
@@ -59,6 +59,9 @@ Describe "Send-3ParVirtualVolumeMetric PS$PSVersion" {
             
             Mock Get-3parStatVV { }
             
+            It 'Should return null' {
+                Send-3ParVirtualVolumeMetric -SANIPAddress 1.2.3.4 -SANUsername admin -SANPwdFile C:\scripts\3par.pwd | Should -Be $null
+            }
             It 'Should execute all verifiable mocks' {
                 Assert-VerifiableMock
             }
@@ -87,6 +90,9 @@ Describe "Send-3ParVirtualVolumeMetric PS$PSVersion" {
             
             Mock Get-3parStatVV { } -Verifiable
             
+            It 'Should return null' {
+                Send-3ParVirtualVolumeMetric -SANIPAddress 1.2.3.4 -SANUsername admin -SANPwdFile C:\scripts\3par.pwd | Should -Be $null
+            }
             It 'Should execute all verifiable mocks' {
                 Assert-VerifiableMock
             }

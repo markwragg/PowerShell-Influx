@@ -66,6 +66,9 @@ Describe "Send-DatacenterMetric PS$PSVersion" {
 
             Mock Get-VM { }
         
+            It 'Should return null' {
+                Send-DatacenterMetric | Should -Be $null
+            }
             It 'Should execute all verifiable mocks' {
                 Assert-VerifiableMock
             }

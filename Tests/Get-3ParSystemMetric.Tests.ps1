@@ -6,10 +6,10 @@ $Module = 'Influx'
 
 If (-not (Get-Module $Module)) { Import-Module "$Root\$Module" -Force }
 
-Describe "Send-3ParSystemMetric PS$PSVersion" {
+Describe "Get-3ParSystemMetric PS$PSVersion" {
 
     InModuleScope Influx {
-        
+
         Function Set-3parPoshSshConnectionUsingPasswordFile { }
         Function Get-3parSystem { }
         Function Get-3parSpace { }
@@ -20,16 +20,16 @@ Describe "Send-3ParSystemMetric PS$PSVersion" {
 
         Mock Write-Influx { }
 
-        Context 'Simulating successful send' {
+        Context 'Simulating successful get' {
         
             Mock Import-Module { } -ParameterFilter {$Name -eq 'HPE3PARPSToolkit'} -Verifiable
             
             Mock Get-3parSystem { Import-Clixml .\Tests\Mock-Get3parSystem.xml } -Verifiable
             
-            $Send3ParSys = Send-3ParSystemMetric -SANIPAddress 1.2.3.4 -SANUsername admin -SANPwdFile C:\scripts\3par.pwd
+            $Get3ParSys = Get-3ParSystemMetric -SANIPAddress 1.2.3.4 -SANUsername admin -SANPwdFile C:\scripts\3par.pwd
             
-            it 'Should return null' {
-                $Send3ParSys | Should be $null
+            it 'Should return a 3PARSystem measure' {
+                $Get3ParSys.measure | Should -Be '3PARSystem'
             }
             It 'Should execute all verifiable mocks' {
                 Assert-VerifiableMock
@@ -46,9 +46,6 @@ Describe "Send-3ParSystemMetric PS$PSVersion" {
             It 'Should call Get-3parSpace exactly 1 time' {
                 Assert-MockCalled Get-3parSpace -Exactly 1
             }
-            It 'Should call Write-Influx exactly 1 time' {
-                Assert-MockCalled Write-Influx -Exactly 1
-            }
         }
 
         Context 'Simulating no system data returned' {
@@ -58,7 +55,7 @@ Describe "Send-3ParSystemMetric PS$PSVersion" {
             Mock Get-3parSystem { } -Verifiable
             
             It 'Should return null' {
-                Send-3ParSystemMetric -SANIPAddress 1.2.3.4 -SANUsername admin -SANPwdFile C:\scripts\3par.pwd | Should -Be $null
+                Get-3ParSystemMetric -SANIPAddress 1.2.3.4 -SANUsername admin -SANPwdFile C:\scripts\3par.pwd | Should -Be $null
             }
             It 'Should execute all verifiable mocks' {
                 Assert-VerifiableMock
@@ -75,9 +72,6 @@ Describe "Send-3ParSystemMetric PS$PSVersion" {
             It 'Should call Get-3parSpace exactly 0 times' {
                 Assert-MockCalled Get-3parSpace -Exactly 0
             }
-            It 'Should call Write-Influx exactly 0 times' {
-                Assert-MockCalled Write-Influx -Exactly 0
-            }
         }
 
         Context 'Simulating module not found' {
@@ -85,7 +79,7 @@ Describe "Send-3ParSystemMetric PS$PSVersion" {
             Mock Import-Module { Throw "The specified module 'HPE3PARPSToolkit' was not loaded because no valid module file was found in any module directory." }
         
             it 'Should throw when the module is not present' {
-                { Send-3ParSystemMetric -SANIPAddress 1.2.3.4 -SANUsername admin -SANPwdFile C:\scripts\3par.pwd } | Should Throw "The specified module 'HPE3PARPSToolkit' was not loaded because no valid module file was found in any module directory."
+                { Get-3ParSystemMetric -SANIPAddress 1.2.3.4 -SANUsername admin -SANPwdFile C:\scripts\3par.pwd } | Should Throw "The specified module 'HPE3PARPSToolkit' was not loaded because no valid module file was found in any module directory."
             }
         }        
     }

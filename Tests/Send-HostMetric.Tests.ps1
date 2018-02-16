@@ -1,4 +1,4 @@
-if(-not $PSScriptRoot) { $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent }
+if (-not $PSScriptRoot) { $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent }
 
 $PSVersion = $PSVersionTable.PSVersion.Major
 $Root = "$PSScriptRoot\.."
@@ -19,9 +19,9 @@ Describe "Send-HostMetric PS$PSVersion" {
             
             Mock Get-VMHost { 
                 [PSCustomObject]@{ 
-                    Name = 'Test VMHost' 
-                    CpuTotalMhz = 30396
-                    CpuUsageMhz = 7651
+                    Name          = 'Test VMHost' 
+                    CpuTotalMhz   = 30396
+                    CpuUsageMhz   = 7651
                     MemoryTotalGB = 255.906
                     MemoryUsageGB = 123.456
 
@@ -53,9 +53,9 @@ Describe "Send-HostMetric PS$PSVersion" {
             
             Mock Get-VMHost { 
                 [PSCustomObject]@{ 
-                    Name = 'Test VMHost' 
-                    CpuTotalMhz = 30396
-                    CpuUsageMhz = 7651
+                    Name          = 'Test VMHost' 
+                    CpuTotalMhz   = 30396
+                    CpuUsageMhz   = 7651
                     MemoryTotalGB = 255.906
                     MemoryUsageGB = 123.456
 
@@ -64,11 +64,11 @@ Describe "Send-HostMetric PS$PSVersion" {
 
             Mock Get-Stat {
                 [PSCustomObject]@{ 
-                    Entity = @{Name = 'Test VMHost'}
-                    MetricID = 'cpu.usage.average'
+                    Entity    = @{Name = 'Test VMHost'}
+                    MetricID  = 'cpu.usage.average'
                     Timestamp = '12/31/2017 12:00:00 AM'
-                    Value = '0.11'
-                    Unit = '%'
+                    Value     = '0.11'
+                    Unit      = '%'
                 }
             } -Verifiable
 
@@ -97,6 +97,9 @@ Describe "Send-HostMetric PS$PSVersion" {
             
             Mock Get-Stat { }
  
+            it 'Should return null' {
+                Send-HostMetric | Should be $null
+            }
             It 'Should execute all verifiable mocks' {
                 Assert-VerifiableMock
             }
