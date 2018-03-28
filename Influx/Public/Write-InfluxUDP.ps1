@@ -84,16 +84,14 @@
     
         $Body = foreach ($Metric in $Metrics.Keys) {
         
-            if ($Metrics[$Metric]) {
-                $MetricValue = if ($Metrics[$Metric] -isnot [ValueType]) { 
-                    '"' + $Metrics[$Metric] + '"'
-                }
-                else {
-                    $Metrics[$Metric] | Out-InfluxEscapeString
-                }
-        
-                "$($Measure | Out-InfluxEscapeString)$TagData $($Metric | Out-InfluxEscapeString)=$MetricValue $timeStampNanoSecs"
+            $MetricValue = if ($Metrics[$Metric] -isnot [ValueType]) { 
+                '"' + $Metrics[$Metric] + '"'
             }
+            else {
+                $Metrics[$Metric] | Out-InfluxEscapeString
+            }
+    
+            "$($Measure | Out-InfluxEscapeString)$TagData $($Metric | Out-InfluxEscapeString)=$MetricValue $timeStampNanoSecs"
         }
     
         if ($Body) {

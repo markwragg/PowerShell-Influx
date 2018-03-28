@@ -85,5 +85,49 @@ Describe "Write-Influx PS$PSVersion" {
                 Assert-MockCalled Invoke-RestMethod -Exactly 0
             }
         }
+
+        Context 'Simulating write of metric with zero value' {
+           
+            $WriteInflux = Write-Influx -Measure WebServer -Tags @{Server = 'Host01'} -Metrics @{CPU = 50; Memory = 0} -Database Web -Server http://localhost:8086 -Timestamp (Get-Date)
+
+            It 'Write-Influx should return null' {
+                $WriteInflux | Should -Be $null
+            }
+            It 'Should execute all verifiable mocks' {
+                Assert-VerifiableMock
+            }
+            It 'Should call ConvertTo-UnixTimeNanosecond exactly 1 time' {
+                Assert-MockCalled ConvertTo-UnixTimeNanosecond -Exactly 1
+            }
+            It 'Should call Out-InfluxEscapeString exactly 8 times' {
+                Assert-MockCalled Out-InfluxEscapeString -Exactly 8
+            }
+            It 'Should call Invoke-RestMethod exactly 1 time' {
+                Assert-MockCalled Invoke-RestMethod -Exactly 1
+            }
+        }
+
+        Context 'Simulating write of metric with null value' {
+           
+            $WriteInflux = Write-Influx -Measure WebServer -Tags @{Server = 'Host01'} -Metrics @{CPU = 50; Memory = $null} -Database Web -Server http://localhost:8086 -Timestamp (Get-Date)
+
+            It 'Write-Influx should return null' {
+                $WriteInflux | Should -Be $null
+            }
+            It 'Should execute all verifiable mocks' {
+                Assert-VerifiableMock
+            }
+            It 'Should call ConvertTo-UnixTimeNanosecond exactly 1 time' {
+                Assert-MockCalled ConvertTo-UnixTimeNanosecond -Exactly 1
+            }
+            It 'Should call Out-InfluxEscapeString exactly 7 times' {
+                Assert-MockCalled Out-InfluxEscapeString -Exactly 7
+            }
+            It 'Should call Invoke-RestMethod exactly 1 time' {
+                Assert-MockCalled Invoke-RestMethod -Exactly 1
+            }
+        }
+
+
     }
 }
