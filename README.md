@@ -1,6 +1,6 @@
 # PowerShell-Influx
 
-[![Build status](https://ci.appveyor.com/api/projects/status/v6215sfhyvorhgo8?svg=true)](https://ci.appveyor.com/project/markwragg/powershell-influx)
+[![Build status](https://ci.appveyor.com/api/projects/status/v6215sfhyvorhgo8?svg=true)](https://ci.appveyor.com/project/markwragg/powershell-influx) ![Test Coverage](https://img.shields.io/badge/coverage.svg)
 
 This is a PowerShell module for interacting with the time-series database platform Influx: https://www.influxdata.com/. At the moment the primary purpose is to enable a consistent experience for writing metrics in to Influx via the REST API, UDP or StatsD. 
 
