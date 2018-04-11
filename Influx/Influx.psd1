@@ -12,7 +12,7 @@
 RootModule = 'Influx.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.0.77'
+ModuleVersion = '1.0.78'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
