@@ -1,6 +1,6 @@
 ﻿# PSScriptAnalyzer tests
 
-#$ExcludeRules = ''
+$ExcludeRules = 'PSAvoidTrailingWhitespace'
 $Rules   = Get-ScriptAnalyzerRule | Where-Object { $_.RuleName -notin $ExcludeRules }
 
 $Scripts = Get-ChildItem "$PSScriptRoot\..\" -Filter '*.ps1' -File -Recurse -Exclude '*.tests.ps1','*.psdeploy.ps1','build.ps1','install.ps1','psake.ps1'

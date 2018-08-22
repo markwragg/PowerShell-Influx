@@ -24,6 +24,9 @@
         .PARAMETER Database
             The name of the Influx database to write to.
 
+        .PARAMETER Credential
+            A PSCredential object with the username and password to use if the Influx server has authentication enabled.
+
         .EXAMPLE
             Write-Influx -Measure WebServer -Tags @{Server='Host01'} -Metrics @{CPU=100; Memory=50} -Database Web -Server http://myinflux.local:8086
             
@@ -58,8 +61,23 @@
         $Database,
         
         [string]
-        $Server = 'http://localhost:8086'
+        $Server = 'http://localhost:8086',
+
+        [pscredential]
+        $Credential
     )
+    Begin {
+        if ($Credential) {
+            $Username = $Credential.UserName
+            $Password = $Credential.GetNetworkCredential().Password
+
+            $EncodedCreds = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes("$($Username):$($Password)"))
+
+            $Headers = @{
+                Authorization = "Basic $EncodedCreds"
+            }
+        }
+    }
     Process {
         if ($InputObject) {
             $Measure = $InputObject.Measure
@@ -100,7 +118,7 @@
             $URI = "$Server/write?&db=$Database"
     
             if ($PSCmdlet.ShouldProcess($URI, $Body)) {
-                Invoke-RestMethod -Uri $URI -Method Post -Body $Body | Out-Null
+                Invoke-RestMethod -Uri $URI -Method Post -Body $Body -Headers $Headers | Out-Null
             }
         }
     }
