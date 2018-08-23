@@ -24,6 +24,9 @@ For example:
 ```
 #REST API
 Write-Influx -Measure Server -Tags @{Hostname=$env:COMPUTERNAME} -Metrics @{Memory=50;CPU=10} -Database Web -Server http://myinflux.local:8086 -Verbose
+
+#REST API with authentication
+Write-Influx -Measure Server -Tags @{Hostname=$env:COMPUTERNAME} -Metrics @{Memory=50;CPU=10} -Database Web -Server http://myinflux.local:8086 -Credential (Get-Credential) -Verbose
  
 #Influx UDP
 Write-InfluxUDP -Measure Server -Tags @{Hostname=$env:COMPUTERNAME} -Metrics @{Memory=50;CPU=10} -Database Web -IP 1.2.3.4 -Port 8089 -Verbose
