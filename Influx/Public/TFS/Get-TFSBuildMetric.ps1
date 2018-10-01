@@ -68,7 +68,15 @@
         throw $_
     }
     
-    Write-Verbose 'Getting builds..'
+    $global:tfs = @{
+        root_url   = $TFSRootURL
+        collection = $TFSCollection
+        project    = $TFSProject
+    }
+    
+    Write-Verbose "TFS settings:`n`n$($global:tfs)"
+
+    Write-Verbose "`nGetting builds.."
     $Builds = Get-TFSBuilds -Top $Top | Where-Object { $_.StartTime }
 
     If ($Latest) {
