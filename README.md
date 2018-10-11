@@ -37,7 +37,7 @@ Write-Statsd "Server.CPU,Hostname=$($env:COMPUTERNAME):10|g" -IP 1.2.3.4 -Port 8
 
 This project was created so that PowerShell could be used to routinely query various infrastructure metrics and then send those metrics in to Influx for storage, where they could then be presented via a Grafana dashboard.
 
-As such the module also contains a number of cmdlets for retrieving data various sources. Current implemntations include: VMWare, 3PAR, Isilon and TFS. You will find these cmdlets under `\Public\<source>`.
+As such the module also contains a number of cmdlets for retrieving data various sources. Current implementations include: VMWare, 3PAR, Isilon and TFS. You will find these cmdlets under `\Public\<source>`.
 
 The `Get-SomeMetric` cmdlets return a `Metric` type object which can be consumed by any of the `Write-*` cmdlets above via the pipeline or the `-InputObject' parameter. For example:
 
