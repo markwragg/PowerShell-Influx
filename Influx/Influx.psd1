@@ -77,7 +77,7 @@ FunctionsToExport = 'ConvertTo-StatsDString', 'Write-Influx', 'Write-InfluxUDP',
                'Get-DatastoreClusterMetric', 'Get-DatastoreMetric', 'Get-HostMetric', 
                'Get-ResourcePoolMetric', 'Get-VMMetric', 'Send-DatacenterMetric', 
                'Send-DatastoreClusterMetric', 'Send-DatastoreMetric', 
-               'Send-HostMetric', 'Send-ResourcePoolMetric', 'Send-VMMetric'
+               'Send-HostMetric', 'Send-ResourcePoolMetric', 'Send-VMMetric', 'ConvertTo-Metric'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = @()

@@ -26,14 +26,18 @@
 
         .PARAMETER Credential
             A PSCredential object with the username and password to use if the Influx server has authentication enabled.
+        
+        .PARAMETER Bulk
+            Switch: Use to have all metrics transmitted via a single connection to Influx.
 
         .EXAMPLE
             Write-Influx -Measure WebServer -Tags @{Server='Host01'} -Metrics @{CPU=100; Memory=50} -Database Web -Server http://myinflux.local:8086
             
             Description
             -----------
-            This command will submit the provided tag and metric data for a measure called 'WebServer' to a database called 'Web' via the API endpoint 'http://myinflux.local:8086'
-    #>  
+            This command will submit the provided tag and metric data for a measure called 'WebServer' to a database called 'Web' 
+            via the API endpoint 'http://myinflux.local:8086'
+    #>
     [cmdletbinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     param (
         [Parameter(ParameterSetName = 'MetricObject', ValueFromPipeline = $True, Position = 0)]
@@ -64,7 +68,10 @@
         $Server = 'http://localhost:8086',
 
         [pscredential]
-        $Credential
+        $Credential,
+
+        [switch]
+        $Bulk
     )
     Begin {
         if ($Credential) {
@@ -77,6 +84,9 @@
                 Authorization = "Basic $EncodedCreds"
             }
         }
+
+        $BulkBody = @()
+        $URI = "$Server/write?&db=$Database"
     }
     Process {
         if ($InputObject) {
@@ -112,13 +122,27 @@
         
             "$($Measure | Out-InfluxEscapeString)$TagData $($Metric | Out-InfluxEscapeString)=$MetricValue $timeStampNanoSecs"
         }
-    
+        
         if ($Body) {
             $Body = $Body -Join "`n"
-            $URI = "$Server/write?&db=$Database"
-    
-            if ($PSCmdlet.ShouldProcess($URI, $Body)) {
-                Invoke-RestMethod -Uri $URI -Method Post -Body $Body -Headers $Headers | Out-Null
+            
+            If ($Bulk) {
+                $BulkBody += $Body
+            }
+            Else {
+                if ($PSCmdlet.ShouldProcess($URI, $Body)) {
+                    Invoke-RestMethod -Uri $URI -Method Post -Body $Body -Headers $Headers | Out-Null
+                }
+            }
+            
+        }
+    }
+    End {
+        If ($Bulk) {
+            $BulkBody = $BulkBody -Join "`n"
+            
+            if ($PSCmdlet.ShouldProcess($URI, $BulkBody)) {
+                Invoke-RestMethod -Uri $URI -Method Post -Body $BulkBody -Headers $Headers | Out-Null
             }
         }
     }

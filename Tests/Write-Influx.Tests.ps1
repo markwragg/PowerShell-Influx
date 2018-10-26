@@ -128,6 +128,42 @@ Describe "Write-Influx PS$PSVersion" {
             }
         }
 
+        Context 'Simulating successful write via piped object with -Bulk switch' {
+            
+            $MeasureObject = @(
+                [pscustomobject]@{
+                    PSTypeName = 'Metric'
+                    Measure    = 'SomeMeasure'
+                    Metrics    = @{One = 'One'; Two = 2}
+                    Tags       = @{TagOne = 'One'; TagTwo = 2}
+                    TimeStamp  = (Get-Date)
+                },
+                [pscustomobject]@{
+                    PSTypeName = 'Metric'
+                    Measure    = 'OtherMeasure'
+                    Metrics    = @{Three = 'Four'; Five = 6}
+                    Tags       = @{TagOne = 'One'; TagTwo = 2}
+                    TimeStamp  = (Get-Date)
+                }
+            )
 
+            $WriteInflux = $MeasureObject | Write-Influx -Bulk -Database Web -Server http://localhost:8086
+
+            It 'Write-Influx should return null' {
+                $WriteInflux | Should -Be $null
+            }
+            It 'Should execute all verifiable mocks' {
+                Assert-VerifiableMock
+            }
+            It 'Should call ConvertTo-UnixTimeNanosecond exactly 1 time' {
+                Assert-MockCalled ConvertTo-UnixTimeNanosecond -Exactly 2
+            }
+            It 'Should call Out-InfluxEscapeString exactly 18 times' {
+                Assert-MockCalled Out-InfluxEscapeString -Exactly 18
+            }
+            It 'Should call Invoke-RestMethod exactly 1 time' {
+                Assert-MockCalled Invoke-RestMethod -Exactly 1
+            }
+        }
     }
 }
