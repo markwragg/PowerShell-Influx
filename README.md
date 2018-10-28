@@ -6,7 +6,7 @@ This is a PowerShell module for interacting with the time-series database platfo
 
 # Purpose
 
-This module was written to allow metrics from different sources to be written to InfluxDB, for presentation via one or more Grafana Dashboards. By utilising this module, InfluxDB and Grafana you can create and populate interactive dashboards like these:
+This module was written to allow metrics from different sources to be written to InfluxDB, for presentation via one or more Grafana Dashboards. By utilising this module, InfluxDB and Grafana you can create and populate interactive dashboards like these (note: sensitive data has been redacted from these screenshots):
 
 <p align="center">
 <img src="http://wragg.io/content/images/2018/02/Grafana-Example-2.png" height=200>  <img src="http://wragg.io/content/images/2018/02/Grafana-TFS-Build-Dashboard.png" height=200>
