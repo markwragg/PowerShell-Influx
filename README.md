@@ -4,6 +4,16 @@
 
 This is a PowerShell module for interacting with the time-series database platform Influx: https://www.influxdata.com/. At the moment the primary purpose is to enable a consistent experience for writing metrics in to Influx via the REST API, UDP or StatsD. 
 
+# Purpose
+
+This module was written to allow metrics from different sources to be written to InfluxDB, for presentation via one or more Grafana Dashboards. By utilising this module, InfluxDB and Grafana you can create and populate interactive dashboards like these:
+
+<p align="center">
+<img src="http://wragg.io/content/images/2018/02/Grafana-Example-2.png" height=200>  <img src="http://wragg.io/content/images/2018/02/Grafana-TFS-Build-Dashboard.png" height=200>
+</p>
+
+For more details on how to implement these tools, [check out my blog post](http://wragg.io/windows-based-grafana-analytics-platform-via-influxdb-and-powershell/). For more information on how to use the Influx PowerShell module, read on below.
+
 # Installation
 
 The module is published in the PSGallery, so if you have PowerShell 5 can be installed by running:
