@@ -20,6 +20,10 @@
 
         .PARAMETER IP
             IP address for InfluxDB UDP listener.
+        
+        .PARAMETER ExcludeEmptyMetric
+            Switch: Use to exclude null or empty metric values from being sent. Useful where a metric is initially created as an integer but then
+            an empty or null instance of that metric would attempt to be sent as an empty string, resulting in a datatype conflict.
     
         .PARAMETER Port
             Port for InfluxDB UDP listener.
@@ -57,7 +61,10 @@
         $IP = '127.0.0.1',
   
         [int]
-        $Port = 8089
+        $Port = 8089,
+
+        [switch]
+        $ExcludeEmptyMetric
     )
     Process {
         if ($InputObject) {
@@ -84,14 +91,19 @@
     
         $Body = foreach ($Metric in $Metrics.Keys) {
         
-            $MetricValue = if ($Metrics[$Metric] -isnot [ValueType]) { 
-                '"' + $Metrics[$Metric] + '"'
+            if ($ExcludeEmptyMetric -and [string]::IsNullOrEmpty($Metrics[$Metric])) {
+                Write-Verbose "$Metric skipped as -ExcludeEmptyMetric was specified and the value is null or empty."
             }
-            else {
-                $Metrics[$Metric] | Out-InfluxEscapeString
+            Else {
+                $MetricValue = if ($Metrics[$Metric] -isnot [ValueType]) { 
+                    '"' + $Metrics[$Metric] + '"'
+                }
+                else {
+                    $Metrics[$Metric] | Out-InfluxEscapeString
+                }
+        
+                "$($Measure | Out-InfluxEscapeString)$TagData $($Metric | Out-InfluxEscapeString)=$MetricValue $timeStampNanoSecs"
             }
-    
-            "$($Measure | Out-InfluxEscapeString)$TagData $($Metric | Out-InfluxEscapeString)=$MetricValue $timeStampNanoSecs"
         }
     
         if ($Body) {

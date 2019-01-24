@@ -167,6 +167,8 @@ Describe "Write-Influx PS$PSVersion" {
         }
 
         Context 'Simulating skip writing null or empty metrics when -ExcludeEmptyMetric is used' {
+
+            Mock Write-Verbose {}
             
             $MeasureObject = @(
                 [PSCustomObject]@{
@@ -181,13 +183,16 @@ Describe "Write-Influx PS$PSVersion" {
                 }
             )
 
-            $WriteInflux = $MeasureObject | ConvertTo-Metric -Measure Test -MetricProperty Name,SomeVal,OtherVal | Write-Influx -Database Web -ExcludeEmptyMetric
+            $WriteInflux = $MeasureObject | ConvertTo-Metric -Measure Test -MetricProperty Name,SomeVal,OtherVal | Write-Influx -Database Web -ExcludeEmptyMetric -Verbose
             
             It 'Write-Influx should return null' {
                 $WriteInflux | Should -Be $null
             }
             It 'Should execute all verifiable mocks' {
                 Assert-VerifiableMock
+            }
+            It 'Should call Write-Verbose exactly 2 times' {
+                Assert-MockCalled Write-Verbose -Exactly 2
             }
             It 'Should call ConvertTo-UnixTimeNanosecond exactly 0 times' {
                 Assert-MockCalled ConvertTo-UnixTimeNanosecond -Exactly 0

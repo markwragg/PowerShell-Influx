@@ -127,5 +127,44 @@ Describe "Write-InfluxUDP PS$PSVersion" {
                 Assert-MockCalled Invoke-UDPSendMethod -Exactly 1
             }
         }
+
+        Context 'Simulating skip writing null or empty metrics when -ExcludeEmptyMetric is used' {
+
+            Mock Write-Verbose {}
+            
+            $MeasureObject = @(
+                [PSCustomObject]@{
+                    Name = 'Object1'
+                    SomeVal = 1
+                    OtherVal = ''
+                },
+                [PSCustomObject]@{
+                    Name = 'Object2'
+                    SomeVal = $null
+                    OtherVal = 2
+                }
+            )
+
+            $WriteInfluxUDP = $MeasureObject | ConvertTo-Metric -Measure Test -MetricProperty Name,SomeVal,OtherVal | Write-InfluxUDP -IP 1.2.3.4 -Port 1234 -ExcludeEmptyMetric -Verbose
+            
+            It 'Write-InfluxUDP should return an array of two nulls' {
+                $WriteInfluxUDP | Should -Be @($null,$null)
+            }
+            It 'Should execute all verifiable mocks' {
+                Assert-VerifiableMock
+            }
+            It 'Should call Write-Verbose exactly 2 times' {
+                Assert-MockCalled Write-Verbose -Exactly 2
+            }
+            It 'Should call ConvertTo-UnixTimeNanosecond exactly 0 times' {
+                Assert-MockCalled ConvertTo-UnixTimeNanosecond -Exactly 0
+            }
+            It 'Should call Out-InfluxEscapeString exactly 10 times' {
+                Assert-MockCalled Out-InfluxEscapeString -Exactly 10
+            }
+            It 'Should call Invoke-RestMethod exactly 2 times' {
+                Assert-MockCalled Invoke-UDPSendMethod -Exactly 2
+            }
+        }
     }
 }
