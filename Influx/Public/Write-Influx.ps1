@@ -30,6 +30,10 @@
         .PARAMETER Bulk
             Switch: Use to have all metrics transmitted via a single connection to Influx.
 
+        .PARAMETER ExcludeEmptyMetric
+            Switch: Use to exclude null or empty metric values from being sent. Useful where a metric is initially created as an integer but then
+            an empty or null instance of that metric would attempt to be sent as an empty string, resulting in a datatype conflict.
+
         .EXAMPLE
             Write-Influx -Measure WebServer -Tags @{Server='Host01'} -Metrics @{CPU=100; Memory=50} -Database Web -Server http://myinflux.local:8086
             
@@ -71,7 +75,10 @@
         $Credential,
 
         [switch]
-        $Bulk
+        $Bulk,
+
+        [switch]
+        $ExcludeEmptyMetric
     )
     Begin {
         if ($Credential) {
@@ -113,14 +120,19 @@
         
         $Body = foreach ($Metric in $Metrics.Keys) {
             
-            if ($Metrics[$Metric] -isnot [ValueType]) { 
-                $MetricValue = '"' + $Metrics[$Metric] + '"'
+            if ($ExcludeEmptyMetric -and [string]::IsNullOrEmpty($Metrics[$Metric])) {
+                Write-Verbose "$Metric skipped as -ExcludeEmptyMetric was specified and the value is null or empty."
             }
-            else {
-                $MetricValue = $Metrics[$Metric] | Out-InfluxEscapeString
-            }
-        
-            "$($Measure | Out-InfluxEscapeString)$TagData $($Metric | Out-InfluxEscapeString)=$MetricValue $timeStampNanoSecs"
+            Else {
+                if ($Metrics[$Metric] -isnot [ValueType]) { 
+                    $MetricValue = '"' + $Metrics[$Metric] + '"'
+                }
+                else {
+                    $MetricValue = $Metrics[$Metric] | Out-InfluxEscapeString
+                }
+            
+                "$($Measure | Out-InfluxEscapeString)$TagData $($Metric | Out-InfluxEscapeString)=$MetricValue $timeStampNanoSecs"
+            }            
         }
         
         if ($Body) {

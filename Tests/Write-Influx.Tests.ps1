@@ -155,7 +155,7 @@ Describe "Write-Influx PS$PSVersion" {
             It 'Should execute all verifiable mocks' {
                 Assert-VerifiableMock
             }
-            It 'Should call ConvertTo-UnixTimeNanosecond exactly 1 time' {
+            It 'Should call ConvertTo-UnixTimeNanosecond exactly 2 times' {
                 Assert-MockCalled ConvertTo-UnixTimeNanosecond -Exactly 2
             }
             It 'Should call Out-InfluxEscapeString exactly 18 times' {
@@ -163,6 +163,40 @@ Describe "Write-Influx PS$PSVersion" {
             }
             It 'Should call Invoke-RestMethod exactly 1 time' {
                 Assert-MockCalled Invoke-RestMethod -Exactly 1
+            }
+        }
+
+        Context 'Simulating skip writing null or empty metrics when -ExcludeEmptyMetric is used' {
+            
+            $MeasureObject = @(
+                [PSCustomObject]@{
+                    Name = 'Object1'
+                    SomeVal = 1
+                    OtherVal = ''
+                },
+                [PSCustomObject]@{
+                    Name = 'Object2'
+                    SomeVal = $null
+                    OtherVal = 2
+                }
+            )
+
+            $WriteInflux = $MeasureObject | ConvertTo-Metric -Measure Test -MetricProperty Name,SomeVal,OtherVal | Write-Influx -Database Web -ExcludeEmptyMetric
+            
+            It 'Write-Influx should return null' {
+                $WriteInflux | Should -Be $null
+            }
+            It 'Should execute all verifiable mocks' {
+                Assert-VerifiableMock
+            }
+            It 'Should call ConvertTo-UnixTimeNanosecond exactly 0 times' {
+                Assert-MockCalled ConvertTo-UnixTimeNanosecond -Exactly 0
+            }
+            It 'Should call Out-InfluxEscapeString exactly 10 times' {
+                Assert-MockCalled Out-InfluxEscapeString -Exactly 10
+            }
+            It 'Should call Invoke-RestMethod exactly 2 times' {
+                Assert-MockCalled Invoke-RestMethod -Exactly 2
             }
         }
     }
