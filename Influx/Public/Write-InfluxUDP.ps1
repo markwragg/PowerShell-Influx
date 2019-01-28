@@ -37,8 +37,9 @@
     #>  
     [cmdletbinding(SupportsShouldProcess, ConfirmImpact = 'Medium')]
     param(
-        [Parameter(ParameterSetName = 'MetricObject', ValueFromPipeline = $True, Position = 0)]
+        [Parameter(ParameterSetName = 'MetricObject', Mandatory = $true, ValueFromPipeline = $True, Position = 0)]
         [PSTypeName('Metric')]
+        [PSObject[]]
         $InputObject,
         
         [Parameter(ParameterSetName = 'Measure', Mandatory = $true, Position = 0)]
@@ -67,50 +68,55 @@
         $ExcludeEmptyMetric
     )
     Process {
-        if ($InputObject) {
-            $Measure = $InputObject.Measure
-            $Metrics = $InputObject.Metrics
-            if ($InputObject.Tags) { $Tags = $InputObject.Tags }
-            if ($InputObject.TimeStamp) { $TimeStamp = $InputObject.TimeStamp }
-        }
-    
-        if ($TimeStamp) {
-            $timeStampNanoSecs = $Timestamp | ConvertTo-UnixTimeNanosecond
-        }
-        else {
-            $null = $timeStampNanoSecs
-        }
-        
-        if ($Tags) {
-            $TagData = foreach ($Tag in $Tags.Keys) {
-                "$($Tag | Out-InfluxEscapeString)=$($Tags[$Tag] | Out-InfluxEscapeString)"
-            }
-            $TagData = $TagData -Join ','
-            $TagData = ",$TagData"
-        }
-    
-        $Body = foreach ($Metric in $Metrics.Keys) {
-        
-            if ($ExcludeEmptyMetric -and [string]::IsNullOrEmpty($Metrics[$Metric])) {
-                Write-Verbose "$Metric skipped as -ExcludeEmptyMetric was specified and the value is null or empty."
-            }
-            Else {
-                $MetricValue = if ($Metrics[$Metric] -isnot [ValueType]) { 
-                    '"' + $Metrics[$Metric] + '"'
-                }
-                else {
-                    $Metrics[$Metric] | Out-InfluxEscapeString
-                }
-        
-                "$($Measure | Out-InfluxEscapeString)$TagData $($Metric | Out-InfluxEscapeString)=$MetricValue $timeStampNanoSecs"
+        if (-not $InputObject) {
+            $InputObject = @{
+                Measure   = $Measure
+                Metrics   = $Metrics
+                Tags      = $Tags
+                TimeStamp = $TimeStamp
             }
         }
-    
-        if ($Body) {
-            $Body = $Body -Join "`n"
+
+        ForEach ($MetricObject in $InputObject) {
             
-            if ($PSCmdlet.ShouldProcess("$($IP):$Port", "$Body")) {
-                $Body | Invoke-UDPSendMethod -IP $IP -Port $Port
+            if ($MetricObject.TimeStamp) {
+                $timeStampNanoSecs = $MetricObject.Timestamp | ConvertTo-UnixTimeNanosecond
+            }
+            else {
+                $null = $timeStampNanoSecs
+            }
+    
+            if ($MetricObject.Tags) {
+                $TagData = foreach ($Tag in $MetricObject.Tags.Keys) {
+                    "$($Tag | Out-InfluxEscapeString)=$($MetricObject.Tags[$Tag] | Out-InfluxEscapeString)"
+                }
+                $TagData = $TagData -Join ','
+                $TagData = ",$TagData"
+            }
+        
+            $Body = foreach ($Metric in $MetricObject.Metrics.Keys) {
+            
+                if ($ExcludeEmptyMetric -and [string]::IsNullOrEmpty($MetricObject.Metrics[$Metric])) {
+                    Write-Verbose "$Metric skipped as -ExcludeEmptyMetric was specified and the value is null or empty."
+                }
+                Else {
+                    if ($MetricObject.Metrics[$Metric] -isnot [ValueType]) { 
+                        $MetricValue = '"' + $MetricObject.Metrics[$Metric] + '"'
+                    }
+                    else {
+                        $MetricValue = $MetricObject.Metrics[$Metric] | Out-InfluxEscapeString
+                    }
+            
+                    "$($MetricObject.Measure | Out-InfluxEscapeString)$TagData $($Metric | Out-InfluxEscapeString)=$MetricValue $timeStampNanoSecs"
+                }            
+            }
+    
+            if ($Body) {
+                $Body = $Body -Join "`n"
+            
+                if ($PSCmdlet.ShouldProcess("$($IP):$Port", "$Body")) {
+                    $Body | Invoke-UDPSendMethod -IP $IP -Port $Port
+                }
             }
         }
     }

@@ -32,6 +32,7 @@
     param(
         [Parameter(ParameterSetName = 'MetricObject', Mandatory = $True, ValueFromPipeline = $True, Position = 0)]
         [PSTypeName('Metric')]
+        [PSObject[]]
         $InputObject,
         
         [parameter(ParameterSetName = 'StatsDString', Mandatory = $True, ValueFromPipeline = $True, Position = 0)]
