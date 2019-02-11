@@ -18,6 +18,9 @@
         .PARAMETER Metrics
             A hashtable of metric names and values.
 
+        .PARAMETER Timestamp
+            Specify the exact date and time for the measure data point. If not specified the current date and time is used.
+
         .PARAMETER Server
             The URL and port for the Influx REST API. Default: 'http://localhost:8086'
 

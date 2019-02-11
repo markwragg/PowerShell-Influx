@@ -18,6 +18,9 @@
         .PARAMETER Metrics
             A hashtable of metric names and values.
 
+        .PARAMETER Timestamp
+            Specify the exact date and time for the measure data point. If not specified the current date and time is used.
+
         .PARAMETER IP
             IP address for InfluxDB UDP listener.
         
