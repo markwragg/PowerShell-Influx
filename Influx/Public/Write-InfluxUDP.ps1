@@ -91,7 +91,12 @@
     
             if ($MetricObject.Tags) {
                 $TagData = foreach ($Tag in $MetricObject.Tags.Keys) {
-                    "$($Tag | Out-InfluxEscapeString)=$($MetricObject.Tags[$Tag] | Out-InfluxEscapeString)"
+                    if ([string]::IsNullOrEmpty($MetricObject.Tags[$Tag])) {
+                        Write-Warning "$Tag skipped as it's value was null or empty, which is not permitted by InfluxDB."
+                    }
+                    else {
+                        "$($Tag | Out-InfluxEscapeString)=$($MetricObject.Tags[$Tag] | Out-InfluxEscapeString)"
+                    }
                 }
                 $TagData = $TagData -Join ','
                 $TagData = ",$TagData"
