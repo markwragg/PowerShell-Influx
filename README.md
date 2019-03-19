@@ -127,3 +127,4 @@ Write-StatsD                 | Writes to Influx via a StatsD listener.
 Send-Statsd                  | Alias of Write-StatsD (for backwards compatibility).
 ConvertTo-StatsDString       | Converts a metric object output from one of the `Get-SomeMetric` cmdlets to StatsD string format. This is also performed automatically if a metric object is piped to `Write-StatsD`.
 ConvertTo-Metric             | Converts the specified properties of any object to a metric object, which can then be easily transmitted to Influx by piping to one of the `Write-` cmdlets.
+ConvertTo-InfluxLineString   | Convert metrics to the Influx line protocol format, output as strings.
