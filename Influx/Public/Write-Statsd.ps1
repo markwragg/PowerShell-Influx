@@ -22,11 +22,17 @@
         .EXAMPLE
             Write-StatsD 'my_metric:123|g'
 
+            This will write a value to a gauge metric named my_metric.
+
         .EXAMPLE
             Write-StatsD 'my_metric:321|g' -ip 10.0.0.10 -port 8180
 
+            This will write a value to a gauge metric named my_metric via the specified IP and port.
+
         .EXAMPLE
             'my_metric:1|c' | Write-StatsD
+
+            This will write a value to a counter metric, using the piepline as input for the cmdlet.
     #>
     [cmdletbinding(SupportsShouldProcess, ConfirmImpact = 'Medium')]
     param(
