@@ -4,7 +4,9 @@ $PSVersion = $PSVersionTable.PSVersion.Major
 $Root = "$PSScriptRoot\..\"
 $Module = 'Influx'
 
-If (-not (Get-Module $Module)) { Import-Module "$Root\$Module" -Force }
+Get-Module $Module | Remove-Module -Force
+
+Import-Module "$Root\$Module" -Force
 
 Describe "Write-InfluxUDP PS$PSVersion" {
     

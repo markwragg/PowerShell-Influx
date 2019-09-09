@@ -1,7 +1,9 @@
 @{
     ExcludeRules = @(
         'PSAvoidTrailingWhitespace',
-        'PSAvoidGlobalVars'
+        'PSAvoidGlobalVars',
+        'PSAvoidUsingCmdletAliases',
+        'PSUseDeclaredVarsMoreThanAssignments'
     )
 
     Severity = @(
