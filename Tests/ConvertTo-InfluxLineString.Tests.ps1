@@ -17,7 +17,7 @@ Describe "ConvertTo-InfluxLineString PS$PSVersion" {
         Mock ConvertTo-UnixTimeNanosecond { '1483274062120000000' }
        
         Context 'Simulating successful output' {
-           
+
             $WriteInflux = ConvertTo-InfluxLineString -Measure WebServer -Tags @{Server = 'Host01'} -Metrics @{CPU = 100; Status = 'PoweredOn'} -Timestamp (Get-Date)
 
             It 'ConvertTo-InfluxLineString should return a string' {
@@ -147,6 +147,20 @@ Describe "ConvertTo-InfluxLineString PS$PSVersion" {
             }
             It 'Should call Out-InfluxEscapeString exactly 10 times' {
                 Assert-MockCalled Out-InfluxEscapeString -Exactly 10
+            }
+        }
+    }
+}
+
+Describe "ConvertTo-InfluxLineString Tag Sorting PS$PSVersion" {
+    
+    InModuleScope Influx {
+        
+        $WriteInflux = ConvertTo-InfluxLineString -Measure Test -Tags @{Server = 'Host01';Database='MyDb';Alert='False'} -Metrics @{CPU = 20; Status = 'PoweredOn'}
+        Write-Host $WriteInflux
+        Context 'The Tags should be sorted alphabetically' {
+            It 'The output should be BeExactly Test,Alert=False,Database=MyDb,Server=Host01 CPU=20,Status="PoweredOn"' {
+                $WriteInflux | Should -BeExactly 'Test,Alert=False,Database=MyDb,Server=Host01 CPU=20,Status="PoweredOn"'
             }
         }
     }

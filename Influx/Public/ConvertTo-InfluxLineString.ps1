@@ -88,7 +88,8 @@
                         "$($Tag | Out-InfluxEscapeString)=$($MetricObject.Tags[$Tag] | Out-InfluxEscapeString)"
                     }
                 }
-                $TagData = $TagData -Join ','
+                #$TagData = $TagData -Join ','
+                $TagData = ($TagData | Sort-Object) -Join ',' 
             }
             
             #No existance check performed since the parameter is mandatory
