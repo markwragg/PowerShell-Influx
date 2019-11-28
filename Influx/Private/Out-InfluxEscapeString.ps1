@@ -24,6 +24,7 @@
         $String
     )
     process {
-        $String -Replace '(\s|\=|,)', '\$1'
+        $String -Replace '(\s|=|,|\\|")', '\$1'
+
     }
 }
