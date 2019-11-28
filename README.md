@@ -64,6 +64,12 @@ Get-TFSBuildMetric -TFSRootURL 'https://mytfsurl.local/tfs' -TFSCollection somec
 
 There are also `Send-SomeMetric` cmdlets that were implemented to retrieve metrics from a datasource and send it to Influx via the REST API in one step. These continue to exist for backwards compatibility, but for more flexibility use the `Get-SomeMetric` cmdlets and pipe their results to whatever `Write-*` method you want to use for interacting with Influx.
 
+Results of other Powershell commands or custom objects can be sent to Influx. Simply map the object properties to a Metric object using the ConvertTo-Metric cmdlet.
+```
+#Send data from Get-Process to InfluxDB using the REST API with authentication
+Get-Process -Name <__Processname__> | ConvertTo-Metric -Measure test -MetricProperty CPU,PagedmemorySize -TagProperty Handles,Id,ProcessName | Write-Influx -Database windows_system_monitor -Server http://<__InfluxEndpoint__>:8086 -Credential (Get-Credential) -Verbose
+```
+
 ## Implementation Example
 
 Here is an example script which could be run as a scheduled task every 5 minutes to send stats from various sources in to Influx. Note this requires a number of dependent modules be present such as the VMWare PowerShell cmdlets.
