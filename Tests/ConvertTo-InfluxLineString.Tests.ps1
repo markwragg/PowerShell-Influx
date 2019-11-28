@@ -159,7 +159,7 @@ Describe "ConvertTo-InfluxLineString Tag Sorting PS$PSVersion" {
         $WriteInflux = ConvertTo-InfluxLineString -Measure Test -Tags @{Server = 'Host01';Database='MyDb';Alert='False'} -Metrics @{CPU = 20; Status = 'PoweredOn'}
         Write-Host $WriteInflux
         Context 'The Tags should be sorted alphabetically' {
-            It 'The output should be BeExactly Test,Alert=False,Database=MyDb,Server=Host01 CPU=20,Status="PoweredOn"' {
+            It 'The output should be be exactly: Test,Alert=False,Database=MyDb,Server=Host01 CPU=20,Status="PoweredOn"' {
                 $WriteInflux | Should -BeExactly 'Test,Alert=False,Database=MyDb,Server=Host01 CPU=20,Status="PoweredOn"'
             }
         }
