@@ -29,8 +29,8 @@ Describe "ConvertTo-InfluxLineString PS$PSVersion" {
             It 'Should call ConvertTo-UnixTimeNanosecond exactly 1 time' {
                 Assert-MockCalled ConvertTo-UnixTimeNanosecond -Exactly 1
             }
-            It 'Should call Out-InfluxEscapeString exactly 7 times' {
-                Assert-MockCalled Out-InfluxEscapeString -Exactly 7
+            It 'Should call Out-InfluxEscapeString exactly 6 times' {
+                Assert-MockCalled Out-InfluxEscapeString -Exactly 6
             }
         }
 
@@ -55,8 +55,8 @@ Describe "ConvertTo-InfluxLineString PS$PSVersion" {
             It 'Should call ConvertTo-UnixTimeNanosecond exactly 1 time' {
                 Assert-MockCalled ConvertTo-UnixTimeNanosecond -Exactly 1
             }
-            It 'Should call Out-InfluxEscapeString exactly 9 times' {
-                Assert-MockCalled Out-InfluxEscapeString -Exactly 9
+            It 'Should call Out-InfluxEscapeString exactly 8 times' {
+                Assert-MockCalled Out-InfluxEscapeString -Exactly 8
             }
         }
 
@@ -70,8 +70,8 @@ Describe "ConvertTo-InfluxLineString PS$PSVersion" {
             It 'Should execute all verifiable mocks' {
                 Assert-VerifiableMock
             }
-            It 'Should call Out-InfluxEscapeString exactly 7 times' {
-                Assert-MockCalled Out-InfluxEscapeString -Exactly 7
+            It 'Should call Out-InfluxEscapeString exactly 6 times' {
+                Assert-MockCalled Out-InfluxEscapeString -Exactly 6
             }
             It 'Should call ConvertTo-UnixTimeNanosecond exactly 0 times' {
                 Assert-MockCalled ConvertTo-UnixTimeNanosecond -Exactly 0
@@ -91,8 +91,8 @@ Describe "ConvertTo-InfluxLineString PS$PSVersion" {
             It 'Should call ConvertTo-UnixTimeNanosecond exactly 1 time' {
                 Assert-MockCalled ConvertTo-UnixTimeNanosecond -Exactly 1
             }
-            It 'Should call Out-InfluxEscapeString exactly 8 times' {
-                Assert-MockCalled Out-InfluxEscapeString -Exactly 8
+            It 'Should call Out-InfluxEscapeString exactly 5 times' {
+                Assert-MockCalled Out-InfluxEscapeString -Exactly 5
             }
         }
 
@@ -109,8 +109,8 @@ Describe "ConvertTo-InfluxLineString PS$PSVersion" {
             It 'Should call ConvertTo-UnixTimeNanosecond exactly 1 time' {
                 Assert-MockCalled ConvertTo-UnixTimeNanosecond -Exactly 1
             }
-            It 'Should call Out-InfluxEscapeString exactly 7 times' {
-                Assert-MockCalled Out-InfluxEscapeString -Exactly 7
+            It 'Should call Out-InfluxEscapeString exactly 5 times' {
+                Assert-MockCalled Out-InfluxEscapeString -Exactly 5
             }
         }
 
