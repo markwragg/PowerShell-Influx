@@ -88,7 +88,6 @@
                         "$($Tag | Out-InfluxEscapeString)=$($MetricObject.Tags[$Tag] | Out-InfluxEscapeString)"
                     }
                 }
-                #$TagData = $TagData -Join ','
                 $TagData = ($TagData | Sort-Object) -Join ',' 
             }
             
@@ -101,6 +100,7 @@
                 elseif ($MetricObject.Metrics[$Metric] -isnot [ValueType]) {
                     $MetricValue = '"' + ($MetricObject.Metrics[$Metric] | Out-InfluxEscapeString) + '"'
                 }
+                #no need to escape numeric values
                 else {
                     $MetricValue = $MetricObject.Metrics[$Metric]
                 }
