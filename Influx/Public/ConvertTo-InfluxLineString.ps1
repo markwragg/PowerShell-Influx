@@ -58,7 +58,8 @@
         [switch]
         $ExcludeEmptyMetric
     )
-    Begin { }
+    Begin {
+    }
     Process {
         if (-not $InputObject) {
             $InputObject = @{
@@ -87,27 +88,29 @@
                         "$($Tag | Out-InfluxEscapeString)=$($MetricObject.Tags[$Tag] | Out-InfluxEscapeString)"
                     }
                 }
-                $TagData = $TagData -Join ','
-                $TagData = ",$TagData"
+                $TagData = ($TagData | Sort-Object) -Join ',' 
             }
-        
-            $Body = foreach ($Metric in $MetricObject.Metrics.Keys) {
             
+            #No existance check performed since the parameter is mandatory
+            $MetricData = foreach ($Metric in $MetricObject.Metrics.Keys) {
                 if ($ExcludeEmptyMetric -and [string]::IsNullOrEmpty($MetricObject.Metrics[$Metric])) {
                     Write-Verbose "$Metric skipped as -ExcludeEmptyMetric was specified and the value is null or empty."
                 }
-                Else {
-                    if ($MetricObject.Metrics[$Metric] -isnot [ValueType]) { 
-                        $MetricValue = '"' + $MetricObject.Metrics[$Metric] + '"'
-                    }
-                    else {
-                        $MetricValue = $MetricObject.Metrics[$Metric] | Out-InfluxEscapeString
-                    }
-            
-                    "$($MetricObject.Measure | Out-InfluxEscapeString)$TagData $($Metric | Out-InfluxEscapeString)=$MetricValue $timeStampNanoSecs"
-                }            
+                #if not a number wrap in "" and escape all influx special char
+                elseif ($MetricObject.Metrics[$Metric] -isnot [ValueType]) {
+                    $MetricValue = '"' + ($MetricObject.Metrics[$Metric] | Out-InfluxEscapeString) + '"'
+                }
+                #no need to escape numeric values
+                else {
+                    $MetricValue = $MetricObject.Metrics[$Metric]
+                }
+
+                "$($Metric | Out-InfluxEscapeString)=$($MetricValue)"
             }
-        
+            $MetricData = $MetricData -Join ','
+
+            $Body = "$($MetricObject.Measure | Out-InfluxEscapeString)"+ $(if($TagData) {","}) + $TagData + " " + $MetricData + $(if($timeStampNanoSecs) {" "}) + $timeStampNanoSecs 
+
             if ($Body) {
                 $Body = $Body -Join "`n"
 
