@@ -93,7 +93,7 @@
             
             #No existance check performed since the parameter is mandatory
             $MetricData = foreach ($Metric in $MetricObject.Metrics.Keys) {
-                if ([string]::IsNullOrEmpty($MetricObject.Metrics[$Metric])) {
+                if ($ExcludeEmptyMetric -and [string]::IsNullOrEmpty($MetricObject.Metrics[$Metric])) {
                     Write-Verbose "$Metric skipped as -ExcludeEmptyMetric was specified and the value is null or empty."
                 }
                 #if not a number wrap in "" and escape all influx special char
