@@ -109,8 +109,8 @@ Describe "ConvertTo-InfluxLineString PS$PSVersion" {
             It 'Should call ConvertTo-UnixTimeNanosecond exactly 1 time' {
                 Assert-MockCalled ConvertTo-UnixTimeNanosecond -Exactly 1
             }
-            It 'Should call Out-InfluxEscapeString exactly 5 times' {
-                Assert-MockCalled Out-InfluxEscapeString -Exactly 5
+            It 'Should call Out-InfluxEscapeString exactly 6 times' {
+                Assert-MockCalled Out-InfluxEscapeString -Exactly 6
             }
         }
 
