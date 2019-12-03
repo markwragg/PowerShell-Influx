@@ -1,6 +1,6 @@
 # Change Log
 
-## !Deploy
+## [1.0.99] - 2019-12-03
 
 * [Feature] Multiple fields for a single metric are written via a single Influx line protocol entry.
 * [Feature] Tags are now sorted alphabetically to improve performance.
