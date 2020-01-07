@@ -13,6 +13,7 @@ Describe "ConvertTo-InfluxLineString PS$PSVersion" {
     InModuleScope Influx {
 
         Mock Out-InfluxEscapeString { 'Some\ \,string\=' } -Verifiable
+        Mock Out-InfluxEscapeString-Field { 'SomeField\ \,string\=' } -Verifiable
 
         Mock ConvertTo-UnixTimeNanosecond { '1483274062120000000' }
        
@@ -29,8 +30,11 @@ Describe "ConvertTo-InfluxLineString PS$PSVersion" {
             It 'Should call ConvertTo-UnixTimeNanosecond exactly 1 time' {
                 Assert-MockCalled ConvertTo-UnixTimeNanosecond -Exactly 1
             }
-            It 'Should call Out-InfluxEscapeString exactly 6 times' {
-                Assert-MockCalled Out-InfluxEscapeString -Exactly 6
+            It 'Should call Out-InfluxEscapeString exactly 5 times' {
+                Assert-MockCalled Out-InfluxEscapeString -Exactly 5
+            }
+            It 'Should call Out-InfluxEscapeString-Field exactly 1 times' {
+                Assert-MockCalled Out-InfluxEscapeString-Field -Exactly 1
             }
         }
 
@@ -55,8 +59,11 @@ Describe "ConvertTo-InfluxLineString PS$PSVersion" {
             It 'Should call ConvertTo-UnixTimeNanosecond exactly 1 time' {
                 Assert-MockCalled ConvertTo-UnixTimeNanosecond -Exactly 1
             }
-            It 'Should call Out-InfluxEscapeString exactly 8 times' {
-                Assert-MockCalled Out-InfluxEscapeString -Exactly 8
+            It 'Should call Out-InfluxEscapeString exactly 7 times' {
+                Assert-MockCalled Out-InfluxEscapeString -Exactly 7
+            }
+            It 'Should call Out-InfluxEscapeString-Field exactly 1 times' {
+                Assert-MockCalled Out-InfluxEscapeString-Field -Exactly 1
             }
         }
 
@@ -70,11 +77,14 @@ Describe "ConvertTo-InfluxLineString PS$PSVersion" {
             It 'Should execute all verifiable mocks' {
                 Assert-VerifiableMock
             }
-            It 'Should call Out-InfluxEscapeString exactly 6 times' {
-                Assert-MockCalled Out-InfluxEscapeString -Exactly 6
+            It 'Should call Out-InfluxEscapeString exactly 5 times' {
+                Assert-MockCalled Out-InfluxEscapeString -Exactly 5
             }
             It 'Should call ConvertTo-UnixTimeNanosecond exactly 0 times' {
                 Assert-MockCalled ConvertTo-UnixTimeNanosecond -Exactly 0
+            }
+            It 'Should call Out-InfluxEscapeString-Field exactly 1 times' {
+                Assert-MockCalled Out-InfluxEscapeString-Field -Exactly 1
             }
         }
 
@@ -94,6 +104,9 @@ Describe "ConvertTo-InfluxLineString PS$PSVersion" {
             It 'Should call Out-InfluxEscapeString exactly 5 times' {
                 Assert-MockCalled Out-InfluxEscapeString -Exactly 5
             }
+            It 'Should call Out-InfluxEscapeString-Field exactly 0 times' {
+                Assert-MockCalled Out-InfluxEscapeString-Field -Exactly 0
+            }
         }
 
         Context 'Simulating output of metric with null value' {
@@ -109,8 +122,12 @@ Describe "ConvertTo-InfluxLineString PS$PSVersion" {
             It 'Should call ConvertTo-UnixTimeNanosecond exactly 1 time' {
                 Assert-MockCalled ConvertTo-UnixTimeNanosecond -Exactly 1
             }
-            It 'Should call Out-InfluxEscapeString exactly 6 times' {
-                Assert-MockCalled Out-InfluxEscapeString -Exactly 6
+            It 'Should call Out-InfluxEscapeString exactly 5 times' {
+                Assert-MockCalled Out-InfluxEscapeString -Exactly 5
+            }
+            #Called one time on Null, which is converted to empty string
+            It 'Should call Out-InfluxEscapeString-Field exactly 1 times' {
+                Assert-MockCalled Out-InfluxEscapeString-Field -Exactly 1
             }
         }
 
@@ -145,8 +162,12 @@ Describe "ConvertTo-InfluxLineString PS$PSVersion" {
             It 'Should call ConvertTo-UnixTimeNanosecond exactly 0 times' {
                 Assert-MockCalled ConvertTo-UnixTimeNanosecond -Exactly 0
             }
-            It 'Should call Out-InfluxEscapeString exactly 10 times' {
-                Assert-MockCalled Out-InfluxEscapeString -Exactly 10
+            It 'Should call Out-InfluxEscapeString exactly 6 times' {
+                Assert-MockCalled Out-InfluxEscapeString -Exactly 6
+            }
+            #Called two times on string val and Null, the latest is converted to an empty string
+            It 'Should call Out-InfluxEscapeString-Field exactly 2 times' {
+                Assert-MockCalled Out-InfluxEscapeString-Field -Exactly 2
             }
         }
     }
