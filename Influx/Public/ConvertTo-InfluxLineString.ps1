@@ -98,14 +98,17 @@
                 }
                 #if not a number wrap in "" and escape all influx special char
                 elseif ($MetricObject.Metrics[$Metric] -isnot [ValueType]) {
-                    $MetricValue = '"' + ($MetricObject.Metrics[$Metric] | Out-InfluxEscapeString) + '"'
+                    $MetricValue = '"' + ($MetricObject.Metrics[$Metric] | Out-InfluxEscapeString-Field) + '"'
+                    #Write output
+                    "$($Metric | Out-InfluxEscapeString)=$($MetricValue)"
                 }
                 #no need to escape numeric values
                 else {
                     $MetricValue = $MetricObject.Metrics[$Metric]
+                    #Write output
+                    "$($Metric | Out-InfluxEscapeString)=$($MetricValue)"
                 }
-
-                "$($Metric | Out-InfluxEscapeString)=$($MetricValue)"
+                
             }
             $MetricData = $MetricData -Join ','
 
