@@ -145,22 +145,50 @@ Describe "ConvertTo-InfluxLineString PS$PSVersion" {
             It 'Should call ConvertTo-UnixTimeNanosecond exactly 0 times' {
                 Assert-MockCalled ConvertTo-UnixTimeNanosecond -Exactly 0
             }
-            It 'Should call Out-InfluxEscapeString exactly 10 times' {
-                Assert-MockCalled Out-InfluxEscapeString -Exactly 10
+            It 'Should call Out-InfluxEscapeString exactly 8 times' {
+                Assert-MockCalled Out-InfluxEscapeString -Exactly 8
             }
         }
     }
 }
 
-Describe "ConvertTo-InfluxLineString Tag Sorting PS$PSVersion" {
+Describe "ConvertTo-InfluxLineString Actual Output (no mock) PS$PSVersion" {
     
     InModuleScope Influx {
         
-        $WriteInflux = ConvertTo-InfluxLineString -Measure Test -Tags @{Server = 'Host01';Database='MyDb';Alert='False'} -Metrics @{CPU = 20; Status = 'PoweredOn'}
+        $WriteInflux = ConvertTo-InfluxLineString -Measure Test -Tags @{Server='Host01';Database='MyDb';Alert='False'} -Metrics @{CPU = 20; Status = 'Online'}
         Write-Host $WriteInflux
         Context 'The Tags should be sorted alphabetically' {
-            It 'The output should be be exactly: Test,Alert=False,Database=MyDb,Server=Host01 CPU=20,Status="PoweredOn"' {
-                $WriteInflux | Should -BeExactly 'Test,Alert=False,Database=MyDb,Server=Host01 CPU=20,Status="PoweredOn"'
+            It 'The output should be exactly: Test,Alert=False,Database=MyDb,Server=Host01 CPU=20,Status="Online"' {
+                $WriteInflux | Should -BeExactly 'Test,Alert=False,Database=MyDb,Server=Host01 CPU=20,Status="Online"'
+            }
+        }
+
+        $WriteInflux = ConvertTo-InfluxLineString -ExcludeEmptyMetric -Measure Test -Tags @{Server='Host01';Database='MyDb';Alert='False'} -Metrics @{CPU=20;Status='Online';OtherValue=''}
+        Write-Host $WriteInflux
+        Context 'Null Fields Should be excluded' {
+            It 'The output should exclude the field: OtherValue=$null' {
+                #Powershell hashtables do not guarantee key sort order but any of the following is ok
+                #Note that Tags are forcefully sorted, while fields are not
+                $ValidOutputs = @(
+                    'Test,Alert=False,Database=MyDb,Server=Host01 CPU=20,Status="Online"',
+                    'Test,Alert=False,Database=MyDb,Server=Host01 Status="Online",CPU=20'
+                )
+                $ValidOutputs.Contains($WriteInflux) | Should -BeTrue
+            }
+        }
+
+        $WriteInflux = ConvertTo-InfluxLineString -ExcludeEmptyMetric -Measure Test -Tags @{Server='Host01';Database='MyDb';Alert='False'} -Metrics @{CPU=20;Status='Online';OtherValue=$null}
+        Write-Host $WriteInflux
+        Context 'Null Fields Should be excluded' {
+            It 'The output should exclude the field: OtherValue=""' {
+                #Powershell hashtables do not guarantee key sort order but any of the following is ok
+                #Note that Tags are forcefully sorted, while fields are not
+                $ValidOutputs = @(
+                    'Test,Alert=False,Database=MyDb,Server=Host01 CPU=20,Status="Online"',
+                    'Test,Alert=False,Database=MyDb,Server=Host01 Status="Online",CPU=20'
+                )
+                $ValidOutputs.Contains($WriteInflux) | Should -BeTrue
             }
         }
     }

@@ -99,17 +99,20 @@
                 #if not a number wrap in "" and escape all influx special char
                 elseif ($MetricObject.Metrics[$Metric] -isnot [ValueType]) {
                     $MetricValue = '"' + ($MetricObject.Metrics[$Metric] | Out-InfluxEscapeString) + '"'
+                    #Write output
+                    "$($Metric | Out-InfluxEscapeString -StringType FieldTextValue)=$($MetricValue)"
                 }
                 #no need to escape numeric values
                 else {
                     $MetricValue = $MetricObject.Metrics[$Metric]
+                    #Write output
+                    "$($Metric | Out-InfluxEscapeString)=$($MetricValue)"
                 }
-
-                "$($Metric | Out-InfluxEscapeString)=$($MetricValue)"
+                
             }
             $MetricData = $MetricData -Join ','
 
-            $Body = "$($MetricObject.Measure | Out-InfluxEscapeString)"+ $(if($TagData) {","}) + $TagData + " " + $MetricData + $(if($timeStampNanoSecs) {" "}) + $timeStampNanoSecs 
+            $Body = "$($MetricObject.Measure | Out-InfluxEscapeString -StringType Measurement)"+ $(if($TagData) {","}) + $TagData + " " + $MetricData + $(if($timeStampNanoSecs) {" "}) + $timeStampNanoSecs 
 
             if ($Body) {
                 $Body = $Body -Join "`n"
