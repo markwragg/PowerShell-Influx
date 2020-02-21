@@ -1,6 +1,6 @@
 # Change Log
 
-## !Deploy
+## [1.0.100] - 2020-02-21
 
 * [Bug] Merged fix [#31](https://github.com/markwragg/PowerShell-Influx/pull/31) from [@Trovalo](https://github.com/Trovalo) where `Out-InfluxEscapeString` was escaping more characters than were necessary.
 
