@@ -1,5 +1,9 @@
 # Change Log
 
+## !Deploy
+
+* [Bug] Merged fix [#31](https://github.com/markwragg/PowerShell-Influx/pull/31) from [@Trovalo](https://github.com/Trovalo) where `Out-InfluxEscapeString` was escaping more characters than were necessary.
+
 ## [1.0.99] - 2019-12-03
 
 * [Feature] Multiple fields for a single metric are written via a single Influx line protocol entry.
