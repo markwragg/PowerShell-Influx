@@ -68,7 +68,7 @@
         [datetime]
         $TimeStamp,
         
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $false)]
         [string]
         $Database,
         
@@ -82,7 +82,13 @@
         $Bulk,
 
         [switch]
-        $ExcludeEmptyMetric
+        $ExcludeEmptyMetric,
+
+        [string]
+        $Token,
+
+        [string]
+        $Org
     )
     Begin {
         if ($Credential) {
@@ -96,8 +102,19 @@
             }
         }
 
+        if ($Token) {
+            $Headers = @{
+                Authorization = "Token $Token"
+            }
+        }
+
         $BulkBody = @()
-        $URI = "$Server/write?&db=$Database"
+
+        if ($Org -and $Database) {
+            $URI = "$Server/api/v2/write?org=$Org&bucket=$Database"
+        } else {
+            $URI = "$Server/write?&db=$Database"
+        }        
     }
     Process {
         if (-not $InputObject) {
