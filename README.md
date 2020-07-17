@@ -1,8 +1,18 @@
 # PowerShell-Influx
 
-[![Build status](https://ci.appveyor.com/api/projects/status/v6215sfhyvorhgo8?svg=true)](https://ci.appveyor.com/project/markwragg/powershell-influx)
+[![Build Status](https://dev.azure.com/markwragg/GitHub/_apis/build/status/markwragg.PowerShell-Influx?branchName=master)](https://dev.azure.com/markwragg/GitHub/_build/latest?definitionId=4&branchName=master) ![Test Coverage](https://img.shields.io/badge/coverage-96%25-brightgreen.svg?maxAge=60)
 
 This is a PowerShell module for interacting with the time-series database platform Influx: https://www.influxdata.com/. At the moment the primary purpose is to enable a consistent experience for writing metrics in to Influx via the REST API, UDP or StatsD. 
+
+# Purpose
+
+This module was written to allow metrics from different sources to be written to InfluxDB, for presentation via one or more Grafana Dashboards. By utilising this module, InfluxDB and Grafana you can create and populate interactive dashboards like these (note: sensitive data has been redacted from these screenshots):
+
+<p align="center">
+<img src="http://wragg.io/content/images/2018/02/Grafana-Example-2.png" height=200>  <img src="http://wragg.io/content/images/2018/02/Grafana-TFS-Build-Dashboard.png" height=200>
+</p>
+
+For more details on how to implement these tools, [check out my blog post](http://wragg.io/windows-based-grafana-analytics-platform-via-influxdb-and-powershell/). For more information on how to use the Influx PowerShell module, read on below.
 
 # Installation
 
@@ -24,6 +34,9 @@ For example:
 ```
 #REST API
 Write-Influx -Measure Server -Tags @{Hostname=$env:COMPUTERNAME} -Metrics @{Memory=50;CPU=10} -Database Web -Server http://myinflux.local:8086 -Verbose
+
+#REST API with authentication
+Write-Influx -Measure Server -Tags @{Hostname=$env:COMPUTERNAME} -Metrics @{Memory=50;CPU=10} -Database Web -Server http://myinflux.local:8086 -Credential (Get-Credential) -Verbose
  
 #Influx UDP
 Write-InfluxUDP -Measure Server -Tags @{Hostname=$env:COMPUTERNAME} -Metrics @{Memory=50;CPU=10} -Database Web -IP 1.2.3.4 -Port 8089 -Verbose
@@ -34,7 +47,7 @@ Write-Statsd "Server.CPU,Hostname=$($env:COMPUTERNAME):10|g" -IP 1.2.3.4 -Port 8
 
 This project was created so that PowerShell could be used to routinely query various infrastructure metrics and then send those metrics in to Influx for storage, where they could then be presented via a Grafana dashboard.
 
-As such the module also contains a number of cmdlets for retrieving data various sources. Current implemntations include: VMWare, 3PAR, Isilon and TFS. You will find these cmdlets under `\Public\<source>`.
+As such the module also contains a number of cmdlets for retrieving data various sources. Current implementations include: VMWare, 3PAR, Isilon and TFS. You will find these cmdlets under `\Public\<source>`.
 
 The `Get-SomeMetric` cmdlets return a `Metric` type object which can be consumed by any of the `Write-*` cmdlets above via the pipeline or the `-InputObject' parameter. For example:
 
@@ -50,6 +63,12 @@ Get-TFSBuildMetric -TFSRootURL 'https://mytfsurl.local/tfs' -TFSCollection somec
 ```
 
 There are also `Send-SomeMetric` cmdlets that were implemented to retrieve metrics from a datasource and send it to Influx via the REST API in one step. These continue to exist for backwards compatibility, but for more flexibility use the `Get-SomeMetric` cmdlets and pipe their results to whatever `Write-*` method you want to use for interacting with Influx.
+
+Results of other Powershell commands or custom objects can be sent to Influx. Simply map the object properties to a Metric object using the ConvertTo-Metric cmdlet.
+```
+#Send data from Get-Process to InfluxDB using the REST API with authentication
+Get-Process -Name <__Processname__> | ConvertTo-Metric -Measure test -MetricProperty CPU,PagedmemorySize -TagProperty Handles,Id,ProcessName | Write-Influx -Database windows_system_monitor -Server http://<__InfluxEndpoint__>:8086 -Credential (Get-Credential) -Verbose
+```
 
 ## Implementation Example
 
@@ -113,3 +132,5 @@ Write-InfluxUDP              | Writes to Influx via UDP.
 Write-StatsD                 | Writes to Influx via a StatsD listener.
 Send-Statsd                  | Alias of Write-StatsD (for backwards compatibility).
 ConvertTo-StatsDString       | Converts a metric object output from one of the `Get-SomeMetric` cmdlets to StatsD string format. This is also performed automatically if a metric object is piped to `Write-StatsD`.
+ConvertTo-Metric             | Converts the specified properties of any object to a metric object, which can then be easily transmitted to Influx by piping to one of the `Write-` cmdlets.
+ConvertTo-InfluxLineString   | Convert metrics to the Influx line protocol format, output as strings.

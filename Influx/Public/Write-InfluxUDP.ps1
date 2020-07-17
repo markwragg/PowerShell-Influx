@@ -18,8 +18,15 @@
         .PARAMETER Metrics
             A hashtable of metric names and values.
 
+        .PARAMETER Timestamp
+            Specify the exact date and time for the measure data point. If not specified the current date and time is used.
+
         .PARAMETER IP
             IP address for InfluxDB UDP listener.
+        
+        .PARAMETER ExcludeEmptyMetric
+            Switch: Use to exclude null or empty metric values from being sent. Useful where a metric is initially created as an integer but then
+            an empty or null instance of that metric would attempt to be sent as an empty string, resulting in a datatype conflict.
     
         .PARAMETER Port
             Port for InfluxDB UDP listener.
@@ -33,8 +40,9 @@
     #>  
     [cmdletbinding(SupportsShouldProcess, ConfirmImpact = 'Medium')]
     param(
-        [Parameter(ParameterSetName = 'MetricObject', ValueFromPipeline = $True, Position = 0)]
+        [Parameter(ParameterSetName = 'MetricObject', Mandatory = $true, ValueFromPipeline = $True, Position = 0)]
         [PSTypeName('Metric')]
+        [PSObject[]]
         $InputObject,
         
         [Parameter(ParameterSetName = 'Measure', Mandatory = $true, Position = 0)]
@@ -57,48 +65,66 @@
         $IP = '127.0.0.1',
   
         [int]
-        $Port = 8089
+        $Port = 8089,
+
+        [switch]
+        $ExcludeEmptyMetric
     )
     Process {
-        if ($InputObject) {
-            $Measure = $InputObject.Measure
-            $Metrics = $InputObject.Metrics
-            if ($InputObject.Tags) { $Tags = $InputObject.Tags }
-            if ($InputObject.TimeStamp) { $TimeStamp = $InputObject.TimeStamp }
-        }
-    
-        if ($TimeStamp) {
-            $timeStampNanoSecs = $Timestamp | ConvertTo-UnixTimeNanosecond
-        }
-        else {
-            $null = $timeStampNanoSecs
-        }
-        
-        if ($Tags) {
-            $TagData = foreach ($Tag in $Tags.Keys) {
-                "$($Tag | Out-InfluxEscapeString)=$($Tags[$Tag] | Out-InfluxEscapeString)"
+        if (-not $InputObject) {
+            $InputObject = @{
+                Measure   = $Measure
+                Metrics   = $Metrics
+                Tags      = $Tags
+                TimeStamp = $TimeStamp
             }
-            $TagData = $TagData -Join ','
-            $TagData = ",$TagData"
         }
-    
-        $Body = foreach ($Metric in $Metrics.Keys) {
-        
-            $MetricValue = if ($Metrics[$Metric] -isnot [ValueType]) { 
-                '"' + $Metrics[$Metric] + '"'
+
+        ForEach ($MetricObject in $InputObject) {
+            
+            if ($MetricObject.TimeStamp) {
+                $timeStampNanoSecs = $MetricObject.Timestamp | ConvertTo-UnixTimeNanosecond
             }
             else {
-                $Metrics[$Metric] | Out-InfluxEscapeString
+                $null = $timeStampNanoSecs
             }
     
-            "$($Measure | Out-InfluxEscapeString)$TagData $($Metric | Out-InfluxEscapeString)=$MetricValue $timeStampNanoSecs"
-        }
-    
-        if ($Body) {
-            $Body = $Body -Join "`n"
+            if ($MetricObject.Tags) {
+                $TagData = foreach ($Tag in $MetricObject.Tags.Keys) {
+                    if ([string]::IsNullOrEmpty($MetricObject.Tags[$Tag])) {
+                        Write-Warning "$Tag skipped as it's value was null or empty, which is not permitted by InfluxDB."
+                    }
+                    else {
+                        "$($Tag | Out-InfluxEscapeString)=$($MetricObject.Tags[$Tag] | Out-InfluxEscapeString)"
+                    }
+                }
+                $TagData = $TagData -Join ','
+                $TagData = ",$TagData"
+            }
+        
+            $Body = foreach ($Metric in $MetricObject.Metrics.Keys) {
             
-            if ($PSCmdlet.ShouldProcess("$($IP):$Port", "$Body")) {
-                $Body | Invoke-UDPSendMethod -IP $IP -Port $Port
+                if ($ExcludeEmptyMetric -and [string]::IsNullOrEmpty($MetricObject.Metrics[$Metric])) {
+                    Write-Verbose "$Metric skipped as -ExcludeEmptyMetric was specified and the value is null or empty."
+                }
+                Else {
+                    if ($MetricObject.Metrics[$Metric] -isnot [ValueType]) { 
+                        $MetricValue = '"' + $MetricObject.Metrics[$Metric] + '"'
+                    }
+                    else {
+                        $MetricValue = $MetricObject.Metrics[$Metric] | Out-InfluxEscapeString
+                    }
+            
+                    "$($MetricObject.Measure | Out-InfluxEscapeString)$TagData $($Metric | Out-InfluxEscapeString)=$MetricValue $timeStampNanoSecs"
+                }            
+            }
+    
+            if ($Body) {
+                $Body = $Body -Join "`n"
+            
+                if ($PSCmdlet.ShouldProcess("$($IP):$Port", "$Body")) {
+                    $Body | Invoke-UDPSendMethod -IP $IP -Port $Port
+                }
             }
         }
     }

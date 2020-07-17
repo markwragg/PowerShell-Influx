@@ -18,23 +18,38 @@
         .PARAMETER Metrics
             A hashtable of metric names and values.
 
+        .PARAMETER Timestamp
+            Specify the exact date and time for the measure data point. If not specified the current date and time is used.
+
         .PARAMETER Server
             The URL and port for the Influx REST API. Default: 'http://localhost:8086'
 
         .PARAMETER Database
             The name of the Influx database to write to.
 
+        .PARAMETER Credential
+            A PSCredential object with the username and password to use if the Influx server has authentication enabled.
+        
+        .PARAMETER Bulk
+            Switch: Use to have all metrics transmitted via a single connection to Influx.
+
+        .PARAMETER ExcludeEmptyMetric
+            Switch: Use to exclude null or empty metric values from being sent. Useful where a metric is initially created as an integer but then
+            an empty or null instance of that metric would attempt to be sent as an empty string, resulting in a datatype conflict.
+
         .EXAMPLE
             Write-Influx -Measure WebServer -Tags @{Server='Host01'} -Metrics @{CPU=100; Memory=50} -Database Web -Server http://myinflux.local:8086
             
             Description
             -----------
-            This command will submit the provided tag and metric data for a measure called 'WebServer' to a database called 'Web' via the API endpoint 'http://myinflux.local:8086'
-    #>  
+            This command will submit the provided tag and metric data for a measure called 'WebServer' to a database called 'Web' 
+            via the API endpoint 'http://myinflux.local:8086'
+    #>
     [cmdletbinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     param (
-        [Parameter(ParameterSetName = 'MetricObject', ValueFromPipeline = $True, Position = 0)]
+        [Parameter(ParameterSetName = 'MetricObject', Mandatory = $true, ValueFromPipeline = $True, Position = 0)]
         [PSTypeName('Metric')]
+        [PSObject[]]
         $InputObject,
 
         [Parameter(ParameterSetName = 'Measure', Mandatory = $true, Position = 0)]
@@ -53,54 +68,125 @@
         [datetime]
         $TimeStamp,
         
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $false)]
         [string]
         $Database,
         
         [string]
-        $Server = 'http://localhost:8086'
+        $Server = 'http://localhost:8086',
+
+        [pscredential]
+        $Credential,
+
+        [switch]
+        $Bulk,
+
+        [switch]
+        $ExcludeEmptyMetric,
+
+        [string]
+        $Token,
+
+        [string]
+        $Org
     )
-    Process {
-        if ($InputObject) {
-            $Measure = $InputObject.Measure
-            $Metrics = $InputObject.Metrics
-            if ($InputObject.Tags) { $Tags = $InputObject.Tags }
-            if ($InputObject.TimeStamp) { $TimeStamp = $InputObject.TimeStamp }
-        }
-    
-        if ($TimeStamp) {
-            $timeStampNanoSecs = $Timestamp | ConvertTo-UnixTimeNanosecond
-        }
-        else {
-            $null = $timeStampNanoSecs
-        }
-    
-        if ($Tags) {
-            $TagData = foreach ($Tag in $Tags.Keys) {
-                "$($Tag | Out-InfluxEscapeString)=$($Tags[$Tag] | Out-InfluxEscapeString)"
+    Begin {
+        if ($Credential) {
+            $Username = $Credential.UserName
+            $Password = $Credential.GetNetworkCredential().Password
+
+            $EncodedCreds = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes("$($Username):$($Password)"))
+
+            $Headers = @{
+                Authorization = "Basic $EncodedCreds"
             }
-            $TagData = $TagData -Join ','
-            $TagData = ",$TagData"
         }
-        
-        $Body = foreach ($Metric in $Metrics.Keys) {
+
+        if ($Token) {
+            $Headers = @{
+                Authorization = "Token $Token"
+            }
+        }
+
+        $BulkBody = @()
+
+        if ($Org -and $Database) {
+            $URI = "$Server/api/v2/write?org=$Org&bucket=$Database"
+        } else {
+            $URI = "$Server/write?&db=$Database"
+        }        
+    }
+    Process {
+        if (-not $InputObject) {
+            $InputObject = @{
+                Measure = $Measure
+                Metrics = $Metrics
+                Tags = $Tags
+                TimeStamp = $TimeStamp
+            }
+        }
+
+        ForEach ($MetricObject in $InputObject) {
             
-            if ($Metrics[$Metric] -isnot [ValueType]) { 
-                $MetricValue = '"' + $Metrics[$Metric] + '"'
+            if ($MetricObject.TimeStamp) {
+                $timeStampNanoSecs = $MetricObject.Timestamp | ConvertTo-UnixTimeNanosecond
             }
             else {
-                $MetricValue = $Metrics[$Metric] | Out-InfluxEscapeString
+                $null = $timeStampNanoSecs
+            }
+
+            if ($MetricObject.Tags) {
+                $TagData = foreach ($Tag in $MetricObject.Tags.Keys) {
+                    if ([string]::IsNullOrEmpty($MetricObject.Tags[$Tag])) {
+                        Write-Warning "$Tag skipped as it's value was null or empty, which is not permitted by InfluxDB."
+                    }
+                    else {
+                        "$($Tag | Out-InfluxEscapeString)=$($MetricObject.Tags[$Tag] | Out-InfluxEscapeString)"
+                    }
+                }
+                $TagData = $TagData -Join ','
+                $TagData = ",$TagData"
             }
         
-            "$($Measure | Out-InfluxEscapeString)$TagData $($Metric | Out-InfluxEscapeString)=$MetricValue $timeStampNanoSecs"
+            $Body = foreach ($Metric in $MetricObject.Metrics.Keys) {
+            
+                if ($ExcludeEmptyMetric -and [string]::IsNullOrEmpty($MetricObject.Metrics[$Metric])) {
+                    Write-Verbose "$Metric skipped as -ExcludeEmptyMetric was specified and the value is null or empty."
+                }
+                Else {
+                    if ($MetricObject.Metrics[$Metric] -isnot [ValueType]) { 
+                        $MetricValue = '"' + $MetricObject.Metrics[$Metric] + '"'
+                    }
+                    else {
+                        $MetricValue = $MetricObject.Metrics[$Metric] | Out-InfluxEscapeString
+                    }
+            
+                    "$($MetricObject.Measure | Out-InfluxEscapeString)$TagData $($Metric | Out-InfluxEscapeString)=$MetricValue $timeStampNanoSecs"
+                }            
+            }
+        
+            if ($Body) {
+                $Body = $Body -Join "`n"
+            
+                If ($Bulk) {
+                    $BulkBody += $Body
+                }
+                Else {
+                    if ($PSCmdlet.ShouldProcess($URI, $Body)) {
+                        Invoke-RestMethod -Uri $URI -Method Post -Body $Body -Headers $Headers | Out-Null
+                    }
+                }
+            
+            }
         }
-    
-        if ($Body) {
-            $Body = $Body -Join "`n"
-            $URI = "$Server/write?&db=$Database"
-    
-            if ($PSCmdlet.ShouldProcess($URI, $Body)) {
-                Invoke-RestMethod -Uri $URI -Method Post -Body $Body | Out-Null
+        
+    }
+    End {
+        If ($Bulk) {
+            $BulkBody = $BulkBody -Join "`n"
+            
+            if ($PSCmdlet.ShouldProcess($URI, $BulkBody)) {
+                Invoke-RestMethod -Uri $URI -Method Post -Body $BulkBody -Headers $Headers | Out-Null
             }
         }
     }
