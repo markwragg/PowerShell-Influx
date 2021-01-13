@@ -23,12 +23,21 @@
 
         .PARAMETER Server
             The URL and port for the Influx REST API. Default: 'http://localhost:8086'
+        
+        .PARAMETER Bucket
+            The name of the Influx bucket/database to write to. (This is an InfluxDB v2.x Parameter)
+
+        .PARAMETER Token
+            The token to authenticate with InfluxDB. (This is an InfluxDB v2.x Parameter)
+
+        .PARAMETER Organisation
+            The name of the Influx organisation. (This is an InfluxDB v2.x Parameter)
 
         .PARAMETER Database
-            The name of the Influx database to write to.
+            The name of the Influx database to write to. (This is an InfluxDB v1.x Parameter)
 
         .PARAMETER Credential
-            A PSCredential object with the username and password to use if the Influx server has authentication enabled.
+            A PSCredential object with the username and password to use if the Influx server has authentication enabled. (This is an InfluxDB v1.x Parameter)
         
         .PARAMETER Bulk
             Switch: Use to have all metrics transmitted via a single connection to Influx.
@@ -47,45 +56,80 @@
     #>
     [cmdletbinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     param (
+        #Parameters for both InfluxDB versions
         [Parameter(ParameterSetName = 'MetricObject', Mandatory = $true, ValueFromPipeline = $True, Position = 0)]
+        [Parameter(ParameterSetName = 'Influx_v1', ValueFromPipeline = $True)]
+        [Parameter(ParameterSetName = 'Influx_v2', ValueFromPipeline = $True)]
         [PSTypeName('Metric')]
         [PSObject[]]
         $InputObject,
 
-        [Parameter(ParameterSetName = 'Measure', Mandatory = $true, Position = 0)]
+        [Parameter(ParameterSetName = 'Measure', Mandatory = $true, Position = 2)]
+        [Parameter(ParameterSetName = 'Influx_v1')]
+        [Parameter(ParameterSetName = 'Influx_v2')]
         [string]
         $Measure,
 
         [Parameter(ParameterSetName = 'Measure')]
+        [Parameter(ParameterSetName = 'Influx_v1')]
+        [Parameter(ParameterSetName = 'Influx_v2')]
         [hashtable]
         $Tags,
         
         [Parameter(ParameterSetName = 'Measure', Mandatory = $true)]
+        [Parameter(ParameterSetName = 'Influx_v1')]
+        [Parameter(ParameterSetName = 'Influx_v2')]
         [hashtable]
         $Metrics,
 
         [Parameter(ParameterSetName = 'Measure')]
+        [Parameter(ParameterSetName = 'Influx_v1')]
+        [Parameter(ParameterSetName = 'Influx_v2')]
         [datetime]
         $TimeStamp,
         
-        [Parameter(Mandatory = $true)]
-        [string]
-        $Database,
-        
         [string]
         $Server = 'http://localhost:8086',
-
-        [pscredential]
-        $Credential,
 
         [switch]
         $Bulk,
 
         [switch]
-        $ExcludeEmptyMetric
+        $ExcludeEmptyMetric,
+
+        #Parameters for InfluxDB v1.x
+        [Parameter(ParameterSetName = 'Influx_v1', Mandatory = $true, Position = 1)]
+        [switch]
+        $InfluxDB_v1,
+        
+        [Parameter(ParameterSetName = 'Influx_v1', Mandatory = $true)]
+        [string]
+        $Database,
+
+        [Parameter(ParameterSetName = 'Influx_v1', Mandatory = $true)]
+        [pscredential]
+        $Credential,
+
+        #Parameters for InfluxDB v2.x
+        [Parameter(ParameterSetName = 'Influx_v2', Mandatory = $true, Position = 1)]
+        [switch]
+        $InfluxDB_v2,
+
+        [Parameter(ParameterSetName = 'Influx_v2', Mandatory = $true)]
+        [string]
+        $Organisation,
+
+        [Parameter(ParameterSetName = 'Influx_v2', Mandatory = $true)]
+        [string]
+        $Bucket,
+
+        [Parameter(ParameterSetName = 'Influx_v2', Mandatory = $true)]
+        [string]
+        $Token
     )
+
     Begin {
-        if ($Credential) {
+        if (($InfluxDB_v1) -and ($Credential)) {
             $Username = $Credential.UserName
             $Password = $Credential.GetNetworkCredential().Password
 
@@ -96,8 +140,17 @@
             }
         }
 
+        If ($InfluxDB_v1) {
+            $URI = "$Server/write?&db=$Database"
+        } else {
+            $Headers = @{
+                Authorization = "Token $Token"
+            }
+            
+            $URI = "$Server/api/v2/write?org=$Organisation&bucket=$Bucket"
+        }
+
         $BulkBody = @()
-        $URI = "$Server/write?&db=$Database"
     }
     Process {
         if (-not $InputObject) {
@@ -110,7 +163,6 @@
         }
 
         ForEach ($MetricObject in $InputObject) {
-            
             if ($MetricObject.TimeStamp) {
                 $timeStampNanoSecs = $MetricObject.Timestamp | ConvertTo-UnixTimeNanosecond
             }
