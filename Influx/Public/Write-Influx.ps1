@@ -23,6 +23,12 @@
 
         .PARAMETER Server
             The URL and port for the Influx REST API. Default: 'http://localhost:8086'
+
+        .PARAMETER Database
+            The name of the Influx database to write to. (This is an InfluxDB v1.x Parameter)
+
+        .PARAMETER Credential
+            A PSCredential object with the username and password to use if the Influx server has authentication enabled. (This is an InfluxDB v1.x Parameter)
         
         .PARAMETER Bucket
             The name of the Influx bucket/database to write to. (This is an InfluxDB v2.x Parameter)
@@ -32,13 +38,7 @@
 
         .PARAMETER Organisation
             The name of the Influx organisation. (This is an InfluxDB v2.x Parameter)
-
-        .PARAMETER Database
-            The name of the Influx database to write to. (This is an InfluxDB v1.x Parameter)
-
-        .PARAMETER Credential
-            A PSCredential object with the username and password to use if the Influx server has authentication enabled. (This is an InfluxDB v1.x Parameter)
-        
+   
         .PARAMETER Bulk
             Switch: Use to have all metrics transmitted via a single connection to Influx.
 
@@ -56,35 +56,29 @@
     #>
     [cmdletbinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     param (
-        #Parameters for both InfluxDB versions
-        [Parameter(ParameterSetName = 'MetricObject', Mandatory = $true, ValueFromPipeline = $True, Position = 0)]
-        [Parameter(ParameterSetName = 'Influx_v1', ValueFromPipeline = $True)]
-        [Parameter(ParameterSetName = 'Influx_v2', ValueFromPipeline = $True)]
+        [Parameter(ParameterSetName = 'MetricObject_v1', Mandatory, ValueFromPipeline)]
+        [Parameter(ParameterSetName = 'MetricObject_v2', Mandatory, ValueFromPipeline)]
         [PSTypeName('Metric')]
         [PSObject[]]
         $InputObject,
 
-        [Parameter(ParameterSetName = 'Measure', Mandatory = $true, Position = 2)]
-        [Parameter(ParameterSetName = 'Influx_v1')]
-        [Parameter(ParameterSetName = 'Influx_v2')]
+        [Parameter(ParameterSetName = 'Measure_v1', Mandatory)]
+        [Parameter(ParameterSetName = 'Measure_v2', Mandatory)]
         [string]
         $Measure,
 
-        [Parameter(ParameterSetName = 'Measure')]
-        [Parameter(ParameterSetName = 'Influx_v1')]
-        [Parameter(ParameterSetName = 'Influx_v2')]
+        [Parameter(ParameterSetName = 'Measure_v1', Mandatory)]
+        [Parameter(ParameterSetName = 'Measure_v2', Mandatory)]
         [hashtable]
         $Tags,
         
-        [Parameter(ParameterSetName = 'Measure', Mandatory = $true)]
-        [Parameter(ParameterSetName = 'Influx_v1')]
-        [Parameter(ParameterSetName = 'Influx_v2')]
+        [Parameter(ParameterSetName = 'Measure_v1', Mandatory)]
+        [Parameter(ParameterSetName = 'Measure_v2', Mandatory)]
         [hashtable]
         $Metrics,
 
-        [Parameter(ParameterSetName = 'Measure')]
-        [Parameter(ParameterSetName = 'Influx_v1')]
-        [Parameter(ParameterSetName = 'Influx_v2')]
+        [Parameter(ParameterSetName = 'Measure_v1', Mandatory)]
+        [Parameter(ParameterSetName = 'Measure_v2', Mandatory)]
         [datetime]
         $TimeStamp,
         
@@ -97,39 +91,34 @@
         [switch]
         $ExcludeEmptyMetric,
 
-        #Parameters for InfluxDB v1.x
-        [Parameter(ParameterSetName = 'Influx_v1', Mandatory = $true, Position = 1)]
-        [switch]
-        $InfluxDB_v1,
-        
-        [Parameter(ParameterSetName = 'Influx_v1', Mandatory = $true)]
+        [Parameter(ParameterSetName = 'Measure_v1', Mandatory)]
+        [Parameter(ParameterSetName = 'MetricObject_v1', Mandatory)]
         [string]
         $Database,
 
-        [Parameter(ParameterSetName = 'Influx_v1', Mandatory = $true)]
+        [Parameter(ParameterSetName = 'Measure_v1', Mandatory)]
+        [Parameter(ParameterSetName = 'MetricObject_v1', Mandatory)]
         [pscredential]
         $Credential,
 
-        #Parameters for InfluxDB v2.x
-        [Parameter(ParameterSetName = 'Influx_v2', Mandatory = $true, Position = 1)]
-        [switch]
-        $InfluxDB_v2,
-
-        [Parameter(ParameterSetName = 'Influx_v2', Mandatory = $true)]
+        [Parameter(ParameterSetName = 'Measure_v2', Mandatory)]
+        [Parameter(ParameterSetName = 'MetricObject_v2', Mandatory)]
         [string]
         $Organisation,
 
-        [Parameter(ParameterSetName = 'Influx_v2', Mandatory = $true)]
+        [Parameter(ParameterSetName = 'Measure_v2', Mandatory)]
+        [Parameter(ParameterSetName = 'MetricObject_v2', Mandatory)]
         [string]
         $Bucket,
 
-        [Parameter(ParameterSetName = 'Influx_v2', Mandatory = $true)]
+        [Parameter(ParameterSetName = 'Measure_v2', Mandatory)]
+        [Parameter(ParameterSetName = 'MetricObject_v2', Mandatory)]
         [string]
         $Token
     )
 
-    Begin {
-        if (($InfluxDB_v1) -and ($Credential)) {
+    begin {
+        if ($Credential) {
             $Username = $Credential.UserName
             $Password = $Credential.GetNetworkCredential().Password
 
@@ -140,9 +129,10 @@
             }
         }
 
-        If ($InfluxDB_v1) {
+        if ($Database) {
             $URI = "$Server/write?&db=$Database"
-        } else {
+        }
+        else {
             $Headers = @{
                 Authorization = "Token $Token"
             }
@@ -152,17 +142,18 @@
 
         $BulkBody = @()
     }
-    Process {
+    process {
         if (-not $InputObject) {
             $InputObject = @{
-                Measure = $Measure
-                Metrics = $Metrics
-                Tags = $Tags
+                Measure   = $Measure
+                Metrics   = $Metrics
+                Tags      = $Tags
                 TimeStamp = $TimeStamp
             }
         }
 
-        ForEach ($MetricObject in $InputObject) {
+        foreach ($MetricObject in $InputObject) {
+
             if ($MetricObject.TimeStamp) {
                 $timeStampNanoSecs = $MetricObject.Timestamp | ConvertTo-UnixTimeNanosecond
             }
@@ -188,7 +179,7 @@
                 if ($ExcludeEmptyMetric -and [string]::IsNullOrEmpty($MetricObject.Metrics[$Metric])) {
                     Write-Verbose "$Metric skipped as -ExcludeEmptyMetric was specified and the value is null or empty."
                 }
-                Else {
+                else {
                     if ($MetricObject.Metrics[$Metric] -isnot [ValueType]) { 
                         $MetricValue = '"' + $MetricObject.Metrics[$Metric] + '"'
                     }
@@ -206,7 +197,7 @@
                 If ($Bulk) {
                     $BulkBody += $Body
                 }
-                Else {
+                else {
                     if ($PSCmdlet.ShouldProcess($URI, $Body)) {
                         Invoke-RestMethod -Uri $URI -Method Post -Body $Body -Headers $Headers | Out-Null
                     }
@@ -216,8 +207,8 @@
         }
         
     }
-    End {
-        If ($Bulk) {
+    end {
+        if ($Bulk) {
             $BulkBody = $BulkBody -Join "`n"
             
             if ($PSCmdlet.ShouldProcess($URI, $BulkBody)) {
