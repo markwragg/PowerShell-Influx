@@ -3,7 +3,7 @@
 if (-not (Get-Module -Name $env:BHProjectName -ListAvailable)) {
     Import-Module -Name $env:BHPSModuleManifest -ErrorAction 'Stop' -Force
 }
-$commands = Get-Command -Module $env:BHProjectName -CommandType Cmdlet, Function, Workflow -ErrorAction 'Stop' # Not alias
+$commands = Get-Command -Module $env:BHProjectName -CommandType Cmdlet, Function -ErrorAction 'Stop' # Not alias
 
 ## When testing help, remember that help is cached at the beginning of each session.
 ## To test, restart session.
