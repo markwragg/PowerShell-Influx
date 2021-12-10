@@ -67,8 +67,8 @@
         [string]
         $Measure,
 
-        [Parameter(ParameterSetName = 'Measure_v1', Mandatory)]
-        [Parameter(ParameterSetName = 'Measure_v2', Mandatory)]
+        [Parameter(ParameterSetName = 'Measure_v1')]
+        [Parameter(ParameterSetName = 'Measure_v2')]
         [hashtable]
         $Tags,
         
@@ -77,8 +77,8 @@
         [hashtable]
         $Metrics,
 
-        [Parameter(ParameterSetName = 'Measure_v1', Mandatory)]
-        [Parameter(ParameterSetName = 'Measure_v2', Mandatory)]
+        [Parameter(ParameterSetName = 'Measure_v1')]
+        [Parameter(ParameterSetName = 'Measure_v2')]
         [datetime]
         $TimeStamp,
         
@@ -96,8 +96,8 @@
         [string]
         $Database,
 
-        [Parameter(ParameterSetName = 'Measure_v1', Mandatory)]
-        [Parameter(ParameterSetName = 'MetricObject_v1', Mandatory)]
+        [Parameter(ParameterSetName = 'Measure_v1')]
+        [Parameter(ParameterSetName = 'MetricObject_v1')]
         [pscredential]
         $Credential,
 
