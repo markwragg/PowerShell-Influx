@@ -54,7 +54,7 @@
             This command will submit the provided tag and metric data for a measure called 'WebServer' to a database called 'Web' 
             via the API endpoint 'http://myinflux.local:8086'
     #>
-    [cmdletbinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+    [cmdletbinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium', DefaultParameterSetName = 'Measure_v1')]
     param (
         [Parameter(ParameterSetName = 'MetricObject_v1', Mandatory, ValueFromPipeline)]
         [Parameter(ParameterSetName = 'MetricObject_v2', Mandatory, ValueFromPipeline)]
