@@ -1,6 +1,6 @@
 # Change Log
 
-## !Deploy
+## [1.0.101] - 2021-12-11
 
 * [Feature] Added support for Influx v2.x to the `Write-Influx` cmdlet. `Write-Influx` still supports Influx v1, which is assumed if the `-Database` parameter is used. If the new `-Organisation` `-Bucket` and `-Token` parameters are used then Influx v2 is assumed. Thanks [@Robin Hermann](https://github.com/R-Studio) for contributing most of this change.
 
