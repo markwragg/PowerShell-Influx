@@ -42,6 +42,9 @@
         .PARAMETER Bulk
             Switch: Use to have all metrics transmitted via a single connection to Influx.
 
+        .PARAMETER BulkSize
+            The number of metrics to include when using the -Bulk switch before a write occurs. Default: 5000.
+
         .PARAMETER ExcludeEmptyMetric
             Switch: Use to exclude null or empty metric values from being sent. Useful where a metric is initially created as an integer but then
             an empty or null instance of that metric would attempt to be sent as an empty string, resulting in a datatype conflict.
@@ -143,7 +146,7 @@
             $URI = "$Server/api/v2/write?org=$Organisation&bucket=$Bucket"
         }
 
-        $count = 0
+        $BulkCount = 0
         $BulkBody = @()
     }
     process {
@@ -199,14 +202,21 @@
                 $Body = $Body -Join "`n"
             
                 If ($Bulk) {
-                    $count++
+
+                    $BulkCount++
                     $BulkBody += $Body
-                    if ($count -eq $BulkSize) {
-                        Write-Verbose "Write $BulkSize lines)"
+
+                    if ($BulkCount -eq $BulkSize) {
+                        Write-Verbose "BulkSize of $BulkSize lines reached."
+                        
                         $BulkBody = $BulkBody -Join "`n"
-                        Invoke-RestMethod -Uri $URI -Method Post -Body $BulkBody -Headers $Headers | Out-Null
+
+                        if ($PSCmdlet.ShouldProcess($URI, $BulkBody)) {
+                            Invoke-RestMethod -Uri $URI -Method Post -Body $BulkBody -Headers $Headers | Out-Null
+                        }
+
                         $BulkBody = @()
-                        $count = 0
+                        $BulkCount = 0
                     }
                 }
                 else {
