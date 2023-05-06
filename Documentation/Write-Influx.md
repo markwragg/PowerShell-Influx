@@ -8,27 +8,27 @@ Writes data to Influx via the REST API.
 ### Measure_v1 (Default)
 ```
 Write-Influx -Measure <String> [-Tags <Hashtable>] -Metrics <Hashtable> [-TimeStamp <DateTime>]
- [-Server <String>] [-Bulk] [-ExcludeEmptyMetric] -Database <String> [-Credential <PSCredential>] [-WhatIf]
- [-Confirm] [<CommonParameters>]
+ [-Server <String>] [-Bulk] [-BulkSize <Int32>] [-ExcludeEmptyMetric] -Database <String>
+ [-Credential <PSCredential>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### MetricObject_v2
 ```
-Write-Influx -InputObject <PSObject[]> [-Server <String>] [-Bulk] [-ExcludeEmptyMetric] -Organisation <String>
- -Bucket <String> -Token <String> [-WhatIf] [-Confirm] [<CommonParameters>]
+Write-Influx -InputObject <PSObject[]> [-Server <String>] [-Bulk] [-BulkSize <Int32>] [-ExcludeEmptyMetric]
+ -Organisation <String> -Bucket <String> -Token <String> [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### MetricObject_v1
 ```
-Write-Influx -InputObject <PSObject[]> [-Server <String>] [-Bulk] [-ExcludeEmptyMetric] -Database <String>
- [-Credential <PSCredential>] [-WhatIf] [-Confirm] [<CommonParameters>]
+Write-Influx -InputObject <PSObject[]> [-Server <String>] [-Bulk] [-BulkSize <Int32>] [-ExcludeEmptyMetric]
+ -Database <String> [-Credential <PSCredential>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### Measure_v2
 ```
 Write-Influx -Measure <String> [-Tags <Hashtable>] -Metrics <Hashtable> [-TimeStamp <DateTime>]
- [-Server <String>] [-Bulk] [-ExcludeEmptyMetric] -Organisation <String> -Bucket <String> -Token <String>
- [-WhatIf] [-Confirm] [<CommonParameters>]
+ [-Server <String>] [-Bulk] [-BulkSize <Int32>] [-ExcludeEmptyMetric] -Organisation <String> -Bucket <String>
+ -Token <String> [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -151,6 +151,22 @@ Aliases:
 Required: False
 Position: Named
 Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -BulkSize
+The number of metrics to include when using the -Bulk switch before a write occurs.
+Default: 5000.
+
+```yaml
+Type: Int32
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: 5000
 Accept pipeline input: False
 Accept wildcard characters: False
 ```

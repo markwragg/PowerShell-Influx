@@ -7,7 +7,7 @@ Converts the specified properties of an object to a metric object, which can the
 
 ```
 ConvertTo-Metric [[-InputObject] <Object>] -Measure <String> -MetricProperty <String[]>
- [-TagProperty <String[]>] [-Tags <Hashtable>] [<CommonParameters>]
+ [-TagProperty <String[]>] [-TimeProperty <String>] [-Tags <Hashtable>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -81,6 +81,21 @@ Optional: One or more strings which match property names of the Input Object, th
 
 ```yaml
 Type: String[]
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -TimeProperty
+Optional: A string that matches a property name of the Input Object, that you want to use as the TimeStamp data.
+
+```yaml
+Type: String
 Parameter Sets: (All)
 Aliases:
 
