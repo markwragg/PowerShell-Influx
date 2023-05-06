@@ -20,6 +20,9 @@ Function ConvertTo-Metric {
         .PARAMETER TagProperty
             Optional: One or more strings which match property names of the Input Object, that you want to use as Tag data.
 
+        .PARAMETER TimeProperty
+            Optional: A string that matches a property name of the Input Object, that you want to use as the TimeStamp data.
+
         .PARAMETER Tags
             Optional: A hashtable of custom tag names and values.
 
@@ -57,7 +60,6 @@ Function ConvertTo-Metric {
 
         ForEach ($ItemObject in $InputObject) {
 
-
             $Metrics = @{}
 
             ForEach ($Metric in $MetricProperty) {
@@ -81,13 +83,18 @@ Function ConvertTo-Metric {
 
             If ($Tags.Count -ne 0) { $TagData += $Tags }
 
-            [pscustomobject]@{
+            $Result = @{
                 PSTypeName = 'Metric'
                 Measure    = $Measure
                 Tags       = $TagData
                 Metrics    = $Metrics
-                TimeStamp = Get-Date($ItemObject.$TimeProperty)
             }
+
+            if ($ItemObject.$TimeProperty) {
+                $Result.add('TimeStamp', $(Get-Date $ItemObject.$TimeProperty))
+            }
+
+            [PSCustomObject]$Result
         }
     }
 }
