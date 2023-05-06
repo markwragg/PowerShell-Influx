@@ -88,6 +88,9 @@
         [switch]
         $Bulk,
 
+        [int]
+        $BulkSize = 5000,
+
         [switch]
         $ExcludeEmptyMetric,
 
@@ -140,6 +143,7 @@
             $URI = "$Server/api/v2/write?org=$Organisation&bucket=$Bucket"
         }
 
+        $count = 0
         $BulkBody = @()
     }
     process {
@@ -161,7 +165,7 @@
                 $null = $timeStampNanoSecs
             }
 
-            if ($MetricObject.Tags) {
+            if (($MetricObject.Tags).count -ne 0) {
                 $TagData = foreach ($Tag in $MetricObject.Tags.Keys) {
                     if ([string]::IsNullOrEmpty($MetricObject.Tags[$Tag])) {
                         Write-Warning "$Tag skipped as it's value was null or empty, which is not permitted by InfluxDB."
@@ -195,7 +199,15 @@
                 $Body = $Body -Join "`n"
             
                 If ($Bulk) {
+                    $count++
                     $BulkBody += $Body
+                    if ($count -eq $BulkSize) {
+                        Write-Verbose "Write $BulkSize lines)"
+                        $BulkBody = $BulkBody -Join "`n"
+                        Invoke-RestMethod -Uri $URI -Method Post -Body $BulkBody -Headers $Headers | Out-Null
+                        $BulkBody = @()
+                        $count = 0
+                    }
                 }
                 else {
                     if ($PSCmdlet.ShouldProcess($URI, $Body)) {

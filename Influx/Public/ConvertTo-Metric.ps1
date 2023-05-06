@@ -47,11 +47,17 @@ Function ConvertTo-Metric {
         [String[]]
         $TagProperty,
 
+        [String]
+        $TimeProperty,
+
         [hashtable]
         $Tags
     )
     Process {
+
         ForEach ($ItemObject in $InputObject) {
+
+
             $Metrics = @{}
 
             ForEach ($Metric in $MetricProperty) {
@@ -80,6 +86,7 @@ Function ConvertTo-Metric {
                 Measure    = $Measure
                 Tags       = $TagData
                 Metrics    = $Metrics
+                TimeStamp = Get-Date($ItemObject.$TimeProperty)
             }
         }
     }
