@@ -89,7 +89,7 @@
                 $null = $timeStampNanoSecs
             }
     
-            if ($MetricObject.Tags) {
+            if (($MetricObject.Tags).count -ne 0) {
                 $TagData = foreach ($Tag in $MetricObject.Tags.Keys) {
                     if ([string]::IsNullOrEmpty($MetricObject.Tags[$Tag])) {
                         Write-Warning "$Tag skipped as it's value was null or empty, which is not permitted by InfluxDB."

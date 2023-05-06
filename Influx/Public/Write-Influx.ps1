@@ -42,6 +42,9 @@
         .PARAMETER Bulk
             Switch: Use to have all metrics transmitted via a single connection to Influx.
 
+        .PARAMETER BulkSize
+            The number of metrics to include when using the -Bulk switch before a write occurs. Default: 5000.
+
         .PARAMETER ExcludeEmptyMetric
             Switch: Use to exclude null or empty metric values from being sent. Useful where a metric is initially created as an integer but then
             an empty or null instance of that metric would attempt to be sent as an empty string, resulting in a datatype conflict.
@@ -87,6 +90,9 @@
 
         [switch]
         $Bulk,
+
+        [int]
+        $BulkSize = 5000,
 
         [switch]
         $ExcludeEmptyMetric,
@@ -140,6 +146,7 @@
             $URI = "$Server/api/v2/write?org=$Organisation&bucket=$Bucket"
         }
 
+        $BulkCount = 0
         $BulkBody = @()
     }
     process {
@@ -161,7 +168,7 @@
                 $null = $timeStampNanoSecs
             }
 
-            if ($MetricObject.Tags) {
+            if (($MetricObject.Tags).count -ne 0) {
                 $TagData = foreach ($Tag in $MetricObject.Tags.Keys) {
                     if ([string]::IsNullOrEmpty($MetricObject.Tags[$Tag])) {
                         Write-Warning "$Tag skipped as it's value was null or empty, which is not permitted by InfluxDB."
@@ -195,7 +202,22 @@
                 $Body = $Body -Join "`n"
             
                 If ($Bulk) {
+
+                    $BulkCount++
                     $BulkBody += $Body
+
+                    if ($BulkCount -eq $BulkSize) {
+                        Write-Verbose "BulkSize of $BulkSize lines reached."
+                        
+                        $BulkBody = $BulkBody -Join "`n"
+
+                        if ($PSCmdlet.ShouldProcess($URI, $BulkBody)) {
+                            Invoke-RestMethod -Uri $URI -Method Post -Body $BulkBody -Headers $Headers | Out-Null
+                        }
+
+                        $BulkBody = @()
+                        $BulkCount = 0
+                    }
                 }
                 else {
                     if ($PSCmdlet.ShouldProcess($URI, $Body)) {

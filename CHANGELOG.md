@@ -1,5 +1,10 @@
 # Change Log
 
+## !Deploy
+
+* [Bug] Merged fix for [#38](https://github.com/markwragg/PowerShell-Influx/issues/38) where using `Write-Influx` or `Write-InfluxUDP` without tags resulted in an error due to an empty hashtable being treated as true. Thanks [@DerT94](https://github.com/DerT94)
+* [Feature] Added a -BulkSize parameter to `Write-Influx` with a default of 5000 (the recommended bulk size). When using `-Bulk` writes will occur when the number of metrics in the bulk reach this size. Thanks [@DerT94](https://github.com/DerT94)
+
 ## [1.0.101] - 2021-12-11
 
 * [Feature] Added support for Influx v2.x to the `Write-Influx` cmdlet. `Write-Influx` still supports Influx v1, which is assumed if the `-Database` parameter is used. If the new `-Organisation` `-Bucket` and `-Token` parameters are used then Influx v2 is assumed. Thanks [@Robin Hermann](https://github.com/R-Studio) for contributing most of this change.
