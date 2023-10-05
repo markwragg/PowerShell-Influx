@@ -49,6 +49,12 @@
             Switch: Use to exclude null or empty metric values from being sent. Useful where a metric is initially created as an integer but then
             an empty or null instance of that metric would attempt to be sent as an empty string, resulting in a datatype conflict.
 
+        .PARAMETER TrustServerCertificate
+            Switch: Skips Server SSL certificate validation.
+
+        .PARAMETER SingleLineMetrics
+            Switch: Sends all measured values for every Metric object or Measure passed within the single Influx Line Protocol line.
+
         .EXAMPLE
             Write-Influx -Measure WebServer -Tags @{Server='Host01'} -Metrics @{CPU=100; Memory=50} -Database Web -Server http://myinflux.local:8086
             
@@ -120,7 +126,13 @@
         [Parameter(ParameterSetName = 'Measure_v2', Mandatory)]
         [Parameter(ParameterSetName = 'MetricObject_v2', Mandatory)]
         [string]
-        $Token
+        $Token,
+
+        [switch]
+        $TrustServerCertificate,
+
+        [switch]
+        $SingleLineMetrics
     )
 
     begin {
@@ -133,6 +145,10 @@
             $Headers = @{
                 Authorization = "Basic $EncodedCreds"
             }
+        }
+
+        if ($TrustServerCertificate) {
+            [System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}
         }
 
         if ($Database) {
@@ -180,23 +196,45 @@
                 $TagData = $TagData -Join ','
                 $TagData = ",$TagData"
             }
-        
-            $Body = foreach ($Metric in $MetricObject.Metrics.Keys) {
-            
-                if ($ExcludeEmptyMetric -and [string]::IsNullOrEmpty($MetricObject.Metrics[$Metric])) {
-                    Write-Verbose "$Metric skipped as -ExcludeEmptyMetric was specified and the value is null or empty."
-                }
-                else {
-                    if ($MetricObject.Metrics[$Metric] -isnot [ValueType]) { 
-                        $MetricValue = '"' + $MetricObject.Metrics[$Metric] + '"'
+ 
+            if($SingleLineMetrics) {
+                $MetricData = foreach ($Metric in $MetricObject.Metrics.Keys) {
+                    if ($ExcludeEmptyMetric -and [string]::IsNullOrEmpty($MetricObject.Metrics[$Metric])) {
+                        Write-Verbose "$Metric skipped as -ExcludeEmptyMetric was specified and the value is null or empty."
                     }
                     else {
-                        $MetricValue = $MetricObject.Metrics[$Metric] | Out-InfluxEscapeString
+                        if ($MetricObject.Metrics[$Metric] -isnot [ValueType]) { 
+                            "$($Metric | Out-InfluxEscapeString)=""$($MetricObject.Metrics[$Metric])"""
+                        }
+                        else {
+                            "$($Metric | Out-InfluxEscapeString)=$($MetricObject.Metrics[$Metric] | Out-InfluxEscapeString)"
+                        }
                     }
-            
-                    "$($MetricObject.Measure | Out-InfluxEscapeString)$TagData $($Metric | Out-InfluxEscapeString)=$MetricValue $timeStampNanoSecs"
-                }            
+                }
+                $MetricData = $MetricData -Join ','
+
+                $Body = "$($MetricObject.Measure | Out-InfluxEscapeString)$TagData $MetricData $timeStampNanoSecs"
             }
+            else {
+
+                $Body = foreach ($Metric in $MetricObject.Metrics.Keys) {
+            
+                    if ($ExcludeEmptyMetric -and [string]::IsNullOrEmpty($MetricObject.Metrics[$Metric])) {
+                        Write-Verbose "$Metric skipped as -ExcludeEmptyMetric was specified and the value is null or empty."
+                    }
+                    else {
+                        if ($MetricObject.Metrics[$Metric] -isnot [ValueType]) { 
+                            $MetricValue = '"' + $MetricObject.Metrics[$Metric] + '"'
+                        }
+                        else {
+                            $MetricValue = $MetricObject.Metrics[$Metric] | Out-InfluxEscapeString
+                        }
+                
+                        "$($MetricObject.Measure | Out-InfluxEscapeString)$TagData $($Metric | Out-InfluxEscapeString)=$MetricValue $timeStampNanoSecs"
+                    }            
+                }
+            }
+
         
             if ($Body) {
                 $Body = $Body -Join "`n"

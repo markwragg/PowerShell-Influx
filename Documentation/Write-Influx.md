@@ -7,28 +7,29 @@ Writes data to Influx via the REST API.
 
 ### Measure_v1 (Default)
 ```
-Write-Influx -Measure <String> [-Tags <Hashtable>] -Metrics <Hashtable> [-TimeStamp <DateTime>]
+Write-Influx -Measure <String> [-Tags <Hashtable>] -Metrics <Hashtable> [-TimeStamp <DateTime>] [-SingleLineMetrics]
  [-Server <String>] [-Bulk] [-BulkSize <Int32>] [-ExcludeEmptyMetric] -Database <String>
- [-Credential <PSCredential>] [-WhatIf] [-Confirm] [<CommonParameters>]
+ [-Credential <PSCredential>] [-TrustServerCertificate] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
+### Measure_v2
+```
+Write-Influx -Measure <String> [-Tags <Hashtable>] -Metrics <Hashtable> [-TimeStamp <DateTime>] [-SingleLineMetrics]
+ [-Server <String>] [-Bulk] [-BulkSize <Int32>] [-ExcludeEmptyMetric] -Organisation <String> -Bucket <String>
+ -Token <String> [-TrustServerCertificate] [-WhatIf] [-Confirm] [<CommonParameters>]
+```
 ### MetricObject_v2
 ```
 Write-Influx -InputObject <PSObject[]> [-Server <String>] [-Bulk] [-BulkSize <Int32>] [-ExcludeEmptyMetric]
- -Organisation <String> -Bucket <String> -Token <String> [-WhatIf] [-Confirm] [<CommonParameters>]
+ [-SingleLineMetrics]  -Organisation <String> -Bucket <String> -Token <String> [-TrustServerCertificate]
+ [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### MetricObject_v1
 ```
 Write-Influx -InputObject <PSObject[]> [-Server <String>] [-Bulk] [-BulkSize <Int32>] [-ExcludeEmptyMetric]
- -Database <String> [-Credential <PSCredential>] [-WhatIf] [-Confirm] [<CommonParameters>]
-```
-
-### Measure_v2
-```
-Write-Influx -Measure <String> [-Tags <Hashtable>] -Metrics <Hashtable> [-TimeStamp <DateTime>]
- [-Server <String>] [-Bulk] [-BulkSize <Int32>] [-ExcludeEmptyMetric] -Organisation <String> -Bucket <String>
- -Token <String> [-WhatIf] [-Confirm] [<CommonParameters>]
+ [-SingleLineMetrics]  -Database <String> [-Credential <PSCredential>] [-TrustServerCertificate]
+ [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -188,6 +189,21 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -SingleLineMetrics
+Switch: Sends all measured values for every Metric object or Measure passed within the single Influx Line Protocol line.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### -Database
 The name of the Influx database to write to.
 (This is an InfluxDB v1.x Parameter)
@@ -267,6 +283,22 @@ Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
+
+### -TrustServerCertificate
+Switch: Skips Server SSL certificate validation.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 
 ### -WhatIf
 Shows what would happen if the cmdlet runs.
