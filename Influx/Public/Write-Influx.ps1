@@ -53,7 +53,7 @@
             Switch: Skips Server SSL certificate validation.
 
         .PARAMETER SingleLineMetrics
-            Switch: Sends all measured values for every single object passed within the single Influx Line Protocol line.
+            Switch: Sends all measured values for every Metric object or Measure passed within the single Influx Line Protocol line.
 
         .EXAMPLE
             Write-Influx -Measure WebServer -Tags @{Server='Host01'} -Metrics @{CPU=100; Memory=50} -Database Web -Server http://myinflux.local:8086

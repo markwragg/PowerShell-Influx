@@ -190,7 +190,7 @@ Accept wildcard characters: False
 ```
 
 ### -SingleLineMetrics
-Switch: Sends all measured values for every single object passed within the single Influx Line Protocol line.
+Switch: Sends all measured values for every Metric object or Measure passed within the single Influx Line Protocol line.
 
 ```yaml
 Type: SwitchParameter
