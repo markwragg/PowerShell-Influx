@@ -1,6 +1,6 @@
 # Change Log
 
-## !Deploy
+## [1.0.103] - 2024-09-07
 
 * [Feature] Added `-TrustServerCertificate` to `Write-Influx` to ignore SSL certificate validation errors. Thanks [@Max-Lyulchenko](https://github.com/max-lyulchenko)!
 * [Feature] Added `-SingleLineMetrics` to `Write-Influx` to combine metrics into a single call of the Influx Line Protocol. Thanks [@Max-Lyulchenko](https://github.com/max-lyulchenko)!
