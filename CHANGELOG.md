@@ -1,5 +1,10 @@
 # Change Log
 
+## !Deploy
+
+* [Feature] Added `-TrustServerCertificate` to `Write-Influx` to ignore SSL certificate validation errors. Thanks [@Max-Lyulchenko](https://github.com/max-lyulchenko)!
+* [Feature] Added `-SingleLineMetrics` to `Write-Influx` to combine metrics into a single call of the Influx Line Protocol. Thanks [@Max-Lyulchenko](https://github.com/max-lyulchenko)!
+
 ## [1.0.102] - 2023-05-06
 
 * [Bug] Merged fix for [#38](https://github.com/markwragg/PowerShell-Influx/issues/38) where using `Write-Influx` or `Write-InfluxUDP` without tags resulted in an error due to an empty hashtable being treated as true. Thanks [@DerT94](https://github.com/DerT94)

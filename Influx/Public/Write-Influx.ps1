@@ -1,4 +1,4 @@
-﻿Function Write-Influx {
+﻿function Write-Influx {
     <#
         .SYNOPSIS
             Writes data to Influx via the REST API.
@@ -148,7 +148,15 @@
         }
 
         if ($TrustServerCertificate) {
-            [System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}
+
+            $SkipCertificateCheck = $false
+
+            if (Get-Help Invoke-RestMethod -Parameter SkipCertificateCheck -ErrorAction SilentlyContinue) {
+                $SkipCertificateCheck = $true
+            }
+            else {
+                [System.Net.ServicePointManager]::ServerCertificateValidationCallback = { $true }
+            }
         }
 
         if ($Database) {
@@ -185,6 +193,7 @@
             }
 
             if (($MetricObject.Tags).count -ne 0) {
+
                 $TagData = foreach ($Tag in $MetricObject.Tags.Keys) {
                     if ([string]::IsNullOrEmpty($MetricObject.Tags[$Tag])) {
                         Write-Warning "$Tag skipped as it's value was null or empty, which is not permitted by InfluxDB."
@@ -197,7 +206,8 @@
                 $TagData = ",$TagData"
             }
  
-            if($SingleLineMetrics) {
+            if ($SingleLineMetrics) {
+
                 $MetricData = foreach ($Metric in $MetricObject.Metrics.Keys) {
                     if ($ExcludeEmptyMetric -and [string]::IsNullOrEmpty($MetricObject.Metrics[$Metric])) {
                         Write-Verbose "$Metric skipped as -ExcludeEmptyMetric was specified and the value is null or empty."
@@ -235,7 +245,15 @@
                 }
             }
 
-        
+            $InvokeRestMethod = @{
+                Uri    = $Uri
+                Method = 'Post'
+            }
+
+            if ($SkipCertificateCheck) {
+                $InvokeRestMethod.add('SkipCertificateCheck', $true)
+            }
+
             if ($Body) {
                 $Body = $Body -Join "`n"
             
@@ -250,7 +268,7 @@
                         $BulkBody = $BulkBody -Join "`n"
 
                         if ($PSCmdlet.ShouldProcess($URI, $BulkBody)) {
-                            Invoke-RestMethod -Uri $URI -Method Post -Body $BulkBody -Headers $Headers | Out-Null
+                            Invoke-RestMethod @InvokeRestMethod -Body $BulkBody -Headers $Headers | Out-Null
                         }
 
                         $BulkBody = @()
@@ -259,7 +277,7 @@
                 }
                 else {
                     if ($PSCmdlet.ShouldProcess($URI, $Body)) {
-                        Invoke-RestMethod -Uri $URI -Method Post -Body $Body -Headers $Headers | Out-Null
+                        Invoke-RestMethod @InvokeRestMethod -Body $Body -Headers $Headers | Out-Null
                     }
                 }
             
@@ -272,8 +290,12 @@
             $BulkBody = $BulkBody -Join "`n"
             
             if ($PSCmdlet.ShouldProcess($URI, $BulkBody)) {
-                Invoke-RestMethod -Uri $URI -Method Post -Body $BulkBody -Headers $Headers | Out-Null
+                Invoke-RestMethod @InvokeRestMethod -Body $BulkBody -Headers $Headers | Out-Null
             }
+        }
+
+        if ($TrustServerCertificate) {
+            [System.Net.ServicePointManager]::ServerCertificateValidationCallback = $null
         }
     }
 }
