@@ -1,9 +1,12 @@
 # Change Log
 
+## !Deploy
+
+* [Bug] Fixed [#36](https://github.com/markwragg/PowerShell-Influx/issues/36) where tag/measurement/field-key values containing a backslash (e.g. a Windows path like `C:\`) were incorrectly escaped to `C:\\`, resulting in an invalid tag value once written to InfluxDB. InfluxDB Line Protocol does not require escaping the backslash character outside of quoted field values. Note: InfluxDB's line protocol parser cannot accept a measurement, tag key/value or field key that *ends* in a backslash under any escaping scheme (a limitation of InfluxDB itself, not this module) - `Write-Influx`/`Write-InfluxUDP`/`ConvertTo-InfluxLineString` now emit a `Write-Warning` when this occurs so it's clear why InfluxDB rejects the write.
+
 ## [2.0.0] - 2026-09-25
 
 * [Breaking] Removed the unused `-Database` and `-Server` parameters from `Get-DatastoreMetric`. They had no effect (that function never writes to Influx); use the identically-named parameters on `Send-DatastoreMetric` instead.
-* [Bug] Fixed [#36](https://github.com/markwragg/PowerShell-Influx/issues/36) where tag/measurement/field-key values containing a backslash (e.g. a Windows path like `C:\`) were incorrectly escaped to `C:\\`, resulting in an invalid tag value once written to InfluxDB. InfluxDB Line Protocol does not require escaping the backslash character outside of quoted field values. Note: InfluxDB's line protocol parser cannot accept a measurement, tag key/value or field key that *ends* in a backslash under any escaping scheme (a limitation of InfluxDB itself, not this module) - `Write-Influx`/`Write-InfluxUDP`/`ConvertTo-InfluxLineString` now emit a `Write-Warning` when this occurs so it's clear why InfluxDB rejects the write.
 
 ## [1.0.103] - 2024-09-07
 
