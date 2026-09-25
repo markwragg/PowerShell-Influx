@@ -9,80 +9,88 @@ Get-Module $Module | Remove-Module -Force
 Import-Module "$Root\$Module" -Force
 
 Describe "Send-DatacenterMetric PS$PSVersion" {
-        
+
     InModuleScope Influx {
 
-        Function Get-Datacenter { }
-        Function Get-VM { }
+        BeforeAll {
+            Function Get-Datacenter { }
+            Function Get-VM { }
 
-        Mock Write-Influx { }
+            Mock Write-Influx { }
+        }
 
         Context 'Simulating successful send' {
-            
-            Mock Get-Datacenter { 
-                [PSCustomObject]@{ 
-                    Name         = 'Test Datacenter' 
-                    ParentFolder = 'Some Folder'
-                }
-            } -Verifiable
 
-            Mock Get-VM {
-                [PSCustomObject]@{ 
-                    Name         = 'TestVM001' 
-                    ParentFolder = 'Some Folder'
-                    MemoryGB     = 4
-                    NumCPU       = 2
-                    PowerState   = 'PoweredOn'
-                }
-                [PSCustomObject]@{ 
-                    Name         = 'TestVM002' 
-                    ParentFolder = 'Some Other Folder'
-                    MemoryGB     = 8
-                    NumCPU       = 4
-                    PowerState   = 'PoweredOff'
-                }
-            } -Verifiable
+            BeforeAll {
+                Mock Get-Datacenter {
+                    [PSCustomObject]@{
+                        Name         = 'Test Datacenter'
+                        ParentFolder = 'Some Folder'
+                    }
+                } -Verifiable
 
-            $SendDC = Send-DatacenterMetric
-            
+                Mock Get-VM {
+                    [PSCustomObject]@{
+                        Name         = 'TestVM001'
+                        ParentFolder = 'Some Folder'
+                        MemoryGB     = 4
+                        NumCPU       = 2
+                        PowerState   = 'PoweredOn'
+                    }
+                    [PSCustomObject]@{
+                        Name         = 'TestVM002'
+                        ParentFolder = 'Some Other Folder'
+                        MemoryGB     = 8
+                        NumCPU       = 4
+                        PowerState   = 'PoweredOff'
+                    }
+                } -Verifiable
+
+                $SendDC = Send-DatacenterMetric
+            }
+
             it 'Should return null' {
-                $SendDC | Should be $null
+                $SendDC | Should -Be $null
             }
             It 'Should execute all verifiable mocks' {
-                Assert-VerifiableMock
+                Should -InvokeVerifiable
             }
             It 'Should call Get-Datacenter exactly 1 time' {
-                Assert-MockCalled Get-Datacenter -Exactly 1
+                Should -Invoke Get-Datacenter -Exactly -Times 1 -Scope Context
             }
             It 'Should call Get-VM exactly 1 time' {
-                Assert-MockCalled Get-VM -Exactly 1
+                Should -Invoke Get-VM -Exactly -Times 1 -Scope Context
             }
             It 'Should call Write-Influx exactly 1 time' {
-                Assert-MockCalled Write-Influx -Exactly 1
-            }  
+                Should -Invoke Write-Influx -Exactly -Times 1 -Scope Context
+            }
         }
 
         Context 'Simulating no Datacenter data returned' {
-        
-            Mock Get-Datacenter { } -Verifiable
 
-            Mock Get-VM { }
-        
+            BeforeAll {
+                Mock Get-Datacenter { } -Verifiable
+
+                Mock Get-VM { }
+
+                $SendDC = Send-DatacenterMetric
+            }
+
             It 'Should return null' {
-                Send-DatacenterMetric | Should -Be $null
+                $SendDC | Should -Be $null
             }
             It 'Should execute all verifiable mocks' {
-                Assert-VerifiableMock
+                Should -InvokeVerifiable
             }
             It 'Should call Get-Datacenter exactly 1 time' {
-                Assert-MockCalled Get-Datacenter -Exactly 1
+                Should -Invoke Get-Datacenter -Exactly -Times 1 -Scope Context
             }
             It 'Should call Get-VM exactly 0 times' {
-                Assert-MockCalled Get-VM -Exactly 0
+                Should -Invoke Get-VM -Exactly -Times 0 -Scope Context
             }
             It 'Should call Write-Influx exactly 0 times' {
-                Assert-MockCalled Write-Influx -Exactly 0
+                Should -Invoke Write-Influx -Exactly -Times 0 -Scope Context
             }
-        }     
+        }
     }
 }

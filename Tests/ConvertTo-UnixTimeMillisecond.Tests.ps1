@@ -1,50 +1,61 @@
-﻿if(-not $PSScriptRoot) { $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent }
+if (-not $PSScriptRoot) { $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent }
 
 $PSVersion = $PSVersionTable.PSVersion.Major
-$Root = "$PSScriptRoot\.."
-$Sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace '\.Tests\.', '.'
+$Root = "$PSScriptRoot\..\"
+$Module = 'Influx'
 
-Get-ChildItem $Root -Filter $Sut -Recurse | ForEach-Object { . $_.FullName }
+Get-Module $Module | Remove-Module -Force
+
+Import-Module "$Root\$Module" -Force
 
 Describe "ConvertTo-UnixTimeMillisecond PS$PSVersion" {
-    
-    $NewTimeSpan = Get-Command New-TimeSpan
-    
-    Mock New-TimeSpan { & $NewTimeSpan -Start $Start -End $End } -Verifiable
-        
-    Context 'Date object input' {
 
-        $UnixTime = Get-Date '01/01/2017' | ConvertTo-UnixTimeMillisecond
+    InModuleScope Influx {
 
-        It 'Should convert 01/01/2017 to 1483228800000' {
-            $UnixTime | Should Be 1483228800000
-        }
-        It "Should return a [double] type value" {
-            $UnixTime | Should BeOfType [double]
-        }
-        It 'Should execute all verifiable mocks' {
-            Assert-VerifiableMock
-        }
-        It 'Should call New-TimeSpan exactly 1 time' {
-            Assert-MockCalled New-TimeSpan -Exactly 1
-        }
-    } 
+        BeforeAll {
+            $NewTimeSpan = Get-Command New-TimeSpan
 
-    Context 'String object input' {
+            Mock New-TimeSpan { & $NewTimeSpan -Start $Start -End $End } -Verifiable
+        }
 
-        $UnixTime = '01-01-2017 12:34:22.12' | ConvertTo-UnixTimeMillisecond
+        Context 'Date object input' {
 
-        It "Should convert '01-01-2017 12:34:22.12' to 1483274062120" {
-            $UnixTime | Should Be 1483274062120
+            BeforeAll {
+                $UnixTime = Get-Date '01/01/2017' | ConvertTo-UnixTimeMillisecond
+            }
+
+            It 'Should convert 01/01/2017 to 1483228800000' {
+                $UnixTime | Should -Be 1483228800000
+            }
+            It "Should return a [double] type value" {
+                $UnixTime | Should -BeOfType [double]
+            }
+            It 'Should execute all verifiable mocks' {
+                Should -InvokeVerifiable
+            }
+            It 'Should call New-TimeSpan exactly 1 time' {
+                Should -Invoke New-TimeSpan -Exactly -Times 1 -Scope Context
+            }
         }
-        It "Should return a [double] type value" {
-            $UnixTime | Should BeOfType [double]
+
+        Context 'String object input' {
+
+            BeforeAll {
+                $UnixTime = '01-01-2017 12:34:22.12' | ConvertTo-UnixTimeMillisecond
+            }
+
+            It "Should convert '01-01-2017 12:34:22.12' to 1483274062120" {
+                $UnixTime | Should -Be 1483274062120
+            }
+            It "Should return a [double] type value" {
+                $UnixTime | Should -BeOfType [double]
+            }
+            It 'Should execute all verifiable mocks' {
+                Should -InvokeVerifiable
+            }
+            It 'Should call New-TimeSpan exactly 1 time' {
+                Should -Invoke New-TimeSpan -Exactly -Times 1 -Scope Context
+            }
         }
-        It 'Should execute all verifiable mocks' {
-            Assert-VerifiableMock
-        }
-        It 'Should call New-TimeSpan exactly 1 time' {
-            Assert-MockCalled New-TimeSpan -Exactly 1
-        }
-    } 
+    }
 }

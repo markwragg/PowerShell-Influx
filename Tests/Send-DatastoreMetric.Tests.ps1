@@ -9,55 +9,63 @@ Get-Module $Module | Remove-Module -Force
 Import-Module "$Root\$Module" -Force
 
 Describe "Send-DatastoreMetric PS$PSVersion" {
-        
+
     InModuleScope Influx {
 
-        Function Get-Datastore { }
-        
-        Mock Write-Influx { }
+        BeforeAll {
+            Function Get-Datastore { }
+
+            Mock Write-Influx { }
+        }
 
         Context 'Simulating successful send' {
-            
-            Mock Get-Datastore { 
-                [PSCustomObject]@{ 
-                    Name        = 'Test Datastore' 
-                    CapacityGB  = 12345.987
-                    FreespaceGB = 654.123
-                }
-            } -Verifiable
 
-            $SendDatastore = Send-DatastoreMetric
-            
+            BeforeAll {
+                Mock Get-Datastore {
+                    [PSCustomObject]@{
+                        Name        = 'Test Datastore'
+                        CapacityGB  = 12345.987
+                        FreespaceGB = 654.123
+                    }
+                } -Verifiable
+
+                $SendDatastore = Send-DatastoreMetric
+            }
+
             it 'Should return null' {
-                $SendDatastore | Should be $null
+                $SendDatastore | Should -Be $null
             }
             It 'Should execute all verifiable mocks' {
-                Assert-VerifiableMock
+                Should -InvokeVerifiable
             }
             It 'Should call Get-Datastore exactly 1 time' {
-                Assert-MockCalled Get-Datastore -Exactly 1
+                Should -Invoke Get-Datastore -Exactly -Times 1 -Scope Context
             }
             It 'Should call Write-Influx exactly 1 time' {
-                Assert-MockCalled Write-Influx -Exactly 1
-            }  
+                Should -Invoke Write-Influx -Exactly -Times 1 -Scope Context
+            }
         }
 
         Context 'Simulating no Datastore data returned' {
-        
-            Mock Get-Datastore { } -Verifiable
- 
+
+            BeforeAll {
+                Mock Get-Datastore { } -Verifiable
+
+                $SendDatastore = Send-DatastoreMetric
+            }
+
             it 'Should return null' {
-                Send-DatastoreMetric | Should be $null
+                $SendDatastore | Should -Be $null
             }
             It 'Should execute all verifiable mocks' {
-                Assert-VerifiableMock
+                Should -InvokeVerifiable
             }
             It 'Should call Get-Datastore exactly 1 time' {
-                Assert-MockCalled Get-Datastore -Exactly 1
+                Should -Invoke Get-Datastore -Exactly -Times 1 -Scope Context
             }
             It 'Should call Write-Influx exactly 0 times' {
-                Assert-MockCalled Write-Influx -Exactly 0
+                Should -Invoke Write-Influx -Exactly -Times 0 -Scope Context
             }
-        }     
+        }
     }
 }

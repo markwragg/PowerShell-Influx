@@ -9,16 +9,11 @@
         }
     }
 
-    # Dependency Management modules
-    # PackageManagement = '1.2.2'
-    # PowerShellGet     = '2.0.1'
-
     # Common modules
     BuildHelpers     = '2.0.1'
-    Pester           = '4.6.0'
+    Pester           = '6.1.0'
     PlatyPS          = '0.12.0'
-    psake            = '4.7.4'
+    psake            = '4.9.0'
     PSDeploy         = '1.0.1'
-    PSScriptAnalyzer = '1.17.1'
-    # 'VMware.VimAutomation.Cloud' = '11.0.0.10379994'
+    PSScriptAnalyzer = '1.21.0'
 }

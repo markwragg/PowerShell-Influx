@@ -1,32 +1,39 @@
-﻿if (-not $PSScriptRoot) { $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent }
+if (-not $PSScriptRoot) { $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent }
 
 $PSVersion = $PSVersionTable.PSVersion.Major
-$Root = "$PSScriptRoot\.."
-$Sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace '\.Tests\.', '.'
+$Root = "$PSScriptRoot\..\"
+$Module = 'Influx'
 
-Get-ChildItem $Root -Filter $Sut -Recurse | ForEach-Object { . $_.FullName }
+Get-Module $Module | Remove-Module -Force
+
+Import-Module "$Root\$Module" -Force
 
 Describe "ConvertTo-Metric PS$PSVersion" {
-      
-    $SomeObject = @(
-        [pscustomobject]@{
-            Name      = 'Test'
-            SomeValue = 1
-        },
-        [pscustomobject]@{
-            Name      = 'Other'
-            SomeValue = 20
-        }
-    )
 
-    $MetricObject = $SomeObject | ConvertTo-Metric -Measure Test -MetricProperty Name,SomeValue
+    InModuleScope Influx {
 
-    It 'Should return Metric objects' {
-        $MetricObject | ForEach-Object {
-            $_.PSObject.TypeNames | Should -Contain 'Metric'
+        BeforeAll {
+            $SomeObject = @(
+                [pscustomobject]@{
+                    Name      = 'Test'
+                    SomeValue = 1
+                },
+                [pscustomobject]@{
+                    Name      = 'Other'
+                    SomeValue = 20
+                }
+            )
+
+            $MetricObject = $SomeObject | ConvertTo-Metric -Measure Test -MetricProperty Name,SomeValue
         }
-    }      
-    It 'Should return two objects' {
-        $MetricObject.count | Should -Be 2
-    }    
-} 
+
+        It 'Should return Metric objects' {
+            $MetricObject | ForEach-Object {
+                $_.PSObject.TypeNames | Should -Contain 'Metric'
+            }
+        }
+        It 'Should return two objects' {
+            $MetricObject.count | Should -Be 2
+        }
+    }
+}

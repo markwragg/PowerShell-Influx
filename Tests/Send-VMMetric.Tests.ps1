@@ -9,128 +9,136 @@ Get-Module $Module | Remove-Module -Force
 Import-Module "$Root\$Module" -Force
 
 Describe "Send-VMMetric PS$PSVersion" {
-        
+
     InModuleScope Influx {
 
-        Function Get-VM { }
-        Function Get-Stat { }
-        
-        Mock Write-Influx { }
+        BeforeAll {
+            Function Get-VM { }
+            Function Get-Stat { }
+
+            Mock Write-Influx { }
+        }
 
         Context 'Simulating successful send' {
-            
-            Mock Get-VM {
-                [PSCustomObject]@{ 
-                    Name         = 'TestVM001' 
-                    ParentFolder = 'Some Folder'
-                    MemoryGB     = 4
-                    NumCPU       = 2
-                    PowerState   = 1
-                }
-                [PSCustomObject]@{ 
-                    Name         = 'TestVM002' 
-                    ParentFolder = 'Some Other Folder'
-                    MemoryGB     = 8
-                    NumCPU       = 4
-                    PowerState   = 0
-                }
-            } -Verifiable
 
-            Mock Get-Stat { }
+            BeforeAll {
+                Mock Get-VM {
+                    [PSCustomObject]@{
+                        Name         = 'TestVM001'
+                        ParentFolder = 'Some Folder'
+                        MemoryGB     = 4
+                        NumCPU       = 2
+                        PowerState   = 1
+                    }
+                    [PSCustomObject]@{
+                        Name         = 'TestVM002'
+                        ParentFolder = 'Some Other Folder'
+                        MemoryGB     = 8
+                        NumCPU       = 4
+                        PowerState   = 0
+                    }
+                } -Verifiable
 
-            $SendVM = Send-VMMetric
-            
+                Mock Get-Stat { }
+
+                $SendVM = Send-VMMetric
+            }
+
             it 'Should return null' {
-                $SendVM | Should be $null
+                $SendVM | Should -Be $null
             }
             It 'Should execute all verifiable mocks' {
-                Assert-VerifiableMock
+                Should -InvokeVerifiable
             }
             It 'Should call Get-VM exactly 1 time' {
-                Assert-MockCalled Get-VM -Exactly 1
+                Should -Invoke Get-VM -Exactly -Times 1 -Scope Context
             }
             It 'Should call Get-Stat exactly 0 times' {
-                Assert-MockCalled Get-Stat -Exactly 0
+                Should -Invoke Get-Stat -Exactly -Times 0 -Scope Context
             }
             It 'Should call Write-Influx exactly 2 time' {
-                Assert-MockCalled Write-Influx -Exactly 2
-            }  
+                Should -Invoke Write-Influx -Exactly -Times 2 -Scope Context
+            }
         }
 
         Context 'Simulating successful send with -Stats switch' {
-            
-            Mock Get-VM {
-                [PSCustomObject]@{ 
-                    Name          = 'TestVM001' 
-                    ParentFolder  = 'Some Folder'
-                    MemoryGB      = 4
-                    NumCPU        = 2
-                    PowerState    = 1
-                    ExtensionData = @{
-                        Summary = @{
-                            QuickStats = [PSCustomObject]@{
-                                OverallCpuUsage  = 10
-                                GuestMemoryUsage = 50
-                                HostMemoryUsage  = 150
-                                UptimeSeconds    = 1234567890
+
+            BeforeAll {
+                Mock Get-VM {
+                    [PSCustomObject]@{
+                        Name          = 'TestVM001'
+                        ParentFolder  = 'Some Folder'
+                        MemoryGB      = 4
+                        NumCPU        = 2
+                        PowerState    = 1
+                        ExtensionData = @{
+                            Summary = @{
+                                QuickStats = [PSCustomObject]@{
+                                    OverallCpuUsage  = 10
+                                    GuestMemoryUsage = 50
+                                    HostMemoryUsage  = 150
+                                    UptimeSeconds    = 1234567890
+                                }
                             }
                         }
                     }
-                }
-            } -Verifiable
+                } -Verifiable
 
-            Mock Get-Stat {
-                [PSCustomObject]@{ 
-                    Entity    = @{Name = 'TestVM001'}
-                    MetricID  = 'cpu.usage.average'
-                    Timestamp = '12/31/2017 12:00:00 AM'
-                    Value     = '0.11'
-                    Unit      = '%'
-                }
-            } -Verifiable
+                Mock Get-Stat {
+                    [PSCustomObject]@{
+                        Entity    = @{Name = 'TestVM001'}
+                        MetricID  = 'cpu.usage.average'
+                        Timestamp = '12/31/2017 12:00:00 AM'
+                        Value     = '0.11'
+                        Unit      = '%'
+                    }
+                } -Verifiable
 
-            $SendVM = Send-VMMetric -Stats
-            
+                $SendVM = Send-VMMetric -Stats
+            }
+
             It 'Should return null' {
-                $SendVM | Should be $null
+                $SendVM | Should -Be $null
             }
             It 'Should execute all verifiable mocks' {
-                Assert-VerifiableMock
+                Should -InvokeVerifiable
             }
             It 'Should call Get-VM exactly 1 time' {
-                Assert-MockCalled Get-VM -Exactly 1
+                Should -Invoke Get-VM -Exactly -Times 1 -Scope Context
             }
             It 'Should call Get-Stat exactly 2 times' {
-                Assert-MockCalled Get-Stat -Exactly 1
+                Should -Invoke Get-Stat -Exactly -Times 1 -Scope Context
             }
             It 'Should call Write-Influx exactly 2 times' {
-                Assert-MockCalled Write-Influx -Exactly 1
-            }  
+                Should -Invoke Write-Influx -Exactly -Times 1 -Scope Context
+            }
         }
-   
-        Context 'Simulating no VM data returned' {
-        
-            Mock Get-VM { } -Verifiable
-            
-            Mock Get-Stat { }
 
-            $SendVM = Send-VMMetric
-            
+        Context 'Simulating no VM data returned' {
+
+            BeforeAll {
+                Mock Get-VM { } -Verifiable
+
+                Mock Get-Stat { }
+
+                $SendVM = Send-VMMetric
+            }
+
             It 'Should return null' {
-                $SendVM | Should be $null
+                $SendVM | Should -Be $null
             }
             It 'Should execute all verifiable mocks' {
-                Assert-VerifiableMock
+                Should -InvokeVerifiable
             }
             It 'Should call Get-VM exactly 1 time' {
-                Assert-MockCalled Get-VM -Exactly 1
+                Should -Invoke Get-VM -Exactly -Times 1 -Scope Context
             }
             It 'Should call Get-Stat exactly 0 times' {
-                Assert-MockCalled Get-Stat -Exactly 0
+                Should -Invoke Get-Stat -Exactly -Times 0 -Scope Context
             }
             It 'Should call Write-Influx exactly 0 times' {
-                Assert-MockCalled Write-Influx -Exactly 0
+                Should -Invoke Write-Influx -Exactly -Times 0 -Scope Context
             }
-        }     
+        }
     }
 }
