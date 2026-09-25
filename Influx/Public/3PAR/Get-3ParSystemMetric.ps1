@@ -27,8 +27,9 @@
             Description
             -----------
             This command will return a metric object with the specified tags and 3PAR metrics for a measure called 'Test3PAR'.
-    #>  
+    #>
     [cmdletbinding()]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'Tags', Justification = 'Used inside the Where-Object closure below; PSScriptAnalyzer does not see usage inside nested scriptblocks.')]
     param(
         [String]
         $Measure = '3PARSystem',

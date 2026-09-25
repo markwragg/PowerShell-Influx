@@ -20,9 +20,10 @@
             -------------------
             CpuUsageMhz,Name=somehost1,PowerState=PoweredOn:305|g
             MemoryUsageGB,Name=somehost1,PowerState=PoweredOn:17.0029296875|g
-    #>      
+    #>
     [cmdletbinding()]
     [OutputType([String])]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'Type', Justification = 'Used inside the ForEach-Object closure below; PSScriptAnalyzer does not see usage inside nested scriptblocks.')]
     Param(
         [Parameter(ValueFromPipeline = $True, Position = 0)]
         [PSTypeName('Metric')]

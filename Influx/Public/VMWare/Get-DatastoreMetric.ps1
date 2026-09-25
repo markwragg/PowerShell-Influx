@@ -15,12 +15,6 @@
         .PARAMETER Datastore
             One or more datastores to be queried.
 
-        .PARAMETER Server
-            The URL and port for the Influx REST API. Default: 'http://localhost:8086'
-
-        .PARAMETER Database
-            The name of the Influx database to write to. Default: 'vmware'. This must exist in Influx!
-
         .EXAMPLE
             Send-DatastoreMetric -Measure 'TestDatastores' -Tags Name,Type -Datastore Test*
             
@@ -37,13 +31,7 @@
         $Tags = ('Name', 'ParentFolder', 'Type'),
 
         [String[]]
-        $Datastore = '*',
-
-        [string]
-        $Database = 'vmware',
-        
-        [string]
-        $Server = 'http://localhost:8086'
+        $Datastore = '*'
     )
 
     Write-Verbose 'Getting datastores..'

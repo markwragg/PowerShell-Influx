@@ -1,5 +1,9 @@
 # Change Log
 
+## !Deploy
+
+* [Breaking] Removed the unused `-Database` and `-Server` parameters from `Get-DatastoreMetric`. They had no effect (that function never writes to Influx); use the identically-named parameters on `Send-DatastoreMetric` instead.
+
 ## [1.0.103] - 2024-09-07
 
 * [Feature] Added `-TrustServerCertificate` to `Write-Influx` to ignore SSL certificate validation errors. Thanks [@Max-Lyulchenko](https://github.com/max-lyulchenko)!
