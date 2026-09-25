@@ -1,5 +1,9 @@
 # Change Log
 
+## !Deploy
+
+* [Bug] Fixed [#16](https://github.com/markwragg/PowerShell-Influx/issues/16) where a `[datetime]` metric value was written using its culture-dependent `ToString()` representation, which is not valid InfluxDB Line Protocol and always failed the write with `invalid number`. `[datetime]` metric values are now converted to a Unix nanosecond integer field. Also, a metric value that's a complex object with no meaningful `ToString()` (e.g. certain SDK objects) now emits a `Write-Warning` instead of silently writing the type name. Boolean metric values are unaffected - InfluxDB requires them unquoted, which this module already did correctly.
+
 ## [2.0.1] - 2026-09-25
 
 * [Bug] Fixed [#36](https://github.com/markwragg/PowerShell-Influx/issues/36) where tag/measurement/field-key values containing a backslash (e.g. a Windows path like `C:\`) were incorrectly escaped to `C:\\`, resulting in an invalid tag value once written to InfluxDB. InfluxDB Line Protocol does not require escaping the backslash character outside of quoted field values. Note: InfluxDB's line protocol parser cannot accept a measurement, tag key/value or field key that *ends* in a backslash under any escaping scheme (a limitation of InfluxDB itself, not this module) - `Write-Influx`/`Write-InfluxUDP`/`ConvertTo-InfluxLineString` now emit a `Write-Warning` when this occurs so it's clear why InfluxDB rejects the write.

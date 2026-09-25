@@ -112,8 +112,8 @@ Describe "Write-Influx PS$PSVersion" {
                 It 'Should call ConvertTo-UnixTimeNanosecond exactly 1 time' {
                     Should -Invoke ConvertTo-UnixTimeNanosecond -Exactly -Times 1 -Scope Context
                 }
-                It 'Should call Out-InfluxEscapeString exactly 8 times' {
-                    Should -Invoke Out-InfluxEscapeString -Exactly -Times 8 -Scope Context
+                It 'Should call Out-InfluxEscapeString exactly 6 times' {
+                    Should -Invoke Out-InfluxEscapeString -Exactly -Times 6 -Scope Context
                 }
                 It 'Should call Invoke-RestMethod exactly 1 time' {
                     Should -Invoke Invoke-RestMethod -Exactly -Times 1 -Scope Context
@@ -318,8 +318,8 @@ Describe "Write-Influx PS$PSVersion" {
                 It 'Should call ConvertTo-UnixTimeNanosecond exactly 1 time' {
                     Should -Invoke ConvertTo-UnixTimeNanosecond -Exactly -Times 1 -Scope Context
                 }
-                It 'Should call Out-InfluxEscapeString exactly 8 times' {
-                    Should -Invoke Out-InfluxEscapeString -Exactly -Times 8 -Scope Context
+                It 'Should call Out-InfluxEscapeString exactly 6 times' {
+                    Should -Invoke Out-InfluxEscapeString -Exactly -Times 6 -Scope Context
                 }
                 It 'Should call Invoke-RestMethod exactly 1 time' {
                     Should -Invoke Invoke-RestMethod -Exactly -Times 1 -Scope Context

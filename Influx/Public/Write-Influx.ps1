@@ -213,12 +213,7 @@
                         Write-Verbose "$Metric skipped as -ExcludeEmptyMetric was specified and the value is null or empty."
                     }
                     else {
-                        if ($MetricObject.Metrics[$Metric] -isnot [ValueType]) { 
-                            "$($Metric | Out-InfluxEscapeString)=""$($MetricObject.Metrics[$Metric])"""
-                        }
-                        else {
-                            "$($Metric | Out-InfluxEscapeString)=$($MetricObject.Metrics[$Metric] | Out-InfluxEscapeString)"
-                        }
+                        "$($Metric | Out-InfluxEscapeString)=$($MetricObject.Metrics[$Metric] | Format-InfluxFieldValue)"
                     }
                 }
                 $MetricData = $MetricData -Join ','
@@ -233,15 +228,10 @@
                         Write-Verbose "$Metric skipped as -ExcludeEmptyMetric was specified and the value is null or empty."
                     }
                     else {
-                        if ($MetricObject.Metrics[$Metric] -isnot [ValueType]) { 
-                            $MetricValue = '"' + $MetricObject.Metrics[$Metric] + '"'
-                        }
-                        else {
-                            $MetricValue = $MetricObject.Metrics[$Metric] | Out-InfluxEscapeString
-                        }
-                
+                        $MetricValue = $MetricObject.Metrics[$Metric] | Format-InfluxFieldValue
+
                         "$($MetricObject.Measure | Out-InfluxEscapeString)$TagData $($Metric | Out-InfluxEscapeString)=$MetricValue $timeStampNanoSecs"
-                    }            
+                    }
                 }
             }
 

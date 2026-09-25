@@ -108,15 +108,10 @@
                     Write-Verbose "$Metric skipped as -ExcludeEmptyMetric was specified and the value is null or empty."
                 }
                 Else {
-                    if ($MetricObject.Metrics[$Metric] -isnot [ValueType]) { 
-                        $MetricValue = '"' + $MetricObject.Metrics[$Metric] + '"'
-                    }
-                    else {
-                        $MetricValue = $MetricObject.Metrics[$Metric] | Out-InfluxEscapeString
-                    }
-            
+                    $MetricValue = $MetricObject.Metrics[$Metric] | Format-InfluxFieldValue
+
                     "$($MetricObject.Measure | Out-InfluxEscapeString)$TagData $($Metric | Out-InfluxEscapeString)=$MetricValue $timeStampNanoSecs"
-                }            
+                }
             }
     
             if ($Body) {
