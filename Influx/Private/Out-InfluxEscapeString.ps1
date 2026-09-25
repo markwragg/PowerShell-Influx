@@ -31,11 +31,22 @@
         $StringType
     )
     process {
+        # Backslashes are not escaped for Measurement/Other: InfluxDB line protocol does not treat '\' as
+        # a reserved character outside of quoted field values, and escaping it here would corrupt values
+        # such as Windows paths (e.g. 'C:\' becoming 'C:\\').
+        if ($StringType -ne 'FieldTextValue' -and $String -match '\\$') {
+            Write-Warning "'$String' ends with a backslash. InfluxDB line protocol cannot parse a measurement, tag key/value or field key ending in a backslash and will reject the write; consider removing or replacing the trailing backslash."
+        }
+
         Switch ($StringType) {
-            "Measurement" { $String -Replace '(\s|,|\\)', '\$1' }
+            # Measurement names only need whitespace and commas escaped; there's no key=value structure to protect.
+            "Measurement" { $String -Replace '(\s|,)', '\$1' }
+            # Field text values are wrapped in "..." so the characters that would break out of the quotes need escaping.
             "FieldTextValue" { $String -Replace '("|\\)', '\$1' }
-            "Other" { $String -Replace '(\s|=|,|\\|")', '\$1' }
-            default { $String -Replace '(\s|=|,|\\|")', '\$1' }
+            # Tag keys/values and field keys are part of key=value,key=value pairs, so = and , are structural and must be escaped, along with whitespace.
+            "Other" { $String -Replace '(\s|=|,)', '\$1' }
+            # No -StringType specified: treat the same as "Other".
+            default { $String -Replace '(\s|=|,)', '\$1' }
         }
     }
 }
