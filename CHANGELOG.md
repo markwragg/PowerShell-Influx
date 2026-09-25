@@ -1,6 +1,6 @@
 # Change Log
 
-## !Deploy
+## [2.0.2] - 2026-09-25
 
 * [Bug] Fixed [#16](https://github.com/markwragg/PowerShell-Influx/issues/16) where a `[datetime]` metric value was written using its culture-dependent `ToString()` representation, which is not valid InfluxDB Line Protocol and always failed the write with `invalid number`. `[datetime]` metric values are now converted to a Unix nanosecond integer field. Also, a metric value that's a complex object with no meaningful `ToString()` (e.g. certain SDK objects) now emits a `Write-Warning` instead of silently writing the type name. Boolean metric values are unaffected - InfluxDB requires them unquoted, which this module already did correctly.
 
