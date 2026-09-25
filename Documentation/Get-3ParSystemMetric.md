@@ -7,7 +7,7 @@ Returns 3Par System metrics as a metric object which can then be transmitted to 
 
 ```
 Get-3ParSystemMetric [[-Measure] <String>] [[-Tags] <String[]>] [-SANIPAddress] <String>
- [-SANUserName] <String> [-SANPwdFile] <String> [<CommonParameters>]
+ [-SANUserName] <String> [-SANPwdFile] <String> [-ProgressAction <ActionPreference>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -97,6 +97,21 @@ Aliases:
 
 Required: True
 Position: 5
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ProgressAction
+{{Fill ProgressAction Description}}
+
+```yaml
+Type: ActionPreference
+Parameter Sets: (All)
+Aliases: proga
+
+Required: False
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False

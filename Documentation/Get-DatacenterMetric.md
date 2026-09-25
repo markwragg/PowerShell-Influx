@@ -6,7 +6,8 @@ Returns VMWare Datacenter metrics as a metric object which can then be transmitt
 ## SYNTAX
 
 ```
-Get-DatacenterMetric [[-Measure] <String>] [[-Tags] <String[]>] [[-Datacenter] <String[]>] [<CommonParameters>]
+Get-DatacenterMetric [[-Measure] <String>] [[-Tags] <String[]>] [[-Datacenter] <String[]>]
+ [-ProgressAction <ActionPreference>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -67,6 +68,21 @@ Aliases:
 Required: False
 Position: 3
 Default value: *
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ProgressAction
+{{Fill ProgressAction Description}}
+
+```yaml
+Type: ActionPreference
+Parameter Sets: (All)
+Aliases: proga
+
+Required: False
+Position: Named
+Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```

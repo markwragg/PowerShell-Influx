@@ -7,7 +7,8 @@ Converts the specified properties of an object to a metric object, which can the
 
 ```
 ConvertTo-Metric [[-InputObject] <Object>] -Measure <String> -MetricProperty <String[]>
- [-TagProperty <String[]>] [-TimeProperty <String>] [-Tags <Hashtable>] [<CommonParameters>]
+ [-TagProperty <String[]>] [-TimeProperty <String>] [-Tags <Hashtable>] [-ProgressAction <ActionPreference>]
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -113,6 +114,21 @@ Optional: A hashtable of custom tag names and values.
 Type: Hashtable
 Parameter Sets: (All)
 Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ProgressAction
+{{Fill ProgressAction Description}}
+
+```yaml
+Type: ActionPreference
+Parameter Sets: (All)
+Aliases: proga
 
 Required: False
 Position: Named

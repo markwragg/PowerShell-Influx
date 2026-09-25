@@ -7,7 +7,7 @@ Returns the 3Par Virtual Volume metrics (as returned by Get-3parStatVV) as a met
 
 ```
 Get-3ParVirtualVolumeMetric [[-Measure] <String>] [-SANIPAddress] <String> [-SANUserName] <String>
- [-SANPwdFile] <String> [<CommonParameters>]
+ [-SANPwdFile] <String> [-ProgressAction <ActionPreference>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -82,6 +82,21 @@ Aliases:
 
 Required: True
 Position: 4
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ProgressAction
+{{Fill ProgressAction Description}}
+
+```yaml
+Type: ActionPreference
+Parameter Sets: (All)
+Aliases: proga
+
+Required: False
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False

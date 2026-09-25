@@ -7,7 +7,8 @@ Sends the 3Par Virtual Volume metrics returned by Get-3parStatVV to Influx.
 
 ```
 Send-3ParVirtualVolumeMetric [[-Measure] <String>] [-SANIPAddress] <String> [-SANUserName] <String>
- [-SANPwdFile] <String> [[-Database] <String>] [[-Server] <String>] [-WhatIf] [-Confirm] [<CommonParameters>]
+ [-SANPwdFile] <String> [[-Database] <String>] [[-Server] <String>] [-ProgressAction <ActionPreference>]
+ [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -143,6 +144,21 @@ Prompts you for confirmation before running the cmdlet.
 Type: SwitchParameter
 Parameter Sets: (All)
 Aliases: cf
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ProgressAction
+{{Fill ProgressAction Description}}
+
+```yaml
+Type: ActionPreference
+Parameter Sets: (All)
+Aliases: proga
 
 Required: False
 Position: Named

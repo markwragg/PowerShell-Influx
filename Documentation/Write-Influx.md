@@ -9,29 +9,30 @@ Writes data to Influx via the REST API.
 ```
 Write-Influx -Measure <String> [-Tags <Hashtable>] -Metrics <Hashtable> [-TimeStamp <DateTime>]
  [-Server <String>] [-Bulk] [-BulkSize <Int32>] [-ExcludeEmptyMetric] -Database <String>
- [-Credential <PSCredential>] [-TrustServerCertificate] [-SingleLineMetrics] [-WhatIf] [-Confirm]
- [<CommonParameters>]
+ [-Credential <PSCredential>] [-TrustServerCertificate] [-SingleLineMetrics]
+ [-ProgressAction <ActionPreference>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### MetricObject_v2
 ```
 Write-Influx -InputObject <PSObject[]> [-Server <String>] [-Bulk] [-BulkSize <Int32>] [-ExcludeEmptyMetric]
  -Organisation <String> -Bucket <String> -Token <String> [-TrustServerCertificate] [-SingleLineMetrics]
- [-WhatIf] [-Confirm] [<CommonParameters>]
+ [-ProgressAction <ActionPreference>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### MetricObject_v1
 ```
 Write-Influx -InputObject <PSObject[]> [-Server <String>] [-Bulk] [-BulkSize <Int32>] [-ExcludeEmptyMetric]
- -Database <String> [-Credential <PSCredential>] [-TrustServerCertificate] [-SingleLineMetrics] [-WhatIf]
- [-Confirm] [<CommonParameters>]
+ -Database <String> [-Credential <PSCredential>] [-TrustServerCertificate] [-SingleLineMetrics]
+ [-ProgressAction <ActionPreference>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### Measure_v2
 ```
 Write-Influx -Measure <String> [-Tags <Hashtable>] -Metrics <Hashtable> [-TimeStamp <DateTime>]
  [-Server <String>] [-Bulk] [-BulkSize <Int32>] [-ExcludeEmptyMetric] -Organisation <String> -Bucket <String>
- -Token <String> [-TrustServerCertificate] [-SingleLineMetrics] [-WhatIf] [-Confirm] [<CommonParameters>]
+ -Token <String> [-TrustServerCertificate] [-SingleLineMetrics] [-ProgressAction <ActionPreference>] [-WhatIf]
+ [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -324,6 +325,21 @@ Prompts you for confirmation before running the cmdlet.
 Type: SwitchParameter
 Parameter Sets: (All)
 Aliases: cf
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ProgressAction
+{{Fill ProgressAction Description}}
+
+```yaml
+Type: ActionPreference
+Parameter Sets: (All)
+Aliases: proga
 
 Required: False
 Position: Named

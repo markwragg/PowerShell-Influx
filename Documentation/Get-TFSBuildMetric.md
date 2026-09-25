@@ -7,7 +7,7 @@ Returns TFS Build metrics as a metric object which can then be transmitted to In
 
 ```
 Get-TFSBuildMetric [[-Measure] <String>] [[-Tags] <String[]>] [[-Top] <Int32>] [-Latest] [-TFSRootURL] <String>
- [-TFSCollection] <String> [-TFSProject] <String> [<CommonParameters>]
+ [-TFSCollection] <String> [-TFSProject] <String> [-ProgressAction <ActionPreference>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -128,6 +128,21 @@ Aliases:
 
 Required: True
 Position: 6
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ProgressAction
+{{Fill ProgressAction Description}}
+
+```yaml
+Type: ActionPreference
+Parameter Sets: (All)
+Aliases: proga
+
+Required: False
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
