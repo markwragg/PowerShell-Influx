@@ -1,6 +1,6 @@
 # Change Log
 
-## !Deploy
+## [2.0.0] - 2026-09-25
 
 * [Breaking] Removed the unused `-Database` and `-Server` parameters from `Get-DatastoreMetric`. They had no effect (that function never writes to Influx); use the identically-named parameters on `Send-DatastoreMetric` instead.
 

@@ -6,7 +6,8 @@ Returns common ESX Host metrics as a metric object which can then be transmitted
 ## SYNTAX
 
 ```
-Get-HostMetric [[-Measure] <String>] [[-Tags] <String[]>] [[-Hosts] <String[]>] [-Stats] [<CommonParameters>]
+Get-HostMetric [[-Measure] <String>] [[-Tags] <String[]>] [[-Hosts] <String[]>] [-Stats]
+ [-ProgressAction <ActionPreference>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -82,6 +83,21 @@ Aliases:
 Required: False
 Position: Named
 Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ProgressAction
+{{Fill ProgressAction Description}}
+
+```yaml
+Type: ActionPreference
+Parameter Sets: (All)
+Aliases: proga
+
+Required: False
+Position: Named
+Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```

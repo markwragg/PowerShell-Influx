@@ -7,14 +7,15 @@ Send metrics to the Influx UDP listener (UDP must be enabled in influxdb.conf) f
 
 ### MetricObject
 ```
-Write-InfluxUDP [-InputObject] <PSObject[]> [-IP <IPAddress>] [-Port <Int32>] [-ExcludeEmptyMetric] [-WhatIf]
- [-Confirm] [<CommonParameters>]
+Write-InfluxUDP [-InputObject] <PSObject[]> [-IP <IPAddress>] [-Port <Int32>] [-ExcludeEmptyMetric]
+ [-ProgressAction <ActionPreference>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### Measure
 ```
 Write-InfluxUDP [-Measure] <String> [-Tags <Hashtable>] -Metrics <Hashtable> [-TimeStamp <DateTime>]
- [-IP <IPAddress>] [-Port <Int32>] [-ExcludeEmptyMetric] [-WhatIf] [-Confirm] [<CommonParameters>]
+ [-IP <IPAddress>] [-Port <Int32>] [-ExcludeEmptyMetric] [-ProgressAction <ActionPreference>] [-WhatIf]
+ [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -179,6 +180,21 @@ Prompts you for confirmation before running the cmdlet.
 Type: SwitchParameter
 Parameter Sets: (All)
 Aliases: cf
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ProgressAction
+{{Fill ProgressAction Description}}
+
+```yaml
+Type: ActionPreference
+Parameter Sets: (All)
+Aliases: proga
 
 Required: False
 Position: Named

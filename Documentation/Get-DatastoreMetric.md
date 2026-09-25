@@ -6,8 +6,8 @@ Returns Datastore metrics as a metric object which can then be transmitted to In
 ## SYNTAX
 
 ```
-Get-DatastoreMetric [[-Measure] <String>] [[-Tags] <String[]>] [[-Datastore] <String[]>] [[-Database] <String>]
- [[-Server] <String>] [<CommonParameters>]
+Get-DatastoreMetric [[-Measure] <String>] [[-Tags] <String[]>] [[-Datastore] <String[]>]
+ [-ProgressAction <ActionPreference>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -72,35 +72,17 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Database
-The name of the Influx database to write to.
-Default: 'vmware'.
-This must exist in Influx!
+### -ProgressAction
+{{Fill ProgressAction Description}}
 
 ```yaml
-Type: String
+Type: ActionPreference
 Parameter Sets: (All)
-Aliases:
+Aliases: proga
 
 Required: False
-Position: 4
-Default value: Vmware
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -Server
-The URL and port for the Influx REST API.
-Default: 'http://localhost:8086'
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 5
-Default value: Http://localhost:8086
+Position: Named
+Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
