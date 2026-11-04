@@ -1,6 +1,9 @@
 # PowerShell-Influx
 
-[![Build Status](https://dev.azure.com/markwragg/GitHub/_apis/build/status/markwragg.PowerShell-Influx?branchName=master)](https://dev.azure.com/markwragg/GitHub/_build/latest?definitionId=4&branchName=master) ![coverage](https://img.shields.io/badge/coverage-93%25-brightgreen.svg)
+[![Build Status](https://github.com/markwragg/PowerShell-Influx/actions/workflows/build.yml/badge.svg)](https://github.com/markwragg/PowerShell-Influx/actions/workflows/build.yml)
+![coverage](https://img.shields.io/badge/coverage-93%25-brightgreen.svg)
+[![PowerShell Gallery Version](https://img.shields.io/powershellgallery/v/Influx?label=PS%20Gallery)](https://www.powershellgallery.com/packages/Influx)
+[![PowerShell Gallery Downloads](https://img.shields.io/powershellgallery/dt/Influx?color=D3D3D3)](https://www.powershellgallery.com/packages/Influx)
 
 This is a PowerShell module for interacting with the time-series database platform Influx: https://www.influxdata.com/. At the moment the primary purpose is to enable a consistent experience for writing metrics in to Influx via the REST API, UDP or StatsD. 
 
