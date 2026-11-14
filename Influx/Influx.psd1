@@ -107,7 +107,7 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = 'https://github.com/markwragg/Powershell-Influx/blob/master/README.md'
+        ReleaseNotes = 'https://github.com/markwragg/PowerShell-Influx/blob/master/CHANGELOG.md'
 
         # Prerelease string of this module
         # Prerelease = ''
