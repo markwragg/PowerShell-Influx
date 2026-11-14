@@ -1,11 +1,13 @@
 # PowerShell-Influx
 
+[<img src="influx-logo.png" align="right" width="100">](https://www.influxdata.com/)
+
 [![Build Status](https://github.com/markwragg/PowerShell-Influx/actions/workflows/build.yml/badge.svg)](https://github.com/markwragg/PowerShell-Influx/actions/workflows/build.yml)
 ![coverage](https://img.shields.io/badge/coverage-93%25-brightgreen.svg)
 [![PowerShell Gallery Version](https://img.shields.io/powershellgallery/v/Influx?label=PS%20Gallery)](https://www.powershellgallery.com/packages/Influx)
 [![PowerShell Gallery Downloads](https://img.shields.io/powershellgallery/dt/Influx?color=D3D3D3)](https://www.powershellgallery.com/packages/Influx)
 
-This is a PowerShell module for interacting with the time-series database platform Influx: https://www.influxdata.com/. At the moment the primary purpose is to enable a consistent experience for writing metrics in to Influx via the REST API, UDP or StatsD. 
+This is a PowerShell module for interacting with the time-series database platform Influx: https://www.influxdata.com/. At the moment the primary purpose is to enable a consistent experience for writing metrics in to Influx via the REST API, UDP or StatsD.
 
 # Purpose
 
@@ -40,10 +42,10 @@ Write-Influx -Measure Server -Tags @{Hostname=$env:COMPUTERNAME} -Metrics @{Memo
 
 #REST API with authentication
 Write-Influx -Measure Server -Tags @{Hostname=$env:COMPUTERNAME} -Metrics @{Memory=50;CPU=10} -Database Web -Server http://myinflux.local:8086 -Credential (Get-Credential) -Verbose
- 
+
 #Influx UDP
 Write-InfluxUDP -Measure Server -Tags @{Hostname=$env:COMPUTERNAME} -Metrics @{Memory=50;CPU=10} -Database Web -IP 1.2.3.4 -Port 8089 -Verbose
- 
+
 #StatsD UDP
 Write-Statsd "Server.CPU,Hostname=$($env:COMPUTERNAME):10|g" -IP 1.2.3.4 -Port 8125 -Verbose
 ```
